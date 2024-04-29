@@ -108,38 +108,39 @@ layout = dbc.Container(
             $$
             f(\\underline x) = \\frac{1}{2\\pi \\sqrt{\\det(\\textbf{C})}}
             \\cdot \\exp\\!\\left\\{ -\\frac{1}{2}
-            \\cdot (\\underline x - \\underline \\mu)^\\top \\textbf{C}^{-1} (\\underline x - \\underline \\mu) \\right\\} \\enspace, \\quad \\underline{x}\\in \\mathbb{R}^2 \\enspace.
+            \\cdot (\\underline x - \\underline \\mu)^\\top \\textbf{C}^{-1} (\\underline x - \\underline \\mu) \\right\\} \\enspace, 
+            \\quad \\underline{x}\\in \\mathbb{R}^2 \\enspace, \\quad \\textbf{C} \\enspace \\text{positive semidefinite}  \\enspace.
             $$
 
             ### Formulas
             - quantile function \n
-              $Q(p) = \\mu + \\sigma\\, \\sqrt{2}\\, \\text{erf}^{-1}(2p-1)$
-            - uniform to Gaussian samples \n
-              $x_i^{\\text{Gauss}} = Q(x_i^{\\text{uni}})$
-            - golden Kronecker sequence  \n
-              $x_i^{\\text{uni}}=\\mod( \\Phi \\cdot (i+z), 1) \\enspace, \\quad i \\in \\{1,2,\\ldots,L\\}\\enspace, \\quad z \\in \\mathbb{Z}$
-            - equidistant samples \n
-              $x_i^{\\text{uni}} = \\frac{2 i - 1 + \\gamma}{2 L} \\enspace, \\quad i \\in \\{1,2,\\ldots,L\\}\\enspace,\\quad \\gamma\\in[-1,1]$
-            - unscented (𝐿=2)\n
-              $x_1=\\mu-\\sigma\\enspace, \\quad x_2=\\mu+\\sigma$
-            - unscented (𝐿=3) \n
-              TODO
+              $Q(p) = \\sqrt{2}\\, \\text{erf}^{-1}(2p-1)$
+            - uniform to SND \n
+              $\\underline x_i^{\\text{SND}} = Q(\\underline x_i^{\\text{uni}})$
+            - SND to Gauss: Cholesky \n
+              $\\underline x_i^{\\text{Gauss}} = \\mathrm{chol}(\\textbf{C}) \\cdot \\underline x_i^{\\text{SND}}$
+            - SND to Gauss: Eigendecomposition \n
+              $\\underline x_i^{\\text{Gauss}} = \\mathbf{V} \\cdot \\sqrt{\\mathbf{D}} \\cdot \\underline x_i^{\\text{SND}}$
+            - Fibonacci-Kronecker Lattice \n
+              $\\underline x_i^{\\text{uni}} = \\begin{bmatrix}\\mod( \\Phi \\cdot (i+z), 1) \\\\ \\frac{2 i - 1 + \\gamma}{2 L} \\end{bmatrix} \\enspace, \\quad i \\in \\{1,2,\\ldots,L\\}\\enspace, \\quad z \\in \\mathbb{Z}, \\quad \\gamma\\in[-1,1]$
+            - Unscented TODO
 
             ### Interactivity
-            - sampling methods
+            - sampling methods (radiobutton)
                 - independent identically distributed (iid), the usual random samples
-                - golden sequence, a low-discrepancy Kronecker sequence based on the golden ratio,
-                - equidistant, with identical amount of probability mass for all samples
-                - unscented transform sampling (𝐿=2)
+                - Fibonacci-Kronecker lattice, combination of 1D golden sequence and equidistant
+                - LCD see [JAIF16_Symmetric_S2KF_Steinbring](https://isif.org/media/smart-sampling-kalman-filter-symmetric-samples)
+                - unscented TODO
             - sampling parameter
                 - iid: dice again
-                - golden: integer offset 𝑧
-                - equidistant: offset 𝛾
-                - unscented: TODO
+                - Fibonacci: integer offset 𝑧, offset 𝛾
+                - LCD: SND rotation 𝛼, a proxy for dependency on initial guess during optimization
+                - unscented: scaling parameter
             - number of Samples 𝐿
             - density parameters
-                - mean 𝜇
-                - standard deviation 𝜎
+                - standard deviation $\\sigma_x$
+                - standard deviation $\\sigma_y$
+                - correlation coefficient $\\rho$
             ''',
             mathjax=True),
     ]), fluid=True, className="g-0")

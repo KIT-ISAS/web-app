@@ -11,6 +11,11 @@ layout = dbc.Container([
         Parameters can be interactively modified using sliders.
         Used in our lectures and for research.
         Created with Plotly Dash.
+
+        Repo: `https://github.com/KIT-ISAS/web-app`
+
+        Version History:
+        - 2024-04 | Daniel Frisch | gauss1d, gauss2d
         '''
         )
 ], fluid=True, className="g-0")

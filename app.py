@@ -17,7 +17,7 @@ app = Dash(__name__, external_stylesheets=external_stylesheets, server=server, u
 app.layout = dbc.Container([
     html.H1('ISAS Interactive'),
     dbc.Nav([
-        dbc.NavLink(html.Div(f"{page['name']}"), href=page["relative_path"], active="exact")
+        dbc.NavLink(html.Div(f"{page['name'].lower()}"), href=page["relative_path"], active="exact")
         for page in dash.page_registry.values()
     ], pills=True, className='bg-light'),
     html.P(),
@@ -26,6 +26,6 @@ app.layout = dbc.Container([
 
 if __name__ == '__main__':
     # processes=6, threaded=False,
-    # app.run(debug=True, threaded=True, host='0.0.0.0', port='8080')
-    app.run(debug=True, processes=6, threaded=False, host='0.0.0.0', port='8080')
+    app.run(debug=True, threaded=True, host='0.0.0.0', port='8080')
+    # app.run(debug=True, processes=6, threaded=False, host='0.0.0.0', port='8080')
     # app.run(debug=True)
