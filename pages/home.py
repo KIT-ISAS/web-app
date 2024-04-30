@@ -10,9 +10,8 @@ layout = dbc.Container([
         Responsive visualization of probability densities, samples, and filtering methods.
         Parameters can be interactively modified using sliders.
         Used in our lectures and for research.
-        Created with Plotly Dash.
 
-        Repo: `https://github.com/KIT-ISAS/web-app`
+        Code: https://github.com/KIT-ISAS/web-app
 
         Version History:
         - 2024-04 | Daniel Frisch | gauss1d, gauss2d

@@ -101,35 +101,44 @@ layout = dbc.Container(
 
         # Description
         dcc.Markdown(
-            '''
+            r'''
             ## 2D Gaussian
             Interactive visualizaton of the bivariate Gaussian density
 
             $$
-            f(\\underline x) = \\frac{1}{2\\pi \\sqrt{\\det(\\textbf{C})}}
-            \\cdot \\exp\\!\\left\\{ -\\frac{1}{2}
-            \\cdot (\\underline x - \\underline \\mu)^\\top \\textbf{C}^{-1} (\\underline x - \\underline \\mu) \\right\\} \\enspace, 
-            \\quad \\underline{x}\\in \\mathbb{R}^2 \\enspace, \\quad \\textbf{C} \\enspace \\text{positive semidefinite}  \\enspace.
+            f(\underline x) = \mathcal{N}(\underline x; \underline \mu, \textbf{C}) = 
+            \frac{1}{2\pi \sqrt{\det(\textbf{C})}}
+            \cdot \exp\!\left\{ -\frac{1}{2}
+            \cdot (\underline x - \underline \mu)^\top \textbf{C}^{-1} (\underline x - \underline \mu) \right\} \enspace,
+            \quad \underline{x}\in \mathbb{R}^2 \enspace, \quad \textbf{C} \enspace \text{positive semidefinite}  \enspace.
             $$
 
             ### Formulas
-            - quantile function \n
-              $Q(p) = \\sqrt{2}\\, \\text{erf}^{-1}(2p-1)$
-            - uniform to SND \n
-              $\\underline x_i^{\\text{SND}} = Q(\\underline x_i^{\\text{uni}})$
-            - SND to Gauss: Cholesky \n
-              $\\underline x_i^{\\text{Gauss}} = \\mathrm{chol}(\\textbf{C}) \\cdot \\underline x_i^{\\text{SND}}$
-            - SND to Gauss: Eigendecomposition \n
-              $\\underline x_i^{\\text{Gauss}} = \\mathbf{V} \\cdot \\sqrt{\\mathbf{D}} \\cdot \\underline x_i^{\\text{SND}}$
-            - Fibonacci-Kronecker Lattice \n
-              $\\underline x_i^{\\text{uni}} = \\begin{bmatrix}\\mod( \\Phi \\cdot (i+z), 1) \\\\ \\frac{2 i - 1 + \\gamma}{2 L} \\end{bmatrix} \\enspace, \\quad i \\in \\{1,2,\\ldots,L\\}\\enspace, \\quad z \\in \\mathbb{Z}, \\quad \\gamma\\in[-1,1]$
+            - quantile function  
+              $Q(p) = \sqrt{2}\, \text{erf}^{-1}(2p-1)$
+            - uniform to SND  
+              $\underline x_i^{\text{SND}} = Q(\underline x_i^{\text{uni}})$
+            - SND to Gauss: Cholesky  
+              $\underline x_i^{\text{Gauss}} = \mathrm{chol}(\textbf{C}) \cdot \underline x_i^{\text{SND}}$
+            - SND to Gauss: Eigendecomposition  
+              $\underline x_i^{\text{Gauss}} = \mathbf{V} \cdot \sqrt{\mathbf{D}} \cdot \underline x_i^{\text{SND}}$
+            - Fibonacci-Kronecker Lattice  
+              $\underline x_i^{\text{uni}} = \begin{bmatrix}\mod( \Phi \cdot (i+z), 1) \\ \frac{2 i - 1 + \gamma}{2 L} \end{bmatrix} \enspace,
+              \quad i \in \{1,2,\ldots,L\}\enspace, \quad z \in \mathbb{Z} \enspace, \quad \gamma\in[-1,1]$
+            - Localized Cumulative Distribution (LCD)  
+              $K(\underline x - \underline m, b) = \exp\!\left\{ -\frac{1}{2} \cdot \left\Vert \frac{\underline x - \underline m}{b} \right\Vert_2^2 \right\} \enspace,$  
+              $F(\underline m, b) = \int_{\mathbb{R}^2} f(\underline x) \, K(\underline x - \underline m, b) \, \text{d} \underline x \enspace,$  
+              $\widetilde f(x) = \mathcal{N}(\underline x; \underline 0, \textbf{I})$  
+              $f(\underline x) = \sum_{i=1}^L \delta(\underline x - \underline x_i)$  
+              $D = \int_{\mathbb{R}_+} w(b) \int_{\mathbb{R}^2} \left( \widetilde F(\underline m, b) - F(\underline m, b) \right)^2 \text{d} \underline m \, \text{d} b$  
+              $\left\{\underline x_i^{\text{SND}}\right\}_{i=0}^L = \arg \min_{\underline x_i} \{D\}$
             - Unscented TODO
 
             ### Interactivity
             - sampling methods (radiobutton)
                 - independent identically distributed (iid), the usual random samples
                 - Fibonacci-Kronecker lattice, combination of 1D golden sequence and equidistant
-                - LCD see [JAIF16_Symmetric_S2KF_Steinbring](https://isif.org/media/smart-sampling-kalman-filter-symmetric-samples)
+                - LCD SND samples, loaded from https://github.com/KIT-ISAS/deterministic-samples-csv
                 - unscented TODO
             - sampling parameter
                 - iid: dice again
@@ -138,9 +147,9 @@ layout = dbc.Container(
                 - unscented: scaling parameter
             - number of Samples 𝐿
             - density parameters
-                - standard deviation $\\sigma_x$
-                - standard deviation $\\sigma_y$
-                - correlation coefficient $\\rho$
+                - standard deviation $\sigma_x$
+                - standard deviation $\sigma_y$
+                - correlation coefficient $\rho$
             ''',
             mathjax=True),
     ]), fluid=True, className="g-0")
