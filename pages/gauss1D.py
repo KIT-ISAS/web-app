@@ -139,29 +139,29 @@ def update(smethod, p, L, μ, σ):
             fig.add_trace(go.Scatter(x=[μ, μ], y=[0, 1], name='Samples', mode='lines', marker_color=col_samples, showlegend=True))
     else:
         # Draw Samples
-        x = None
+        xGauss = None
         match smethod:
             case 'iid':
                 # xUni = sort(rand(L))
-                x = sort(randn(L)*σ + μ)
+                xGauss = sort(randn(L)*σ + μ)
             case 'Golden-Sequence':
                 xUni = (sqrt(5)-1)/2 * (arange(L)+1+round(p)) % 1
             case 'Equidistant':
                 xUni = (2*arange(L)+1+p)/(2*L)
             case 'Unscented':
                 if L == 0:
-                    x = array([])
+                    xGauss = array([])
                 if L == 1:
-                    x = array([μ])
+                    xGauss = array([μ])
                 else:
                     # TODO scaled unscented etc
-                    x = array([μ-σ, μ+σ])
+                    xGauss = array([μ-σ, μ+σ])
             case _:
                 raise Exception("Wrong smethod")
         # Transform Samples
-        if x is None:
-            x = σ*sqrt(2)*erfinv(2*xUni-1) + μ
-        L2 = len(x)
+        if xGauss is None:
+            xGauss = σ*sqrt(2)*erfinv(2*xUni-1) + μ
+        L2 = len(xGauss)
         sample_height = full([1, L2], gauss1(0, 0, σ))
         # sample_height = full([1, L], 1/L)
         # Plot Density
@@ -170,7 +170,7 @@ def update(smethod, p, L, μ, σ):
         # TODO lighter fillcolor: fillcolor=matplotlib.colors.to_rgba('#aabbcc80')
         fig.add_trace(go.Scatter(x=s, y=gauss1(s, μ, σ), hoverinfo='skip', line={'width': 5}, line_shape='spline', name='Density', fill='tozeroy', marker_color=col_density, showlegend=True))
         # Plot Samples
-        xp = vstack((x, x, full([1, L2], nan))).T.flatten()
+        xp = vstack((xGauss, xGauss, full([1, L2], nan))).T.flatten()
         yp = vstack((full([1, L2], 0), sample_height, full([1, L2], nan))).T.flatten()
         fig.add_trace(go.Scatter(x=xp, y=yp, name='Samples', mode='lines', marker_color=col_samples, showlegend=True))
     # Style

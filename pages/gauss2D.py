@@ -5,9 +5,9 @@ from urllib.error import HTTPError
 from dash import dcc, html, Input, Output, callback, Patch
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
-from numpy import sqrt, linspace, vstack, pi, nan, full, exp, square, arange, array, sin, cos, diff, matmul, log10, deg2rad
+from numpy import sqrt, linspace, vstack, hstack, pi, nan, full, exp, square, arange, array, sin, cos, diff, matmul, log10, deg2rad, identity
 from numpy.random import randn, randint
-from numpy.linalg import cholesky, eig
+from numpy.linalg import cholesky, eig, det
 from scipy.special import erfinv
 
 dash.register_page(__name__)
@@ -35,7 +35,7 @@ def url_SND_LCD(D, L):
 
 # Define Parameters
 # Sampling methods
-smethods = ['iid', 'Fibonacci', 'LCD']  # , 'Unscented'
+smethods = ['iid', 'Fibonacci', 'LCD', 'UT-Julier04']
 # Transformation methods
 tmethods = ['Cholesky', 'Eigendecomposition']
 # Colors
@@ -55,7 +55,7 @@ circ = vstack((cos(s), sin(s))) * 2
 # https://plotly.com/python-api-reference/generated/plotly.graph_objects.Scatter.html
 fig = go.Figure()
 fig.add_trace(go.Scatter(name='Density', x=[0], y=[0], mode='lines',   marker_color=col_density, showlegend=True, hoverinfo='skip', line={'width': 3}, line_shape='spline', fill='tozerox'))
-fig.add_trace(go.Scatter(name='Samples', x=[0], y=[0], mode='markers', marker_color=col_samples, showlegend=True))
+fig.add_trace(go.Scatter(name='Samples', x=[0], y=[0], mode='markers', marker_color=col_samples, showlegend=True, marker_size=10))
 fig.update_xaxes(range=rangx, tickmode='array', tickvals=list(range(rangx[0], rangx[1]+1)))
 fig.update_yaxes(range=rangy, tickmode='array', tickvals=list(range(rangy[0], rangy[1]+1)), scaleanchor="x", scaleratio=1)
 fig.update_layout(legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1))
@@ -140,13 +140,13 @@ layout = dbc.Container(
                 - Fibonacci-Kronecker lattice, combination of 1D golden sequence and equidistant
                 - LCD SND samples, loaded from https://github.com/KIT-ISAS/deterministic-samples-csv
                 - unscented TODO
-            - sampling parameter
+            - sampling parameter (slider)
                 - iid: dice again
                 - Fibonacci: integer offset 𝑧, offset 𝛾
                 - LCD: SND rotation 𝛼, a proxy for dependency on initial guess during optimization
                 - unscented: scaling parameter
-            - number of Samples 𝐿
-            - density parameters
+            - number of Samples 𝐿 (slider)
+            - density parameters (slider)
                 - standard deviation $\sigma_x$
                 - standard deviation $\sigma_y$
                 - correlation coefficient $\rho$
@@ -176,9 +176,9 @@ def update_smethod(smethod):
         case 'LCD':
             patched_tooltip.template = "α={value}°"
             return -360, 360, 0, 0.1, patched_tooltip
-        case 'Unscented':
-            patched_tooltip.template = "{value}"
-            return 0, 2, 1, 0.001, patched_tooltip
+        case 'UT-Julier04':
+            patched_tooltip.template = "W0={value}"
+            return 0, 1, .1, 0.001, patched_tooltip
         case _:
             raise Exception("Wrong smethod")
 
@@ -206,6 +206,7 @@ def update(smethod, tmethod, p, L0, σx, σy, ρ):
 
     patched_fig = Patch()
     # Draw SND
+    weights = None
     match smethod:
         case 'iid':
             xySND = randn(2, L)
@@ -217,16 +218,17 @@ def update(smethod, tmethod, p, L0, σx, σy, ρ):
         case 'LCD':
             xySND = get_data(url_SND_LCD(2, L))
             xySND = matmul(rot(p), xySND)
-        # case 'Unscented':
-        #     if L == 0:
-        #         x = array([])
-        #     elif L == 1:
-        #         x = array([μx])
-        #     elif L == 2:
-        #         # TODO scaled unscented etc
-        #         x = array([μx-σx, μx+σx])
-        #     else:
-        #         x = full([2,0], nan)
+        case 'UT-Julier04':
+            # https://ieeexplore.ieee.org/abstract/document/1271397
+            Nx = 2   # dimension
+            x0 = full([Nx, 1], 0)
+            W0 = full([1, 1], p)  # parameter, W0<1
+            x1 = sqrt(Nx/(1-W0) * identity(Nx))
+            W1 = full([1, Nx], (1-W0)/(2*Nx))
+            x2 = -x1
+            W2 = W1
+            xySND = hstack((x0, x1, x2))
+            weights = hstack((W0, W1, W2))
         case _:
             raise Exception("Wrong smethod")
     match tmethod:
@@ -236,13 +238,19 @@ def update(smethod, tmethod, p, L0, σx, σy, ρ):
             xyG = matmul(C_R, sqrt(C_D) * xySND) + μ
         case _:
             raise Exception("Wrong smethod")
-    # Plot Samples
-    patched_fig['data'][1]['x'] = xyG[0, :]
-    patched_fig['data'][1]['y'] = xyG[1, :]
+    # Adjust Weights
+    L2 = xySND.shape[1]  # actual #Samples
+    if weights is None:
+        weights = full([1, L2], 1/L2)
+    weights = weights * L2 * 100 * det(2*pi*C)**(1/4) / sqrt(L2)
     # Plot Ellipse
     elp = matmul(C_R * sqrt(C_D).T, circ) + μ
     patched_fig['data'][0]['x'] = elp[0, :]
     patched_fig['data'][0]['y'] = elp[1, :]
+    # Plot Samples
+    patched_fig['data'][1]['x'] = xyG[0, :]
+    patched_fig['data'][1]['y'] = xyG[1, :]
+    patched_fig['data'][1]['marker']['size'] = weights.flatten()
     return patched_fig
 
 
