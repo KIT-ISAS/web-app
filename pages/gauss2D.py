@@ -5,9 +5,9 @@ from urllib.error import HTTPError
 from dash import dcc, html, Input, Output, callback, Patch
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
-from numpy import sqrt, linspace, vstack, hstack, pi, nan, full, exp, square, arange, array, sin, cos, diff, matmul, log10, deg2rad, identity
+from numpy import sqrt, linspace, vstack, hstack, pi, nan, full, exp, square, arange, array, sin, cos, diff, matmul, log10, deg2rad, identity, ones, zeros, diag, cov, mean
 from numpy.random import randn, randint
-from numpy.linalg import cholesky, eig, det
+from numpy.linalg import cholesky, eig, det, inv
 from scipy.special import erfinv
 
 dash.register_page(__name__)
@@ -35,7 +35,7 @@ def url_SND_LCD(D, L):
 
 # Define Parameters
 # Sampling methods
-smethods = ['iid', 'Fibonacci', 'LCD', 'UT-Julier04']
+smethods = ['iid', 'Fibonacci', 'LCD', 'SP-Julier04', 'SP-Menegaz11']
 # Transformation methods
 tmethods = ['Cholesky', 'Eigendecomposition']
 # Colors
@@ -55,7 +55,7 @@ circ = vstack((cos(s), sin(s))) * 2
 # https://plotly.com/python-api-reference/generated/plotly.graph_objects.Scatter.html
 fig = go.Figure()
 fig.add_trace(go.Scatter(name='Density', x=[0], y=[0], mode='lines',   marker_color=col_density, showlegend=True, hoverinfo='skip', line={'width': 3}, line_shape='spline', fill='tozerox'))
-fig.add_trace(go.Scatter(name='Samples', x=[0], y=[0], mode='markers', marker_color=col_samples, showlegend=True, marker_size=10))
+fig.add_trace(go.Scatter(name='Samples', x=[0], y=[0], mode='markers', marker_color=col_samples, marker_line_color='black', marker_opacity=1, showlegend=True))
 fig.update_xaxes(range=rangx, tickmode='array', tickvals=list(range(rangx[0], rangx[1]+1)))
 fig.update_yaxes(range=rangy, tickmode='array', tickvals=list(range(rangy[0], rangy[1]+1)), scaleanchor="x", scaleratio=1)
 fig.update_layout(legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1))
@@ -86,7 +86,7 @@ layout = dbc.Container(
                    tooltip={"template": "p={value}", "placement": "bottom", "always_visible": True}),
 
         # L Slider
-        dcc.Slider(id="gauss2D-L", min=log10(1.2), max=4.001, step=0.001, value=2, updatemode='drag', marks=None,
+        dcc.Slider(id="gauss2D-L", min=log10(1.2), max=4.001, step=0.001, value=2, updatemode='drag', marks=None, # persistence=True,
                    tooltip={"template": "L={value}", "placement": "bottom", "always_visible": True, "transform": "trafo_L"}),
 
         # σ Slider
@@ -113,38 +113,59 @@ layout = dbc.Container(
             \quad \underline{x}\in \mathbb{R}^2 \enspace, \quad \textbf{C} \enspace \text{positive semidefinite}  \enspace.
             $$
 
-            ### Formulas
+            ### Formulas and Literature
             - quantile function  
-              $Q(p) = \sqrt{2}\, \text{erf}^{-1}(2p-1)$
+              $Q(p) = \sqrt{2}\, \mathrm{erf}^{-1}(2p-1)$
             - uniform to SND  
               $\underline x_i^{\text{SND}} = Q(\underline x_i^{\text{uni}})$
             - SND to Gauss: Cholesky  
               $\underline x_i^{\text{Gauss}} = \mathrm{chol}(\textbf{C}) \cdot \underline x_i^{\text{SND}}$
-            - SND to Gauss: Eigendecomposition  
+            - SND to Gauss: Eigendecomposition
+              [[Frisch23](https://isif.org/media/generalized-eibonacci-grid-low-discrepancy-point-set-optimal-deterministic-gaussian), eq. 18], 
+              [[Frisch21](https://ieeexplore.ieee.org/document/9626975), eq. 4]  
               $\underline x_i^{\text{Gauss}} = \mathbf{V} \cdot \sqrt{\mathbf{D}} \cdot \underline x_i^{\text{SND}}$
             - Fibonacci-Kronecker Lattice  
               $\underline x_i^{\text{uni}} = \begin{bmatrix}\mod( \Phi \cdot (i+z), 1) \\ \frac{2 i - 1 + \gamma}{2 L} \end{bmatrix} \enspace,
               \quad i \in \{1,2,\ldots,L\}\enspace, \quad z \in \mathbb{Z} \enspace, \quad \gamma\in[-1,1]$
-            - Localized Cumulative Distribution (LCD)  
-              $K(\underline x - \underline m, b) = \exp\!\left\{ -\frac{1}{2} \cdot \left\Vert \frac{\underline x - \underline m}{b} \right\Vert_2^2 \right\} \enspace,$  
-              $F(\underline m, b) = \int_{\mathbb{R}^2} f(\underline x) \, K(\underline x - \underline m, b) \, \text{d} \underline x \enspace,$  
-              $\widetilde f(x) = \mathcal{N}(\underline x; \underline 0, \textbf{I})$  
-              $f(\underline x) = \sum_{i=1}^L \delta(\underline x - \underline x_i)$  
-              $D = \int_{\mathbb{R}_+} w(b) \int_{\mathbb{R}^2} \left( \widetilde F(\underline m, b) - F(\underline m, b) \right)^2 \text{d} \underline m \, \text{d} b$  
+            - LCD: Localized Cumulative Distribution 
+              [[Hanebeck08](https://ieeexplore.ieee.org/document/4648104)],
+              [[Hanebeck09](https://ieeexplore.ieee.org/document/5400649)],
+              loaded from [library](https://github.com/KIT-ISAS/deterministic-samples-csv)  
+              $K(\underline x - \underline m, b) = \exp\!\left\{ -\frac{1}{2} \cdot \left\Vert \frac{\underline x - \underline m}{b} \right\Vert_2^2 \right\} \enspace, \quad
+              F(\underline m, b) = \int_{\mathbb{R}^2} f(\underline x) \, K(\underline x - \underline m, b) \, \mathrm{d} \underline x \enspace,$  
+              $\widetilde f(x) = \mathcal{N}(\underline x; \underline 0, \textbf{I}) \enspace, \quad
+              f(\underline x) = \sum_{i=1}^L \delta(\underline x - \underline x_i) \enspace,$  
+              $D = \int_{\mathbb{R}_+} w(b) \int_{\mathbb{R}^2} \left( \widetilde F(\underline m, b) - F(\underline m, b) \right)^2 \mathrm{d} \underline m \, \mathrm{d} b \enspace,$  
               $\left\{\underline x_i^{\text{SND}}\right\}_{i=0}^L = \arg \min_{\underline x_i} \{D\}$
-            - Unscented TODO
-
+            - SP-Julier14: Sigma Points 
+              [[Julier04](https://ieeexplore.ieee.org/document/1271397), eq. 12]  
+              $L=2\cdot d + 1 \enspace, \quad i\in\{1,2,\dots,d\} \enspace,$  
+              $\underline x_0=\underline 0 \enspace, \quad W_0 < 1 \enspace,$  
+              $\underline x_i = \sqrt{\frac{L}{1-W_0}} \cdot \underline e_i \enspace, \quad W_i = \frac{1-W_0}{2 L} \enspace,$  
+              $\underline x_{i+L} = -x_i \enspace, \quad W_{i+L} = W_i$
+            - SP-Menegaz11: Minimum Sigma Set 
+              [[Menegaz11](https://ieeexplore.ieee.org/abstract/document/6161480), eq. 2-8]  
+              $L=d+1 \enspace, \quad i \in \{1,2, \dots d\} \enspace,$  
+              $0 < w_0 < 1 \enspace, \quad 
+              \alpha=\sqrt{\frac{1-w_0}{d}} \enspace, \quad
+              C = \sqrt{\mathbf{I} - \alpha^2 \cdot \mathbf 1} \enspace, \quad
+              \underline x_0 = - \frac{\alpha}{\sqrt{w_0}} \cdot \underline 1$  
+              $w_{1\colon n} = \mathrm{diag}(w_0 \cdot \alpha^2 \cdot C^{-1} \cdot  \mathbf{1} \cdot (C^\top)^{-1}) \enspace,$  
+              $\underline x_{1\colon n} = C \cdot (\sqrt{\mathbf{I} \cdot w_{1\colon n}})^{-1}$
             ### Interactivity
             - sampling methods (radiobutton)
-                - independent identically distributed (iid), the usual random samples
-                - Fibonacci-Kronecker lattice, combination of 1D golden sequence and equidistant
-                - LCD SND samples, loaded from https://github.com/KIT-ISAS/deterministic-samples-csv
-                - unscented TODO
+                - Independent identically distributed (iid), the usual random samples. 
+                - Fibonacci-Kronecker lattice, combination of 1D golden sequence and equidistant. Use with eigendecomposition for best homogeneity.
+                - LCD SND samples. 
+                - Sigma Points - Julier04.
+            - transformation methods (radiobutton)
+                - Cholesky decomposition. 
+                - Eigenvalue-Eigenvector decomposition.
             - sampling parameter (slider)
                 - iid: dice again
                 - Fibonacci: integer offset 𝑧, offset 𝛾
                 - LCD: SND rotation 𝛼, a proxy for dependency on initial guess during optimization
-                - unscented: scaling parameter
+                - sigma points: scaling parameter
             - number of Samples 𝐿 (slider)
             - density parameters (slider)
                 - standard deviation $\sigma_x$
@@ -161,6 +182,7 @@ layout = dbc.Container(
     Output('gauss2D-p', 'value'),
     Output('gauss2D-p', 'step'),
     Output('gauss2D-p', 'tooltip'),
+    Output('gauss2D-L', 'disabled'),
     Input("gauss2D-smethod", "value"),
 )
 def update_smethod(smethod):
@@ -169,16 +191,19 @@ def update_smethod(smethod):
         case 'iid':
             patched_tooltip.template = "dice"
             # min, max, value, step, tooltip
-            return 0, 1, .5, 0.001, patched_tooltip
+            return 0, 1, .5, 0.001, patched_tooltip, False
         case 'Fibonacci':
             patched_tooltip.template = "z={value}"
-            return -50, 50, 0, 1, patched_tooltip
+            return -50, 50, 0, 1, patched_tooltip, False
         case 'LCD':
             patched_tooltip.template = "α={value}°"
-            return -360, 360, 0, 0.1, patched_tooltip
-        case 'UT-Julier04':
-            patched_tooltip.template = "W0={value}"
-            return 0, 1, .1, 0.001, patched_tooltip
+            return -360, 360, 0, 0.1, patched_tooltip, False
+        case 'SP-Julier04':
+            patched_tooltip.template = "W₀={value}"
+            return -2, 1, .1, 0.001, patched_tooltip, True
+        case 'SP-Menegaz11':
+            patched_tooltip.template = "Wₙ₊₁={value}"
+            return 0, 1, 1/3, 0.001, patched_tooltip, True
         case _:
             raise Exception("Wrong smethod")
 
@@ -218,10 +243,10 @@ def update(smethod, tmethod, p, L0, σx, σy, ρ):
         case 'LCD':
             xySND = get_data(url_SND_LCD(2, L))
             xySND = matmul(rot(p), xySND)
-        case 'UT-Julier04':
+        case 'SP-Julier04':
             # https://ieeexplore.ieee.org/abstract/document/1271397
             Nx = 2   # dimension
-            x0 = full([Nx, 1], 0)
+            x0 = zeros([Nx, 1])
             W0 = full([1, 1], p)  # parameter, W0<1
             x1 = sqrt(Nx/(1-W0) * identity(Nx))
             W1 = full([1, Nx], (1-W0)/(2*Nx))
@@ -229,6 +254,19 @@ def update(smethod, tmethod, p, L0, σx, σy, ρ):
             W2 = W1
             xySND = hstack((x0, x1, x2))
             weights = hstack((W0, W1, W2))
+        case 'SP-Menegaz11':
+            # https://ieeexplore.ieee.org/abstract/document/6161480
+            n = 2  # dimension
+            w0 = p  # parameter, 0<w0<1
+            α = sqrt((1-w0)/n)
+            CC2 = identity(n) - α**2
+            CC = cholesky(CC2)
+            w1 = diag(w0 * α**2 * matmul(matmul(inv(CC), ones([n, n])), inv(CC.T)))
+            x0 = full([n, 1], -α/sqrt(w0))
+            x1 = matmul(CC, inv(identity(n)*sqrt(w1)))
+            # x1 = CC / sqrt(W1)
+            xySND = hstack((x0, x1))
+            weights = hstack((p, w1))
         case _:
             raise Exception("Wrong smethod")
     match tmethod:
@@ -238,19 +276,26 @@ def update(smethod, tmethod, p, L0, σx, σy, ρ):
             xyG = matmul(C_R, sqrt(C_D) * xySND) + μ
         case _:
             raise Exception("Wrong smethod")
-    # Adjust Weights
-    L2 = xySND.shape[1]  # actual #Samples
-    if weights is None:
-        weights = full([1, L2], 1/L2)
-    weights = weights * L2 * 100 * det(2*pi*C)**(1/4) / sqrt(L2)
+    # Sample weights to scatter sizes
+    L2 = xySND.shape[1]  # actual number of saamples
+    if L2 == 0:
+        sizes = 10
+    else:
+        if weights is None:
+            weights = 1/L2  # equally weighted
+        else:
+            weights = weights.flatten()
+        sizes = sqrt(abs(weights) * L2) * det(2*pi*C)**(1/4) / sqrt(L2) * 70
+    # print(hstack((cov(xyG, bias=True, aweights=weights), C)))
     # Plot Ellipse
-    elp = matmul(C_R * sqrt(C_D).T, circ) + μ
+    elp = matmul(C_R, sqrt(C_D) * circ) + μ
     patched_fig['data'][0]['x'] = elp[0, :]
     patched_fig['data'][0]['y'] = elp[1, :]
     # Plot Samples
     patched_fig['data'][1]['x'] = xyG[0, :]
     patched_fig['data'][1]['y'] = xyG[1, :]
-    patched_fig['data'][1]['marker']['size'] = weights.flatten()
+    patched_fig['data'][1]['marker']['size'] = sizes
+    patched_fig['data'][1]['marker']['line']['width'] = sizes/20
     return patched_fig
 
 

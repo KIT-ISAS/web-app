@@ -57,7 +57,7 @@ layout = dbc.Container(
 
             ### Formulas
             - quantile function  
-              $Q(p) = \mu + \sigma\, \sqrt{2}\, \text{erf}^{-1}(2p-1)$
+              $Q(p) = \mu + \sigma\, \sqrt{2}\, \mathrm{erf}^{-1}(2p-1)$
             - uniform to Gaussian  
               $x_i^{\text{Gauss}} = Q(x_i^{\text{uni}})$
             - golden Kronecker sequence   
@@ -101,6 +101,7 @@ rang = [-5, 5]
     Output('gauss1D-p', 'value'),
     Output('gauss1D-p', 'step'),
     Output('gauss1D-p', 'tooltip'),
+    Output('gauss1D-L', 'disabled'),
     Input("gauss1D-smethod", "value"),
 )
 def update_smethod(smethod):
@@ -108,16 +109,16 @@ def update_smethod(smethod):
     match smethod:
         case 'iid':
             patched_tooltip.template = "dice"
-            return 0, 1, .5, 0.001, patched_tooltip
+            return 0, 1, .5, 0.001, patched_tooltip, False
         case 'Golden-Sequence':
             patched_tooltip.template = "z={value}"
-            return -50, 50, 0, 1, patched_tooltip
+            return -50, 50, 0, 1, patched_tooltip, False
         case 'Equidistant':
             patched_tooltip.template = "γ={value}"
-            return -1, 1, 0, 0.001, patched_tooltip
+            return -1, 1, 0, 0.001, patched_tooltip, False
         case 'Unscented':
             patched_tooltip.template = "{value}"
-            return 0, 2, 1, 0.001, patched_tooltip
+            return 0, 2, 1, 0.001, patched_tooltip, True
         case _:
             raise Exception("Wrong smethod")
 
@@ -149,13 +150,8 @@ def update(smethod, p, L, μ, σ):
             case 'Equidistant':
                 xUni = (2*arange(L)+1+p)/(2*L)
             case 'Unscented':
-                if L == 0:
-                    xGauss = array([])
-                if L == 1:
-                    xGauss = array([μ])
-                else:
-                    # TODO scaled unscented etc
-                    xGauss = array([μ-σ, μ+σ])
+                # TODO scaled unscented etc
+                xGauss = array([μ-σ, μ+σ])  # TODO parameter
             case _:
                 raise Exception("Wrong smethod")
         # Transform Samples
