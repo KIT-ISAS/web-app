@@ -86,7 +86,7 @@ layout = dbc.Container(
                    tooltip={"template": "p={value}", "placement": "bottom", "always_visible": True}),
 
         # L Slider
-        dcc.Slider(id="gauss2D-L", min=log10(1.2), max=4.001, step=0.001, value=2, updatemode='drag', marks=None, # persistence=True,
+        dcc.Slider(id="gauss2D-L", min=log10(1.2), max=4.001, step=0.001, value=2, updatemode='drag', marks=None,  # persistence=True,
                    tooltip={"template": "L={value}", "placement": "bottom", "always_visible": True, "transform": "trafo_L"}),
 
         # σ Slider
@@ -236,6 +236,7 @@ def update(smethod, tmethod, p, L0, σx, σy, ρ):
         case 'iid':
             xySND = randn(2, L)
         case 'Fibonacci':
+            # TODO 2nd parameter
             xUni = (sqrt(5)-1)/2 * (arange(L)+1+round(p)) % 1
             yUni = (2*arange(L)+1)/(2*L)  # +p
             xyUni = vstack((xUni, yUni))
