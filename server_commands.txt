@@ -1,4 +1,8 @@
 
+# Create server
+https://portal.bw-cloud.org/project/instances/
+https://www.bw-cloud.org/de/bwcloud_scope/nutzen
+
 # Log in
 ssh isas-interactive
 
@@ -19,7 +23,7 @@ pip install -r requirements.txt
 nohup python app.py &
 
 # Official production solution
-gunicorn --bind localhost:8050 app:server
+gunicorn --bind 0.0.0.0:8080 app:server
 
 # Test in Browser
 http://193.196.38.30:8080

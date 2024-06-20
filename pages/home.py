@@ -36,6 +36,7 @@ layout = dbc.Container([
         - Tracking example: 3D Line
         - trisurf, Isosurface: sample on sphere, torus, 
         - make plots resizable: https://stackoverflow.com/questions/17855401/how-do-i-make-a-div-width-draggable 
+        - Distributed Sampling: Fusion of two 2D Gaussians; show naive, CI, ICI; sliders for 4 variances, 2 visible and 4 hidden correlations
         '''
         )
 ], fluid=True, className="g-0")
