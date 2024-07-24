@@ -6,10 +6,13 @@ https://www.bw-cloud.org/de/bwcloud_scope/nutzen
 # Log in
 ssh isas-interactive
 
+# Update
+sudo apt-get dist-upgrade
+
 # Install
-sudo apt update
-sudo apt install git
-sudo apt install virtualenv
+sudo apt-get update
+sudo apt-get install git
+sudo apt-get install virtualenv
 
 rm ./web-app
 git clone https://github.com/KIT-ISAS/web-app.git
