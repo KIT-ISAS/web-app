@@ -1,7 +1,8 @@
 import plotly
 import dash
 import pandas
-from sampling_test import update_sampling
+from pages.sampling_test import update_julier
+from pages.sampling_test import update_mengazz
 from urllib.error import HTTPError
 from dash import dcc, html, Input, Output, callback, Patch
 import plotly.graph_objects as go
@@ -219,7 +220,7 @@ def update_smethod(smethod):
     Input("gauss2D-σy", "value"),
     Input("gauss2D-ρ", "value"),
 )
-def update_sampling(smethod, tmethod, p, L0, σx, σy, ρ, dim): #dim = dimension
+def update_sampling(smethod, tmethod, p, L0, σx, σy, ρ):
     # Slider Transform,
     L = trafo_L(L0)
     # Mean
@@ -247,32 +248,10 @@ def update_sampling(smethod, tmethod, p, L0, σx, σy, ρ, dim): #dim = dimensio
             xySND = matmul(rot(p), xySND)
         case 'SP-Julier04':
             # https://ieeexplore.ieee.org/abstract/document/1271397
-            Nx = dim   # dimension
-            x0 = zeros([Nx, 1])
-            W0 = full([1, 1], p)  # parameter, W0<1
-            x1 = sqrt(Nx/(1-W0) * identity(Nx))
-            W1 = full([1, Nx], (1-W0)/(2*Nx))
-            if Nx > 1:
-                x2 = -x1
-                W2 = W1
-                xySND = hstack((x0, x1, x2))
-                weights = hstack((W0, W1, W2))
-            else:
-                xySND = hstack((x0,x1))
-                weights = hstack((W0,W1))
+            update_julier(smethod, tmethod, p, L0, σx, σy, ρ, 2, xySND, weights)
         case 'SP-Menegaz11':
             # https://ieeexplore.ieee.org/abstract/document/6161480
-            n = dim  # dimension
-            w0 = p  # parameter, 0<w0<1
-            α = sqrt((1-w0)/n)
-            CC2 = identity(n) - α**2
-            CC = cholesky(CC2)
-            w1 = diag(w0 * α**2 * matmul(matmul(inv(CC), ones([n, n])), inv(CC.T)))
-            x0 = full([n, 1], -α/sqrt(w0))
-            x1 = matmul(CC, inv(identity(n)*sqrt(w1)))
-            # x1 = CC / sqrt(W1)
-            xySND = hstack((x0, x1))
-            weights = hstack((p, w1))
+            update_mengazz(smethod, tmethod, p, L0, σx, σy, ρ, 2)
         case _:
             raise Exception("Wrong smethod")
     match tmethod:
