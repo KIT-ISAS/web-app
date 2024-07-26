@@ -26,6 +26,6 @@ app.layout = dbc.Container([
 
 if __name__ == '__main__':
     # processes=6, threaded=False,
-    app.run(debug=True, threaded=True, host='0.0.0.0', port='8080')
+    app.run(debug=True, threaded=True, host='127.0.0.1', port='8080')
     # app.run(debug=True, processes=6, threaded=False, host='0.0.0.0', port='8080')
     # app.run(debug=True)

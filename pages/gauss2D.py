@@ -1,6 +1,7 @@
 import plotly
 import dash
 import pandas
+from sampling_test import update_sampling
 from urllib.error import HTTPError
 from dash import dcc, html, Input, Output, callback, Patch
 import plotly.graph_objects as go
@@ -218,7 +219,7 @@ def update_smethod(smethod):
     Input("gauss2D-σy", "value"),
     Input("gauss2D-ρ", "value"),
 )
-def update(smethod, tmethod, p, L0, σx, σy, ρ):
+def update_sampling(smethod, tmethod, p, L0, σx, σy, ρ, dim): #dim = dimension
     # Slider Transform,
     L = trafo_L(L0)
     # Mean
@@ -246,18 +247,22 @@ def update(smethod, tmethod, p, L0, σx, σy, ρ):
             xySND = matmul(rot(p), xySND)
         case 'SP-Julier04':
             # https://ieeexplore.ieee.org/abstract/document/1271397
-            Nx = 2   # dimension
+            Nx = dim   # dimension
             x0 = zeros([Nx, 1])
             W0 = full([1, 1], p)  # parameter, W0<1
             x1 = sqrt(Nx/(1-W0) * identity(Nx))
             W1 = full([1, Nx], (1-W0)/(2*Nx))
-            x2 = -x1
-            W2 = W1
-            xySND = hstack((x0, x1, x2))
-            weights = hstack((W0, W1, W2))
+            if Nx > 1:
+                x2 = -x1
+                W2 = W1
+                xySND = hstack((x0, x1, x2))
+                weights = hstack((W0, W1, W2))
+            else:
+                xySND = hstack((x0,x1))
+                weights = hstack((W0,W1))
         case 'SP-Menegaz11':
             # https://ieeexplore.ieee.org/abstract/document/6161480
-            n = 2  # dimension
+            n = dim  # dimension
             w0 = p  # parameter, 0<w0<1
             α = sqrt((1-w0)/n)
             CC2 = identity(n) - α**2

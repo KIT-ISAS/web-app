@@ -1,5 +1,4 @@
 import plotly
-import dash
 import pandas
 from urllib.error import HTTPError
 from dash import dcc, html, Input, Output, callback, Patch
@@ -31,67 +30,7 @@ def url_SND_LCD(D, L):
     return f'https://raw.githubusercontent.com/KIT-ISAS/deterministic-samples-csv/main/standard-normal/glcd/D{D}-N{L}.csv'
 
 
-# Define Parameters
-# Sampling methods
-smethods = ['iid', 'Fibonacci', 'LCD', 'SP-Julier04', 'SP-Menegaz11']
-# Transformation methods
-tmethods = ['Cholesky', 'Eigendecomposition']
-# Colors
-col_density = plotly.colors.qualitative.Plotly[1]
-col_samples = plotly.colors.qualitative.Plotly[0]
-# axis limits
-rangx = [-5, 5]
-rangy = [-4, 4]
-# plot size relative to window size
-relwidth = 100
-relheight = round((relwidth/diff(rangx)*diff(rangy))[0])
-# Gauss ellipse
-s = linspace(0, 2*pi, 500)
-circ = vstack((cos(s), sin(s))) * 2
-
-@callback(
-    Output('gauss2D-p', 'min'),
-    Output('gauss2D-p', 'max'),
-    Output('gauss2D-p', 'value'),
-    Output('gauss2D-p', 'step'),
-    Output('gauss2D-p', 'tooltip'),
-    Output('gauss2D-L', 'disabled'),
-    Input("gauss2D-smethod", "value"),
-)
-def update_smethod(smethod):
-    patched_tooltip = Patch()
-    match smethod:
-        case 'iid':
-            patched_tooltip.template = "dice"
-            # min, max, value, step, tooltip
-            return 0, 1, .5, 0.001, patched_tooltip, False
-        case 'Fibonacci':
-            patched_tooltip.template = "z={value}"
-            return -50, 50, 0, 1, patched_tooltip, False
-        case 'LCD':
-            patched_tooltip.template = "α={value}°"
-            return -360, 360, 0, 0.1, patched_tooltip, False
-        case 'SP-Julier04':
-            patched_tooltip.template = "W₀={value}"
-            return -2, 1, .1, 0.001, patched_tooltip, True
-        case 'SP-Menegaz11':
-            patched_tooltip.template = "Wₙ₊₁={value}"
-            return 0, 1, 1/3, 0.001, patched_tooltip, True
-        case _:
-            raise Exception("Wrong smethod")
-
-
-@callback(
-    Output("gauss2D-graph", "figure"),
-    Input("gauss2D-smethod", "value"),
-    Input("gauss2D-tmethod", "value"),
-    Input("gauss2D-p", "value"),
-    Input("gauss2D-L", "value"),
-    Input("gauss2D-σx", "value"),
-    Input("gauss2D-σy", "value"),
-    Input("gauss2D-ρ", "value"),
-)
-def update(smethod, tmethod, p, L0, σx, σy, ρ):
+def update_sampling(smethod, tmethod, p, L0, σx, σy, ρ, dim): #dim = dimension
     # Slider Transform,
     L = trafo_L(L0)
     # Mean
@@ -119,7 +58,7 @@ def update(smethod, tmethod, p, L0, σx, σy, ρ):
             xySND = matmul(rot(p), xySND)
         case 'SP-Julier04':
             # https://ieeexplore.ieee.org/abstract/document/1271397
-            Nx = int   # dimension
+            Nx = dim   # dimension
             x0 = zeros([Nx, 1])
             W0 = full([1, 1], p)  # parameter, W0<1
             x1 = sqrt(Nx/(1-W0) * identity(Nx))
@@ -134,7 +73,7 @@ def update(smethod, tmethod, p, L0, σx, σy, ρ):
                 weights = hstack((W0,W1))
         case 'SP-Menegaz11':
             # https://ieeexplore.ieee.org/abstract/document/6161480
-            n = int  # dimension
+            n = dim  # dimension
             w0 = p  # parameter, 0<w0<1
             α = sqrt((1-w0)/n)
             CC2 = identity(n) - α**2
