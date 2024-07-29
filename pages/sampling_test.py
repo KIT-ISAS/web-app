@@ -5,7 +5,7 @@ from numpy.random import randn, randint
 from numpy.linalg import cholesky, eig, det, inv
 from scipy.special import erfinv
 
-def update_julier(smethod, tmethod, p, L0, σx, σy, ρ, Nx): #Nx = dimension
+def update_julier(p, Nx): #Nx = dimension
     x0 = zeros([Nx, 1])
     W0 = full([1, 1], p)  # parameter, W0<1
     x1 = sqrt(Nx/(1-W0) * identity(Nx))
@@ -15,13 +15,14 @@ def update_julier(smethod, tmethod, p, L0, σx, σy, ρ, Nx): #Nx = dimension
         W2 = W1
         xySND = hstack((x0, x1, x2))
         weights = hstack((W0, W1, W2))
+        return xySND, weights
     else:
         xySND = hstack((x0,x1))
         weights = hstack((W0,W1))
-
+        return xySND, weights
 
     
-def update_mengazz(smethod, tmethod, p, L0, σx, σy, ρ, dim): #dim = dimension
+def update_mengazz(p, dim): #dim = dimension
     # https://ieeexplore.ieee.org/abstract/document/6161480
     n = dim  # dimension
     w0 = p  # parameter, 0<w0<1
@@ -34,3 +35,4 @@ def update_mengazz(smethod, tmethod, p, L0, σx, σy, ρ, dim): #dim = dimension
     # x1 = CC / sqrt(W1)
     xySND = hstack((x0, x1))
     weights = hstack((p, w1))
+    return xySND, weights

@@ -248,10 +248,12 @@ def update_sampling(smethod, tmethod, p, L0, σx, σy, ρ):
             xySND = matmul(rot(p), xySND)
         case 'SP-Julier04':
             # https://ieeexplore.ieee.org/abstract/document/1271397
-            update_julier(smethod, tmethod, p, L0, σx, σy, ρ, 2, xySND, weights)
+            xySND = update_julier(p, 2)[0]
+            weights = update_julier(p,2)[1]
         case 'SP-Menegaz11':
             # https://ieeexplore.ieee.org/abstract/document/6161480
-            update_mengazz(smethod, tmethod, p, L0, σx, σy, ρ, 2)
+            xySND = update_mengazz(p, 2)[0]
+            weights = update_mengazz(p,2)[1]
         case _:
             raise Exception("Wrong smethod")
     match tmethod:
