@@ -1,4 +1,9 @@
 
+# Lokal Testen
+source .venv/bin/activate
+python app.py
+http://193.196.38.30:8080
+
 # Create server
 https://portal.bw-cloud.org/project/instances/
 https://www.bw-cloud.org/de/bwcloud_scope/nutzen
