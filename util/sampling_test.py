@@ -14,8 +14,6 @@ def update_julier(p, Nx): #Nx = dimension
     W2 = W1
     xySND = hstack((x0, x1, x2))
     weights = hstack((W0, W1, W2))
-    print(xySND)
-    print(weights)
     return xySND, weights
 
     
@@ -32,8 +30,4 @@ def update_mengazz(p, dim): #dim = dimension
     # x1 = CC / sqrt(W1)
     xySND = hstack((x0, x1))
     weights = hstack((p, w1))
-    print(xySND)
-    print(weights)
     return xySND, weights
-
-update_julier(1/3,2)

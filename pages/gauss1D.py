@@ -1,6 +1,8 @@
 import plotly
 import dash
 from dash import dcc, html, Input, Output, callback, Patch
+from util.sampling_test import update_julier
+from util.sampling_test import update_mengazz
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
 from numpy import sqrt, linspace, vstack, pi, nan, full, exp, square, sort, arange, array
@@ -118,7 +120,7 @@ def update_smethod(smethod):
             return -1, 1, 0, 0.001, patched_tooltip, False
         case 'Unscented':
             patched_tooltip.template = "{value}"
-            return 0, 2, 1, 0.001, patched_tooltip, True
+            return 0, 1, 1, 0.001, patched_tooltip, True #changed to 1
         case _:
             raise Exception("Wrong smethod")
 
@@ -132,6 +134,7 @@ def update_smethod(smethod):
     Input("gauss1D-σ", "value"),
 )
 def update(smethod, p, L, μ, σ):
+    weights = None
     fig = go.Figure()
     if σ == 0:
         # Dirac Delta
@@ -151,13 +154,19 @@ def update(smethod, p, L, μ, σ):
                 xUni = (2*arange(L)+1+p)/(2*L)
             case 'Unscented':
                 # TODO scaled unscented etc
-                xGauss = array([μ-σ, μ+σ])  # TODO parameter
+                #xGauss = array([μ-σ, μ+σ])  # TODO parameter
+                xGauss = update_julier(p,1)[0]
+                weights = update_julier(p,1)[1]
+                if weights is None:
+                    weights = 1/L2  # equally weighted
+                else:
+                    weights = weights.flatten()
             case _:
                 raise Exception("Wrong smethod")
         # Transform Samples
         if xGauss is None:
             xGauss = σ*sqrt(2)*erfinv(2*xUni-1) + μ
-        L2 = len(xGauss)
+        L2 = xGauss.size
         sample_height = full([1, L2], gauss1(0, 0, σ))
         # sample_height = full([1, L], 1/L)
         # Plot Density
@@ -166,6 +175,7 @@ def update(smethod, p, L, μ, σ):
         # TODO lighter fillcolor: fillcolor=matplotlib.colors.to_rgba('#aabbcc80')
         fig.add_trace(go.Scatter(x=s, y=gauss1(s, μ, σ), hoverinfo='skip', line={'width': 5}, line_shape='spline', name='Density', fill='tozeroy', marker_color=col_density, showlegend=True))
         # Plot Samples
+        #print(vstack((xGauss, xGauss, full([1, L2], nan))))
         xp = vstack((xGauss, xGauss, full([1, L2], nan))).T.flatten()
         yp = vstack((full([1, L2], 0), sample_height, full([1, L2], nan))).T.flatten()
         fig.add_trace(go.Scatter(x=xp, y=yp, name='Samples', mode='lines', marker_color=col_samples, showlegend=True))
