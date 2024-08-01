@@ -10,16 +10,13 @@ def update_julier(p, Nx): #Nx = dimension
     W0 = full([1, 1], p)  # parameter, W0<1
     x1 = sqrt(Nx/(1-W0) * identity(Nx))
     W1 = full([1, Nx], (1-W0)/(2*Nx))
-    if Nx > 1:
-        x2 = -x1
-        W2 = W1
-        xySND = hstack((x0, x1, x2))
-        weights = hstack((W0, W1, W2))
-        return xySND, weights
-    else:
-        xySND = hstack((x0,x1))
-        weights = hstack((W0,W1))
-        return xySND, weights
+    x2 = -x1
+    W2 = W1
+    xySND = hstack((x0, x1, x2))
+    weights = hstack((W0, W1, W2))
+    print(xySND)
+    print(weights)
+    return xySND, weights
 
     
 def update_mengazz(p, dim): #dim = dimension
@@ -35,4 +32,8 @@ def update_mengazz(p, dim): #dim = dimension
     # x1 = CC / sqrt(W1)
     xySND = hstack((x0, x1))
     weights = hstack((p, w1))
+    print(xySND)
+    print(weights)
     return xySND, weights
+
+update_julier(1/3,2)

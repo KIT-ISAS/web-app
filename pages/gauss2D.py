@@ -1,8 +1,8 @@
 import plotly
 import dash
 import pandas
-from pages.sampling_test import update_julier
-from pages.sampling_test import update_mengazz
+from util.sampling_test import update_julier
+from util.sampling_test import update_mengazz
 from urllib.error import HTTPError
 from dash import dcc, html, Input, Output, callback, Patch
 import plotly.graph_objects as go
