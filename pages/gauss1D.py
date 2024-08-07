@@ -167,7 +167,7 @@ def update(smethod, p, L, μ, σ):
         if xGauss is None:
             xGauss = σ*sqrt(2)*erfinv(2*xUni-1) + μ
         L2 = xGauss.size
-        sample_height = full([1, L2], gauss1(0, 0, σ))
+        sample_height = full([1, L2], gauss1(xGauss, μ, σ)) #channged it to the height of density
         # sample_height = full([1, L], 1/L)
         # Plot Density
         s = linspace(rang[0], rang[1], 500)
