@@ -2,7 +2,7 @@
 # Lokal Testen
 source .venv/bin/activate
 python app.py
-http://193.196.38.30:8080
+http://127.0.0.1:8080/
 
 # Create server
 https://portal.bw-cloud.org/project/instances/
