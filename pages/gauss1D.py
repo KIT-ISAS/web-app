@@ -173,11 +173,10 @@ def update(smethod, p, L, μ, σ):
             case 'Julier':
                 # TODO scaled unscented etc
                 #xGauss = array([μ-σ, μ+σ])  # TODO parameter
-                xGauss = update_julier(p,1)[0]
-                weights = update_julier(p,1)[1]
+                xGauss,weights = update_julier(p,1)
+                #weights = update_julier(p,1)[1]
             case 'Mengazz':
-                xGauss = update_mengazz(p,1)[0]
-                weights = update_mengazz(p,1)[1]
+                xGauss,weights = update_mengazz(p,1)
             case _:
                 raise Exception("Wrong smethod")
         # Transform Samples
