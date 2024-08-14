@@ -11,7 +11,7 @@ from scipy.special import erfinv
 
 dash.register_page(__name__)
 
-methods = ['iid', 'Golden-Sequence', 'Equidistant', 'Unscented']
+methods = ['iid', 'Golden-Sequence', 'Equidistant', 'Julier', 'Mengazz']
 
 layout = dbc.Container(
     dbc.Col([
@@ -66,6 +66,21 @@ layout = dbc.Container(
               $x_i^{\text{uni}}=\mod( \Phi \cdot (i+z), 1) \enspace, \quad i \in \{1,2,\ldots,L\}\enspace, \quad z \in \mathbb{Z}$
             - equidistant samples  
               $x_i^{\text{uni}} = \frac{2 i - 1 + \gamma}{2 L} \enspace, \quad i \in \{1,2,\ldots,L\}\enspace,\quad \gamma\in[-1,1]$
+            - SP-Julier14: Sigma Points 
+              [[Julier04](https://ieeexplore.ieee.org/document/1271397), eq. 12]  
+              $L=2\cdot d + 1 \enspace, \quad i\in\{1,2,\dots,d\} \enspace,$  
+              $\underline x_0=\underline 0 \enspace, \quad W_0 < 1 \enspace,$  
+              $\underline x_i = \sqrt{\frac{L}{1-W_0}} \cdot \underline e_i \enspace, \quad W_i = \frac{1-W_0}{2 L} \enspace,$  
+              $\underline x_{i+L} = -x_i \enspace, \quad W_{i+L} = W_i$
+            - SP-Menegaz11: Minimum Sigma Set 
+              [[Menegaz11](https://ieeexplore.ieee.org/abstract/document/6161480), eq. 2-8]  
+              $L=d+1 \enspace, \quad i \in \{1,2, \dots d\} \enspace,$  
+              $0 < w_0 < 1 \enspace, \quad 
+              \alpha=\sqrt{\frac{1-w_0}{d}} \enspace, \quad
+              C = \sqrt{\mathbf{I} - \alpha^2 \cdot \mathbf 1} \enspace, \quad
+              \underline x_0 = - \frac{\alpha}{\sqrt{w_0}} \cdot \underline 1$  
+              $w_{1\colon n} = \mathrm{diag}(w_0 \cdot \alpha^2 \cdot C^{-1} \cdot  \mathbf{1} \cdot (C^\top)^{-1}) \enspace,$  
+              $\underline x_{1\colon n} = C \cdot (\sqrt{\mathbf{I} \cdot w_{1\colon n}})^{-1}$
             - unscented (𝐿=2)  
               $x_1=\mu-\sigma\enspace, \quad x_2=\mu+\sigma$
             - unscented (𝐿=3)  
@@ -118,7 +133,10 @@ def update_smethod(smethod):
         case 'Equidistant':
             patched_tooltip.template = "γ={value}"
             return -1, 1, 0, 0.001, patched_tooltip, False
-        case 'Unscented':
+        case 'Julier':
+            patched_tooltip.template = "{value}"
+            return -1, 1, 1, 0.001, patched_tooltip, True #changed to 1
+        case 'Mengazz':
             patched_tooltip.template = "{value}"
             return 0, 1, 1, 0.001, patched_tooltip, True #changed to 1
         case _:
@@ -152,22 +170,26 @@ def update(smethod, p, L, μ, σ):
                 xUni = (sqrt(5)-1)/2 * (arange(L)+1+round(p)) % 1
             case 'Equidistant':
                 xUni = (2*arange(L)+1+p)/(2*L)
-            case 'Unscented':
+            case 'Julier':
                 # TODO scaled unscented etc
                 #xGauss = array([μ-σ, μ+σ])  # TODO parameter
                 xGauss = update_julier(p,1)[0]
                 weights = update_julier(p,1)[1]
-                if weights is None:
-                    weights = 1/L2  # equally weighted
-                else:
-                    weights = weights.flatten()
+            case 'Mengazz':
+                xGauss = update_mengazz(p,1)[0]
+                weights = update_mengazz(p,1)[1]
             case _:
                 raise Exception("Wrong smethod")
         # Transform Samples
         if xGauss is None:
             xGauss = σ*sqrt(2)*erfinv(2*xUni-1) + μ
         L2 = xGauss.size
-        sample_height = full([1, L2], gauss1(xGauss, μ, σ)) #channged it to the height of density
+        if weights is None:
+            weights = 1/L2  # equally weighted
+            sample_height = full([1, L2], gauss1(0, 0, σ))
+        else:
+            weights = weights.flatten()
+            sample_height = full([1, L2], gauss1(weights, μ, σ)) #channged it to the height of density with weights
         # sample_height = full([1, L], 1/L)
         # Plot Density
         s = linspace(rang[0], rang[1], 500)
