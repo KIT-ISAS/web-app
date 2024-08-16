@@ -7,7 +7,7 @@ from urllib.error import HTTPError
 from dash import dcc, html, Input, Output, callback, Patch
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
-from numpy import sqrt, linspace, vstack, hstack, pi, nan, full, exp, square, arange, array, sin, cos, diff, matmul, log10, deg2rad, identity, ones, zeros, diag, cov, mean
+from numpy import sqrt, linspace, vstack, hstack, pi, nan, full, exp, square, arange, array, sin, cos, diff, matmul, log10, deg2rad, identity, ones, zeros, diag, cov, mean, arctan2
 from numpy.random import randn, randint
 from numpy.linalg import cholesky, eig, det, inv
 from scipy.special import erfinv
@@ -101,6 +101,10 @@ layout = dbc.Container(
         dcc.Slider(id="gauss2D-ρ", min=-1, max=1, step=0.001, value=0, updatemode='drag', marks=None,
                    tooltip={"template": 'ρ={value}', "placement": "bottom", "always_visible": True}),
 
+        # angle Slider
+        dcc.Slider(id="gauss2D-angle", min=0, max=360, step=0.001, value=0, updatemode='drag', marks=None,
+                   tooltip={"template": 'angle={value}', "placement": "bottom", "always_visible": True}),
+
         # Description
         dcc.Markdown(
             r'''
@@ -185,6 +189,7 @@ layout = dbc.Container(
     Output('gauss2D-p', 'step'),
     Output('gauss2D-p', 'tooltip'),
     Output('gauss2D-L', 'disabled'),
+    Output('gauss2D-angle', 'value'),
     Input("gauss2D-smethod", "value"),
 )
 def update_smethod(smethod):
@@ -192,20 +197,20 @@ def update_smethod(smethod):
     match smethod:
         case 'iid':
             patched_tooltip.template = "dice"
-            # min, max, value, step, tooltip
-            return 0, 1, .5, 0.001, patched_tooltip, False
+            # min, max, value, step, angle, tooltip
+            return 0, 1, .5, 0.001, patched_tooltip, False,0
         case 'Fibonacci':
             patched_tooltip.template = "z={value}"
-            return -50, 50, 0, 1, patched_tooltip, False
+            return -50, 50, 0, 1, patched_tooltip, False,0
         case 'LCD':
             patched_tooltip.template = "α={value}°"
-            return -360, 360, 0, 0.1, patched_tooltip, False
+            return -360, 360, 0, 0.1, patched_tooltip, False,0
         case 'SP-Julier04':
             patched_tooltip.template = "W₀={value}"
-            return -2, 1, .1, 0.001, patched_tooltip, True
+            return -2, 1, .1, 0.001, patched_tooltip, True,0
         case 'SP-Menegaz11':
             patched_tooltip.template = "Wₙ₊₁={value}"
-            return 0, 1, 1/3, 0.001, patched_tooltip, True
+            return 0, 1, 1/3, 0.001, patched_tooltip, True, 0
         case _:
             raise Exception("Wrong smethod")
 
@@ -219,8 +224,9 @@ def update_smethod(smethod):
     Input("gauss2D-σx", "value"),
     Input("gauss2D-σy", "value"),
     Input("gauss2D-ρ", "value"),
+    Input("gauss2D-angle", "value"),
 )
-def update_sampling(smethod, tmethod, p, L0, σx, σy, ρ):
+def update_sampling(smethod, tmethod, p, L0, σx, σy, ρ, angle):
     # Slider Transform,
     L = trafo_L(L0)
     # Mean
@@ -230,6 +236,15 @@ def update_sampling(smethod, tmethod, p, L0, σx, σy, ρ):
     C = array([[square(σx), σx*σy*ρ], [σx*σy*ρ, square(σy)]])
     C_D, C_R = eig(C)
     C_D = C_D[..., None]  # to column vector
+    #angle = eig(C)
+    #print(angle)
+    #rot_alpha = array([[cos(angle.eigenvectors.max[0]), -sin(angle.eigenvectors.max[1])], 
+    #                   [sin(angle.eigenvectors.min[0]), cos(angle.eigenvectors.min[1])]])
+    #rot_alpha = arctan2(angle.eigenvectors.max,angle.eigenvectors.min)
+    #print(rot_alpha)
+    #alpha = arctan2(rot_alpha[0], rot_alpha[1])
+    #print(alpha)
+
 
     patched_fig = Patch()
     # Draw SND
@@ -273,7 +288,8 @@ def update_sampling(smethod, tmethod, p, L0, σx, σy, ρ):
         sizes = sqrt(abs(weights) * L2) * det(2*pi*C)**(1/4) / sqrt(L2) * 70
     # print(hstack((cov(xyG, bias=True, aweights=weights), C)))
     # Plot Ellipse
-    elp = matmul(C_R, sqrt(C_D) * circ) + μ
+    elp = C_R @ sqrt(C_D)  * circ + μ  #matmul(C_R, sqrt(C_D) * circ) + μ
+    #print(elp)
     patched_fig['data'][0]['x'] = elp[0, :]
     patched_fig['data'][0]['y'] = elp[1, :]
     # Plot Samples
