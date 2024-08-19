@@ -7,7 +7,7 @@ from urllib.error import HTTPError
 from dash import dcc, html, Input, Output, callback, Patch
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
-from numpy import sqrt, linspace, vstack, hstack, pi, nan, full, exp, square, arange, array, sin, cos, diff, matmul, log10, deg2rad, identity, ones, zeros, diag, cov, mean, arctan2
+from numpy import sqrt, linspace, vstack, hstack, pi, nan, full, exp, square, arange, array, sin, cos, diff, matmul, log10, deg2rad, identity, ones, zeros, diag, cov, mean, atan2
 from numpy.random import randn, randint
 from numpy.linalg import cholesky, eig, det, inv
 from scipy.special import erfinv
@@ -189,7 +189,6 @@ layout = dbc.Container(
     Output('gauss2D-p', 'step'),
     Output('gauss2D-p', 'tooltip'),
     Output('gauss2D-L', 'disabled'),
-    Output('gauss2D-angle', 'value'),
     Input("gauss2D-smethod", "value"),
 )
 def update_smethod(smethod):
@@ -197,20 +196,20 @@ def update_smethod(smethod):
     match smethod:
         case 'iid':
             patched_tooltip.template = "dice"
-            # min, max, value, step, angle, tooltip
-            return 0, 1, .5, 0.001, patched_tooltip, False,0
+            # min, max, value, step, tooltip
+            return 0, 1, .5, 0.001, patched_tooltip, False
         case 'Fibonacci':
             patched_tooltip.template = "z={value}"
-            return -50, 50, 0, 1, patched_tooltip, False,0
+            return -50, 50, 0, 1, patched_tooltip, False
         case 'LCD':
             patched_tooltip.template = "α={value}°"
-            return -360, 360, 0, 0.1, patched_tooltip, False,0
+            return -360, 360, 0, 0.1, patched_tooltip, False
         case 'SP-Julier04':
             patched_tooltip.template = "W₀={value}"
-            return -2, 1, .1, 0.001, patched_tooltip, True,0
+            return -2, 1, .1, 0.001, patched_tooltip, True
         case 'SP-Menegaz11':
             patched_tooltip.template = "Wₙ₊₁={value}"
-            return 0, 1, 1/3, 0.001, patched_tooltip, True, 0
+            return 0, 1, 1/3, 0.001, patched_tooltip, True
         case _:
             raise Exception("Wrong smethod")
 
@@ -236,15 +235,13 @@ def update_sampling(smethod, tmethod, p, L0, σx, σy, ρ, angle):
     C = array([[square(σx), σx*σy*ρ], [σx*σy*ρ, square(σy)]])
     C_D, C_R = eig(C)
     C_D = C_D[..., None]  # to column vector
-    #angle = eig(C)
-    #print(angle)
-    #rot_alpha = array([[cos(angle.eigenvectors.max[0]), -sin(angle.eigenvectors.max[1])], 
-    #                   [sin(angle.eigenvectors.min[0]), cos(angle.eigenvectors.min[1])]])
-    #rot_alpha = arctan2(angle.eigenvectors.max,angle.eigenvectors.min)
-    #print(rot_alpha)
-    #alpha = arctan2(rot_alpha[0], rot_alpha[1])
-    #print(alpha)
-
+    eigenValues, eigenVectors = eig(C)
+    #print(calculateNewAngle)
+    maxColumn = list(eigenValues).index(max(eigenValues))
+    onlyEigenVectors = eigenVectors[:,maxColumn]
+    #print(onlyEigenVectors)
+    newangle = atan2(onlyEigenVectors[1],onlyEigenVectors[0])
+    #print(newAngle)
 
     patched_fig = Patch()
     # Draw SND
@@ -277,7 +274,7 @@ def update_sampling(smethod, tmethod, p, L0, σx, σy, ρ, angle):
         case _:
             raise Exception("Wrong smethod")
     # Sample weights to scatter sizes
-    L2 = xySND.shape[1]  # actual number of saamples
+    L2 = xySND.shape[1]  # actual number of samples
     if L2 == 0:
         sizes = 10
     else:
@@ -287,8 +284,9 @@ def update_sampling(smethod, tmethod, p, L0, σx, σy, ρ, angle):
             weights = weights.flatten()
         sizes = sqrt(abs(weights) * L2) * det(2*pi*C)**(1/4) / sqrt(L2) * 70
     # print(hstack((cov(xyG, bias=True, aweights=weights), C)))
+
     # Plot Ellipse
-    elp = C_R @ sqrt(C_D)  * circ + μ  #matmul(C_R, sqrt(C_D) * circ) + μ
+    elp = matmul(C_R, sqrt(C_D) * circ) + μ
     #print(elp)
     patched_fig['data'][0]['x'] = elp[0, :]
     patched_fig['data'][0]['y'] = elp[1, :]
