@@ -235,13 +235,12 @@ def update_sampling(smethod, tmethod, p, L0, σx, σy, ρ, angle):
     C = array([[square(σx), σx*σy*ρ], [σx*σy*ρ, square(σy)]])
     C_D, C_R = eig(C)
     C_D = C_D[..., None]  # to column vector
-    eigenValues, eigenVectors = eig(C)
-    #print(calculateNewAngle)
-    maxColumn = list(eigenValues).index(max(eigenValues))
-    onlyEigenVectors = eigenVectors[:,maxColumn]
-    #print(onlyEigenVectors)
-    newangle = atan2(onlyEigenVectors[1],onlyEigenVectors[0])
-    #print(newAngle)
+
+    newangle = eigen_dec(C)
+    #backtrack = eigen_rec(C,angle)
+    print(newangle)
+    print(C)
+    #print(backtrack)
 
     patched_fig = Patch()
     # Draw SND
@@ -268,9 +267,9 @@ def update_sampling(smethod, tmethod, p, L0, σx, σy, ρ, angle):
             raise Exception("Wrong smethod")
     match tmethod:
         case 'Cholesky':
-            xyG = matmul(cholesky(C), xySND) + μ
+            xyG = matmul(rot(angle),matmul(cholesky(C), xySND)) + μ
         case 'Eigendecomposition':
-            xyG = matmul(C_R, sqrt(C_D) * xySND) + μ
+            xyG = matmul(rot(angle),matmul(C_R, sqrt(C_D) * xySND)) + μ
         case _:
             raise Exception("Wrong smethod")
     # Sample weights to scatter sizes
@@ -286,8 +285,9 @@ def update_sampling(smethod, tmethod, p, L0, σx, σy, ρ, angle):
     # print(hstack((cov(xyG, bias=True, aweights=weights), C)))
 
     # Plot Ellipse
-    elp = matmul(C_R, sqrt(C_D) * circ) + μ
+    elp = matmul(rot(angle),matmul(C_R, sqrt(C_D) * circ)) + μ
     #print(elp)
+    #print(angle)
     patched_fig['data'][0]['x'] = elp[0, :]
     patched_fig['data'][0]['y'] = elp[1, :]
     # Plot Samples
@@ -313,3 +313,22 @@ def trafo_L(L0):
 def rot(a):
     ar = deg2rad(a)
     return array([[cos(ar), -sin(ar)], [sin(ar), cos(ar)]])
+
+def eigen_dec(c): #decompose covariance matrix
+    eigenValues, eigenVectors = eig(c) #calculate eigendecomposition
+    #print(calculateNewAngle)
+    maxColumn = list(eigenValues).index(max(eigenValues))
+    onlyEigenVectors = eigenVectors[:,maxColumn]
+    #print(onlyEigenVectors)
+    newangle = atan2(onlyEigenVectors[1],onlyEigenVectors[0])
+    return newangle
+
+def eigen_rec(c, angle): #reconstruct covariance matrix
+    eigenValues, eigenVectors = eig(c)
+    maxColumn = list(eigenValues).index(max(eigenValues))
+    onlyEigenVectors = eigenVectors[:,maxColumn]
+    V = onlyEigenVectors
+    Vinv = inv(V)
+    D = array([eigenValues[0],eigenValues[1]]).sort
+    originalMatrix = matmul(V,matmul(D,Vinv))
+    return originalMatrix
