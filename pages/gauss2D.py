@@ -1,6 +1,7 @@
 import plotly
 import dash
 import pandas
+import math
 from util.sampling_test import update_julier
 from util.sampling_test import update_mengazz
 from urllib.error import HTTPError
@@ -236,11 +237,15 @@ def update_sampling(smethod, tmethod, p, L0, σx, σy, ρ, angle):
     C_D, C_R = eig(C)
     C_D = C_D[..., None]  # to column vector
 
-    newangle = eigen_dec(C)
-    #backtrack = eigen_rec(C,angle)
-    print(newangle)
+    #print(C)
+    #newangle = eigen_dec(C)
+    #oldCvariance = eigen_rec(C,angle)
+    testVariance = test_rec(C,angle, σx, σy, ρ)
+    print(testVariance)
+    #print(newangle)
+    #print(oldCvariance)
+    print("Covariance")
     print(C)
-    #print(backtrack)
 
     patched_fig = Patch()
     # Draw SND
@@ -287,7 +292,6 @@ def update_sampling(smethod, tmethod, p, L0, σx, σy, ρ, angle):
     # Plot Ellipse
     elp = matmul(rot(angle),matmul(C_R, sqrt(C_D) * circ)) + μ
     #print(elp)
-    #print(angle)
     patched_fig['data'][0]['x'] = elp[0, :]
     patched_fig['data'][0]['y'] = elp[1, :]
     # Plot Samples
@@ -316,19 +320,25 @@ def rot(a):
 
 def eigen_dec(c): #decompose covariance matrix
     eigenValues, eigenVectors = eig(c) #calculate eigendecomposition
-    #print(calculateNewAngle)
     maxColumn = list(eigenValues).index(max(eigenValues))
     onlyEigenVectors = eigenVectors[:,maxColumn]
     #print(onlyEigenVectors)
-    newangle = atan2(onlyEigenVectors[1],onlyEigenVectors[0])
+    newangleRadian = atan2(onlyEigenVectors[1],onlyEigenVectors[0])
+    newangle = math.degrees(newangleRadian)
     return newangle
 
 def eigen_rec(c, angle): #reconstruct covariance matrix
     eigenValues, eigenVectors = eig(c)
-    maxColumn = list(eigenValues).index(max(eigenValues))
-    onlyEigenVectors = eigenVectors[:,maxColumn]
-    V = onlyEigenVectors
+    #print(array(eigenVectors))
+    V = array(eigenVectors)
     Vinv = inv(V)
-    D = array([eigenValues[0],eigenValues[1]]).sort
+    #print(array([[max(eigenValues), 0],[0, min(eigenValues)]]))
+    D = array([[max(eigenValues), 0],[0, min(eigenValues)]])
     originalMatrix = matmul(V,matmul(D,Vinv))
     return originalMatrix
+
+def test_rec(c, angle, σx, σy, ρ): #rotate matrix -> calculate new values
+    σx = sqrt(c[0,0])
+    σy = c([0,1] / σx)
+    ρ = c([0,1]/(σx * σy))
+    return σx, σy, ρ
