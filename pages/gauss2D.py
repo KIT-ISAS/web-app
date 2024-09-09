@@ -5,7 +5,7 @@ import math
 from util.sampling_test import update_julier
 from util.sampling_test import update_mengazz
 from urllib.error import HTTPError
-from dash import dcc, html, Input, Output, callback, Patch
+from dash import dcc, html, Input, Output, callback, Patch,ctx
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
 from numpy import sqrt, linspace, vstack, hstack, pi, nan, full, exp, square, arange, array, sin, cos, diff, matmul, log10, deg2rad, identity, ones, zeros, diag, cov, mean, atan2
@@ -103,7 +103,7 @@ layout = dbc.Container(
                    tooltip={"template": 'ρ={value}', "placement": "bottom", "always_visible": True}),
 
         # angle Slider
-        dcc.Slider(id="gauss2D-angle", min=0, max=360, step=0.001, value=0, updatemode='drag', marks=None,
+        dcc.Slider(id="gauss2D-angle", min=0, max=360, step=1, value=0, updatemode='drag', marks=None,
                    tooltip={"template": 'angle={value}', "placement": "bottom", "always_visible": True}),
 
         # Description
@@ -237,15 +237,18 @@ def update_sampling(smethod, tmethod, p, L0, σx, σy, ρ, angle):
     C_D, C_R = eig(C)
     C_D = C_D[..., None]  # to column vector
 
+    #print("Covariance old:")
     #print(C)
-    #newangle = eigen_dec(C)
+    # #newangle = eigen_dec(C)
+    #print("covariance new")
     #oldCvariance = eigen_rec(C,angle)
-    testVariance = test_rec(C,angle, σx, σy, ρ)
-    print(testVariance)
-    #print(newangle)
     #print(oldCvariance)
-    print("Covariance")
-    print(C)
+    #σx, σy, ρ = calculate_new_cov_values(oldCvariance)
+    #print(newangle)
+    #print("old values:")
+    #print(σx, σy, ρ)
+    #print("new values:")
+    #testVariance = test_rec(C,angle, σx, σy, ρ)
 
     patched_fig = Patch()
     # Draw SND
@@ -301,6 +304,33 @@ def update_sampling(smethod, tmethod, p, L0, σx, σy, ρ, angle):
     patched_fig['data'][1]['marker']['line']['width'] = sizes/20
     return patched_fig
 
+@callback(
+    Output("gauss2D-σx", "value"),
+    Output("gauss2D-σy", "value"),
+    Output("gauss2D-ρ", "value"),
+    Output("gauss2D-angle", "value"),
+    Input("gauss2D-L", "value"),
+    Input("gauss2D-σx", "value"),
+    Input("gauss2D-σy", "value"),
+    Input("gauss2D-ρ", "value"),
+    Input("gauss2D-angle", "value"),
+)
+def update_sliders(L0, σx, σy, ρ, angle):
+    # Slider Transform,
+    L = trafo_L(L0)
+    # Mean
+    # μ = array([[μx], [μy]])
+    μ = array([[0], [0]])
+    # Covariance
+    C = array([[square(σx), σx*σy*ρ], [σx*σy*ρ, square(σy)]])
+    slider_moved = ctx.triggered_id
+    if(slider_moved == "gauss2D-angle"): 
+        oldCvariance = eigen_rec(C,angle)
+        #print(oldCvariance)
+        σx, σy, ρ = calculate_new_cov_values(oldCvariance)
+    if(slider_moved == "gauss2D-σx" or slider_moved == "gauss2D-σy" or slider_moved == "gauss2D-ρ"):
+        angle = eigen_dec(C)
+    return σx, σy, ρ, angle 
 
 def gauss1(x, μ, σ):
     return 1/sqrt(2*pi*σ) * exp(-1/2 * square((x-μ)/σ))
@@ -328,17 +358,19 @@ def eigen_dec(c): #decompose covariance matrix
     return newangle
 
 def eigen_rec(c, angle): #reconstruct covariance matrix
-    eigenValues, eigenVectors = eig(c)
+    #eigenValues, eigenVectors = eig(c)
     #print(array(eigenVectors))
-    V = array(eigenVectors)
-    Vinv = inv(V)
+    #V = array(eigenVectors)
+    #Vinv = inv(V)
     #print(array([[max(eigenValues), 0],[0, min(eigenValues)]]))
-    D = array([[max(eigenValues), 0],[0, min(eigenValues)]])
-    originalMatrix = matmul(V,matmul(D,Vinv))
-    return originalMatrix
+    #D = array([[max(eigenValues), 0],[0, min(eigenValues)]])
+    #oldCovariance = matmul(V,matmul(D,Vinv))
+    rotCovariance = matmul(rot(angle), matmul(c, rot(angle).T))
+    return rotCovariance
 
-def test_rec(c, angle, σx, σy, ρ): #rotate matrix -> calculate new values
+def calculate_new_cov_values(c): #calculate new values
     σx = sqrt(c[0,0])
-    σy = c([0,1] / σx)
-    ρ = c([0,1]/(σx * σy))
+    σy = sqrt(c[1,1])
+    ρ = (c[0,1]/(σx * σy))
+    #print(σx, σy, ρ)
     return σx, σy, ρ
