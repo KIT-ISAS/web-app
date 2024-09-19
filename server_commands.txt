@@ -1,5 +1,6 @@
 
 # Lokal Testen
+pip freeze > requirements.txt
 source .venv/bin/activate
 python app.py
 http://127.0.0.1:8080/
