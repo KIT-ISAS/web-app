@@ -5,7 +5,7 @@ from urllib.error import HTTPError
 from dash import dcc, html, Input, Output, callback, Patch, callback_context
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
-from numpy import sqrt, linspace, vstack, hstack, pi, nan, full, exp, square, arange, array, sin, cos, diff, matmul, log10, deg2rad, identity, ones, zeros, diag, cov, mean, meshgrid, transpose, matmul, append, eye
+from numpy import sqrt, linspace, pi, sign, full, exp, square, arange, array, sin, cos, diff, matmul, log10, deg2rad, identity, ones, zeros, diag, cov, mean, meshgrid, transpose, matmul, append, eye
 from numpy.random import randn, randint
 from numpy.linalg import cholesky, eig, det, inv, solve
 from scipy.special import erfinv
@@ -37,7 +37,7 @@ def gauss1(x, μ, C):
 
 
 def gauss2(x, y, μ, C):
-    d = array([x-μ[0], y-μ[1]])
+    d = array([x-μ[0], y-μ[1]]) 
     d = d.reshape(-1,1) # to column vector
     f = 1/sqrt(det(2*pi*C)) * exp(-1/2 * matmul(d.T, solve(C, d)))
     return f[0][0]
@@ -105,7 +105,11 @@ layout = dbc.Container(
 
 
             ### Interactivity
-            - plot size is controlled via window width
+            - GUI
+                - plot size: controlled via window width
+                - rotate: left mouse click
+                - pan: right mouse click
+                - zoom: mouse wheel
             - value in state space (slider)
                 - value to condition on $\hat{y}$ 
             - density parameter (slider)
@@ -126,6 +130,8 @@ def update(ys, ρ):
     μ = zeros([2, 1])
     sx = 1
     sy = 1
+    # TODO special treatment for singular density
+    ρ = sign(ρ) * min(abs(ρ), .9999)
     C = array([[sx**2, sx*sy*ρ], [sx*sy*ρ, sy**2]])
     # Marginal Parameters
     µMarginal = µ[0]
