@@ -1,14 +1,11 @@
 import plotly
 import dash
-import pandas
-from urllib.error import HTTPError
 from dash import dcc, html, Input, Output, callback, Patch, callback_context
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
-from numpy import sqrt, linspace, pi, sign, full, exp, square, arange, array, sin, cos, diff, matmul, log10, deg2rad, identity, ones, zeros, diag, cov, mean, meshgrid, transpose, matmul, append, eye
-from numpy.random import randn, randint
-from numpy.linalg import cholesky, eig, det, inv, solve
-from scipy.special import erfinv
+from numpy import sqrt, linspace, pi, sign, exp, square, array, diff, matmul, zeros, meshgrid
+from numpy.random import randint
+from numpy.linalg import det, solve
 
 dash.register_page(__name__)
 
@@ -37,11 +34,10 @@ def gauss1(x, μ, C):
 
 
 def gauss2(x, y, μ, C):
-    d = array([x-μ[0], y-μ[1]]) 
-    d = d.reshape(-1,1) # to column vector
+    d = array([x-μ[0], y-μ[1]])
+    d = d.reshape(-1, 1)  # to column vector
     f = 1/sqrt(det(2*pi*C)) * exp(-1/2 * matmul(d.T, solve(C, d)))
     return f[0][0]
-
 
 
 # Initialize Plot
@@ -161,6 +157,3 @@ def update(ys, ρ):
     patched_fig['data'][3]['y'] = xv*0+ys
     patched_fig['data'][3]['z'] = zSlice + 1e-3
     return patched_fig
-
-
-
