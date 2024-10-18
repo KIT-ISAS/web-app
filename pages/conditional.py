@@ -53,14 +53,25 @@ fig.update_yaxes(range=rangy, tickmode='array', tickvals=list(range(rangy[0], ra
 fig.update_layout(legend=dict(orientation='v', yanchor='top', xanchor='right'))
 fig.update_layout(transition_duration=100, transition_easing='linear')
 fig.update_scenes(camera_projection_type="orthographic")
+fig.update_scenes(aspectmode="cube")
 # fig.update_scenes(xaxis_nticks=1)
 # fig.update_scenes(yaxis_nticks=1)
 fig.update_scenes(zaxis_nticks=1)
 
+config = {
+    'toImageButtonOptions': {
+        'format': 'png',  # png, svg, pdf, jpeg, webp
+        'width':  None,   # None: use currently-rendered size
+        'height': None,
+        'filename': 'conditional',
+    }
+}
+
+
 layout = dbc.Container(
     dbc.Col([
         # Plot
-        dcc.Graph(id="joint-graph", figure=fig, style={'width': f'{relwidth}vw', 'height': f'{relheight}vw'}),
+        dcc.Graph(id="joint-graph", figure=fig, config=config, style={'width': f'{relwidth}vw', 'height': f'{relheight}vw'}),
 
         html.P(),  # style={"margin-bottom": "3cm"}
 

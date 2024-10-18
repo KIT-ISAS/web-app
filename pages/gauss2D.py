@@ -60,12 +60,22 @@ fig.update_xaxes(range=rangx, tickmode='array', tickvals=list(range(rangx[0], ra
 fig.update_yaxes(range=rangy, tickmode='array', tickvals=list(range(rangy[0], rangy[1]+1)), scaleanchor="x", scaleratio=1)
 fig.update_layout(legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1))
 # fig.update_layout(transition_duration=100, transition_easing='linear')
+fig.update_layout(modebar_add=['drawopenpath', 'eraseshape'], newshape_line_color='cyan', dragmode='pan')
+
+config = {
+    'toImageButtonOptions': {
+        'format': 'svg',  # png, svg, pdf, jpeg, webp
+        'height': None,   # None: use currently-rendered size
+        'width': None,
+        'filename': 'gauss2d',
+    }
+}
 
 
 layout = dbc.Container(
     dbc.Col([
         # Plot
-        dcc.Graph(id="gauss2D-graph", figure=fig, style={'width': f'{relwidth}vw', 'height': f'{relheight}vw'}),
+        dcc.Graph(id="gauss2D-graph", figure=fig, config=config, style={'width': f'{relwidth}vw', 'height': f'{relheight}vw'}),
 
         # Sampling Strategy RadioItems
         dbc.RadioItems(id='gauss2D-smethod',
@@ -121,7 +131,7 @@ layout = dbc.Container(
             - SND to Gauss: Cholesky  
               $\underline x_i^{\text{Gauss}} = \mathrm{chol}(\textbf{C}) \cdot \underline x_i^{\text{SND}}$
             - SND to Gauss: Eigendecomposition
-              [[Frisch23](https://isif.org/media/generalized-eibonacci-grid-low-discrepancy-point-set-optimal-deterministic-gaussian), eq. 18], 
+              [[Frisch23](https://isif.org/media/generalized-fibonacci-grid-low-discrepancy-point-set-optimal-deterministic-gaussian), eq. 18], 
               [[Frisch21](https://ieeexplore.ieee.org/document/9626975), eq. 4]  
               $\underline x_i^{\text{Gauss}} = \mathbf{V} \cdot \sqrt{\mathbf{D}} \cdot \underline x_i^{\text{SND}}$
             - Fibonacci-Kronecker Lattice  
