@@ -17,12 +17,14 @@ config = {
         'height': None,   # None: use currently-rendered size
         'width': None,
         'filename': 'gauss2d',
-    }
+    },
+    'modeBarButtonsToRemove': ['zoom'],
+    'scrollZoom': True,
 }
 
 style = {
-    'resize': 'both', 
-    'overflow': 'auto', 
+    'resize': 'both',
+    'overflow': 'auto',
 }
 
 
@@ -189,8 +191,9 @@ def update(smethod, p, L, μ, σ):
         fig.add_trace(go.Scatter(x=xp, y=yp, name='Samples', mode='lines', marker_color=col_samples, showlegend=True))
     # Style
     fig.update_xaxes(range=rang, tickmode='array', tickvals=list(range(-5, 6)))
-    fig.update_yaxes(range=[0, None])
+    fig.update_yaxes(range=[0, None], fixedrange=True)
     fig.update_layout(legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1))
+    fig.update_layout(dragmode="pan")
     # fig.update_layout(transition_duration=100, transition_easing='linear')
     return fig
 

@@ -68,14 +68,15 @@ config = {
         'height': None,   # None: use currently-rendered size
         'width': None,
         'filename': 'gauss2d',
-    }
+    },
+    'scrollZoom': True,
 }
 
 style = {
-    'resize': 'both', 
-    'overflow': 'auto', 
-    'width': f'{relwidth}vw', 
-    'height': f'{relheight}vw'
+    'resize': 'both',
+    'overflow': 'auto',
+    'width': f'{relwidth}vw',
+    'height': f'{relheight}vw',
 }
 
 layout = dbc.Container(
@@ -169,7 +170,7 @@ layout = dbc.Container(
               $w_{1\colon n} = \mathrm{diag}(w_0 \cdot \alpha^2 \cdot C^{-1} \cdot  \mathbf{1} \cdot (C^\top)^{-1}) \enspace,$  
               $\underline x_{1\colon n} = C \cdot (\sqrt{\mathbf{I} \cdot w_{1\colon n}})^{-1}$
             ### Interactivity
-            - GUIT
+            - GUI
                 - plot size: drag bottom-right corner of graph
                 - add/remove lines: click in legend
             - sampling methods (radiobutton)

@@ -18,7 +18,7 @@ layout = dbc.Container([
 
         TODO:
         - Sample Reduction
-        - 1D Gauss: add sigma points and weights; use Patch update; dice with button; add LCD; add Sobol
+        - 1D Gauss: use Patch update; insert freeform drawing; dice with button; add LCD; add Sobol
         - 2D Gauss: add rotation angle; dice with button; add 2nd paramter for Fibonacci; Fibonacci-rk1; 
           Fibonacci-Kron; add Sobol; adjust sample size according to figure size
         - 2D Gauss Density (no samples but show covariance marginals, det, trace, and marginals)

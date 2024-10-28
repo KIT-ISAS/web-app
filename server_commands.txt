@@ -26,7 +26,7 @@ pip install -r requirements.txt
 nohup python app.py &
 
 # Official production solution
-gunicorn --bind 0.0.0.0:8080 app:server
+nohup gunicorn --bind 0.0.0.0:8080 app:server &
 
 # Test in Browser
 http://193.196.38.30:8080
