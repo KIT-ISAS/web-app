@@ -45,7 +45,7 @@ col_samples = plotly.colors.qualitative.Plotly[0]
 rangx = [-5, 5]
 rangy = [-4, 4]
 # plot size relative to window size
-relwidth = 100
+relwidth = 95
 relheight = round((relwidth/diff(rangx)*diff(rangy))[0])
 # Gauss ellipse
 s = linspace(0, 2*pi, 500)
@@ -71,11 +71,17 @@ config = {
     }
 }
 
+style = {
+    'resize': 'both', 
+    'overflow': 'auto', 
+    'width': f'{relwidth}vw', 
+    'height': f'{relheight}vw'
+}
 
 layout = dbc.Container(
     dbc.Col([
         # Plot
-        dcc.Graph(id="gauss2D-graph", figure=fig, config=config, style={'width': f'{relwidth}vw', 'height': f'{relheight}vw'}),
+        dcc.Graph(id="gauss2D-graph", figure=fig, config=config, style=style),
 
         # Sampling Strategy RadioItems
         dbc.RadioItems(id='gauss2D-smethod',
@@ -163,6 +169,9 @@ layout = dbc.Container(
               $w_{1\colon n} = \mathrm{diag}(w_0 \cdot \alpha^2 \cdot C^{-1} \cdot  \mathbf{1} \cdot (C^\top)^{-1}) \enspace,$  
               $\underline x_{1\colon n} = C \cdot (\sqrt{\mathbf{I} \cdot w_{1\colon n}})^{-1}$
             ### Interactivity
+            - GUIT
+                - plot size: drag bottom-right corner of graph
+                - add/remove lines: click in legend
             - sampling methods (radiobutton)
                 - Independent identically distributed (iid), the usual random samples. 
                 - Fibonacci-Kronecker lattice, combination of 1D golden sequence and equidistant. Use with eigendecomposition for best homogeneity.

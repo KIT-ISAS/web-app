@@ -11,10 +11,25 @@ dash.register_page(__name__)
 
 methods = ['iid', 'Golden-Sequence', 'Equidistant', 'Unscented']
 
+config = {
+    'toImageButtonOptions': {
+        'format': 'svg',  # png, svg, pdf, jpeg, webp
+        'height': None,   # None: use currently-rendered size
+        'width': None,
+        'filename': 'gauss2d',
+    }
+}
+
+style = {
+    'resize': 'both', 
+    'overflow': 'auto', 
+}
+
+
 layout = dbc.Container(
     dbc.Col([
         # Plot
-        dcc.Graph(id="gauss1D-graph"),
+        dcc.Graph(id="gauss1D-graph", config=config, style=style),
 
         # Sampling Strategy RadioItems
         dbc.RadioItems(id='gauss1D-smethod',
@@ -70,6 +85,9 @@ layout = dbc.Container(
               TODO
 
             ### Interactivity
+            - GUI
+                - plot size: drag bottom-right corner of graph
+                - add/remove lines: click in legend
             - sampling methods (radiobutton)
                 - independent identically distributed (iid), the usual random samples
                 - golden sequence, a low-discrepancy Kronecker sequence based on the golden ratio

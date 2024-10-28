@@ -20,7 +20,7 @@ rangy = [-4, 4]
 smin = rangy[0]
 smax = rangy[1]
 # plot size relative to window size
-relwidth = 100
+relwidth = 95
 relheight = round((relwidth/diff(rangx)*diff(rangy))[0])
 
 # Grid
@@ -50,7 +50,8 @@ fig.add_trace(go.Scatter3d(name='Conditional f(x|ŷ)', x=xv, y=yv*0+yv[0], mode=
 fig.add_trace(go.Scatter3d(name='Slice f(x,ŷ)', x=xv, y=yv*0+yv[0], mode='lines', z=xv*0, marker_color=col_slice, showlegend=True, hoverinfo='skip', line={'width': 8}))  
 fig.update_xaxes(range=rangx, tickmode='array', tickvals=list(range(rangx[0], rangx[1]+1)))
 fig.update_yaxes(range=rangy, tickmode='array', tickvals=list(range(rangy[0], rangy[1]+1)), scaleanchor="x", scaleratio=1)
-fig.update_layout(legend=dict(orientation='v', yanchor='top', xanchor='right'))
+# fig.update_layout(legend=dict(orientation='v', yanchor='top', xanchor='right'))
+fig.update_layout(legend=dict(orientation='h', yanchor='bottom', xanchor='right', y=1.02, x=1))
 fig.update_layout(transition_duration=100, transition_easing='linear')
 fig.update_scenes(camera_projection_type="orthographic")
 fig.update_scenes(aspectmode="cube")
@@ -67,11 +68,18 @@ config = {
     }
 }
 
+style = {
+    'resize': 'both', 
+    'overflow': 'auto', 
+    'width': f'{relwidth}vw', 
+    'height': f'{relheight}vw'
+}
+
 
 layout = dbc.Container(
     dbc.Col([
         # Plot
-        dcc.Graph(id="joint-graph", figure=fig, config=config, style={'width': f'{relwidth}vw', 'height': f'{relheight}vw'}),
+        dcc.Graph(id="joint-graph", figure=fig, config=config, style=style),
 
         html.P(),  # style={"margin-bottom": "3cm"}
 
@@ -113,10 +121,11 @@ layout = dbc.Container(
 
             ### Interactivity
             - GUI
-                - plot size: controlled via window width
+                - plot size: drag bottom-right corner of graph
                 - rotate: left mouse click
                 - pan: right mouse click
                 - zoom: mouse wheel
+                - add/remove lines: click in legend
             - value in state space (slider)
                 - value to condition on $\hat{y}$ 
             - density parameter (slider)
