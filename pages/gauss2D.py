@@ -171,7 +171,7 @@ layout = dbc.Container(
               $\underline x_{1\colon n} = C \cdot (\sqrt{\mathbf{I} \cdot w_{1\colon n}})^{-1}$
             ### Interactivity
             - GUI
-                - plot size: drag bottom-right corner of graph
+                - plot size: initial size from window width; then drag bottom-right corner of graph
                 - add/remove lines: click in legend
             - sampling methods (radiobutton)
                 - Independent identically distributed (iid), the usual random samples. 

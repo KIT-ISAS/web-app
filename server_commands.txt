@@ -26,10 +26,11 @@ pip install -r requirements.txt
 nohup python app.py &
 
 # Official production solution
-nohup gunicorn --bind 0.0.0.0:8080 app:server &
+nohup gunicorn --bind 0.0.0.0:8080 --workers 32 app:server &
+TODO use daemon
 
 # Test in Browser
-http://193.196.38.30:8080
+http://193.196.39.224:8080
 
 # Terminate old process
 ps

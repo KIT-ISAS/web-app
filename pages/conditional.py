@@ -121,7 +121,7 @@ layout = dbc.Container(
 
             ### Interactivity
             - GUI
-                - plot size: drag bottom-right corner of graph
+                - plot size: initial size from window width; then drag bottom-right corner of graph
                 - rotate: left mouse click
                 - pan: right mouse click
                 - zoom: mouse wheel

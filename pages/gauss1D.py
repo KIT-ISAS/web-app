@@ -88,7 +88,7 @@ layout = dbc.Container(
 
             ### Interactivity
             - GUI
-                - plot size: drag bottom-right corner of graph
+                - plot size: initial size from window width; then drag bottom-right corner of graph
                 - add/remove lines: click in legend
             - sampling methods (radiobutton)
                 - independent identically distributed (iid), the usual random samples
