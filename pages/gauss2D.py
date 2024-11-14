@@ -237,19 +237,6 @@ def update_sampling(smethod, tmethod, p, L0, σx, σy, ρ, angle):
     C_D, C_R = eig(C)
     C_D = C_D[..., None]  # to column vector
 
-    #print("Covariance old:")
-    #print(C)
-    # #newangle = eigen_dec(C)
-    #print("covariance new")
-    #oldCvariance = eigen_rec(C,angle)
-    #print(oldCvariance)
-    #σx, σy, ρ = calculate_new_cov_values(oldCvariance)
-    #print(newangle)
-    #print("old values:")
-    #print(σx, σy, ρ)
-    #print("new values:")
-    #testVariance = test_rec(C,angle, σx, σy, ρ)
-
     patched_fig = Patch()
     # Draw SND
     weights = None
@@ -324,12 +311,14 @@ def update_sliders(L0, σx, σy, ρ, angle):
     # Covariance
     C = array([[square(σx), σx*σy*ρ], [σx*σy*ρ, square(σy)]])
     slider_moved = ctx.triggered_id
-    if(slider_moved == "gauss2D-angle"): 
+    if(slider_moved == "gauss2D-angle"): # if the angle was changed 
         oldCvariance = eigen_rec(C,angle)
+        C = oldCvariance
         #print(oldCvariance)
+        print(angle)
         σx, σy, ρ = calculate_new_cov_values(oldCvariance)
     if(slider_moved == "gauss2D-σx" or slider_moved == "gauss2D-σy" or slider_moved == "gauss2D-ρ"):
-        angle = eigen_dec(C)
+        angle = eigen_dec(C) # if σ, or ρ was changed
     return σx, σy, ρ, angle 
 
 def gauss1(x, μ, σ):
@@ -358,19 +347,13 @@ def eigen_dec(c): #decompose covariance matrix
     return newangle
 
 def eigen_rec(c, angle): #reconstruct covariance matrix
-    #eigenValues, eigenVectors = eig(c)
-    #print(array(eigenVectors))
-    #V = array(eigenVectors)
-    #Vinv = inv(V)
-    #print(array([[max(eigenValues), 0],[0, min(eigenValues)]]))
-    #D = array([[max(eigenValues), 0],[0, min(eigenValues)]])
-    #oldCovariance = matmul(V,matmul(D,Vinv))
-    rotCovariance = matmul(rot(angle), matmul(c, rot(angle).T))
-    return rotCovariance
+    newCovariance =  matmul(rot(angle), matmul(c, rot(angle).T))  # matmul(rot(angle), matmul(rotCovariance, rot(angle).T))
+    #print(newCovariance)
+    return newCovariance
 
 def calculate_new_cov_values(c): #calculate new values
-    σx = sqrt(c[0,0])
-    σy = sqrt(c[1,1])
-    ρ = (c[0,1]/(σx * σy))
-    #print(σx, σy, ρ)
+    σx = round(sqrt(c[0,0]),4)
+    σy = round(sqrt(c[1,1]),4)
+    ρ = round(c[0,1]/(σx * σy),4)
+    print(σx, σy, ρ)
     return σx, σy, ρ
