@@ -355,5 +355,5 @@ def calculate_new_cov_values(c): #calculate new values
     σx = round(sqrt(c[0,0]),4)
     σy = round(sqrt(c[1,1]),4)
     ρ = round(c[0,1]/(σx * σy),4)
-    print(σx, σy, ρ)
+    #print(σx, σy, ρ)
     return σx, σy, ρ
