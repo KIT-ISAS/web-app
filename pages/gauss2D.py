@@ -315,7 +315,7 @@ def update_sliders(L0, σx, σy, ρ, angle):
         oldCvariance = eigen_rec(C,angle)
         C = oldCvariance
         #print(oldCvariance)
-        print(angle)
+        #print(angle)
         σx, σy, ρ = calculate_new_cov_values(oldCvariance)
     if(slider_moved == "gauss2D-σx" or slider_moved == "gauss2D-σy" or slider_moved == "gauss2D-ρ"):
         angle = eigen_dec(C) # if σ, or ρ was changed
