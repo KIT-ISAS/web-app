@@ -4,7 +4,8 @@ https://portal.bw-cloud.org/project/instances/
 https://www.bw-cloud.org/de/bwcloud_scope/nutzen
 
 # Log in
-ssh isas-interactive
+Linux: ssh isas-interactive
+Windows: Puttygen -> Putty -> username "debian"
 
 # Update
 sudo apt-get dist-upgrade
@@ -14,7 +15,7 @@ sudo apt-get update
 sudo apt-get install git
 sudo apt-get install virtualenv
 
-rm ./web-app
+sudo rm -r ./web-app
 git clone https://github.com/KIT-ISAS/web-app.git
 cd ./web-app
 virtualenv .venv
@@ -30,12 +31,16 @@ nohup gunicorn --bind 0.0.0.0:8080 --workers 32 app:server &
 TODO use daemon
 
 # Test in Browser
-http://193.196.39.224:8080
+http://193.196.39.120:8080
 
 # Terminate old process
 ps
 pkill -9 python
+<<<<<<< HEAD
 pkill -f gunicorn
+=======
+pkill -9 gunicorn
+>>>>>>> 50ebd0eefea556c0a34a89ce8af0fbb02e078697
 
 # Update code from GitHub
 ssh isas-interactive
