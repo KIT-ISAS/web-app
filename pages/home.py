@@ -36,11 +36,12 @@ layout = dbc.Container([
         - Tracking example: 3D Line
         - trisurf, Isosurface: sample on sphere, torus, 
         - make plots resizable: https://stackoverflow.com/questions/17855401/how-do-i-make-a-div-width-draggable 
-        - Distributed Sampling: Fusion of two 2D Gaussians; show naive, CI, ICI; sliders for 4 variances, 2 visible and 4 hidden correlations
+        - Distributed Sampling: Fusion of two 2D Gaussians; show naive, CI, ICI; sliders for w parameter and 4 variances, 2 visible and 4 hidden correlations
         - try: Dash Draggable
         - try draggable data points: https://dash.plotly.com/cytoscape
         - try 3D vtk: https://dash.plotly.com/vtk
         - try slicer for multivariate data / densities: https://dash.plotly.com/slicer
+        - Optimization: Steepest Descent, Gauß-Newton, Levenberg-Marquardt, Newton, SDP
         '''
         )
 ], fluid=True, className="g-0")
