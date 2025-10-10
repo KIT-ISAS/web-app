@@ -4,7 +4,7 @@ import dash_bootstrap_components as dbc
 
 
 
-def SplitPane(children1, children2):
+def SplitPane(children1, children2, default_size):
 	return html.Div([
 		PanelGroup(
 			id='panel-group',
@@ -12,10 +12,11 @@ def SplitPane(children1, children2):
 				Panel(
 					id='left-sidebar',
 					minSizePercentage=15,
+					defaultSizePercentage=default_size,
 					children=[
 						html.Div([
 							dbc.Container(children1, fluid=True)
-						], className="bg-light vh-100 w-100 rounded-3") 
+						], className="bg-light h-100 w-100 rounded-3") 
 					],
 				),
 				PanelResizeHandle(
@@ -39,8 +40,8 @@ def SplitPane(children1, children2):
 				)
 			], 
 			direction='horizontal',
-			className='vh-100 w-100 px-0',
+			className='h-100 w-100 px-0',
 		)
 	], 
-	className='vh-100 px-0',
+	className='h-100 px-0',
 	)
