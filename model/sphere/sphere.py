@@ -1,10 +1,13 @@
 import numpy as np
+from model.distributions.distribution_loader import DistributionLoader
+from model.distributions.sphere.sphere_distribution import SphereDistribution
 
 class Sphere:
 	def __init__(self, resolution=50, radius=1):
 		self.xyz = self.generate_xyz(resolution, radius)
 		self.mesh = np.array([])
 		self.samples = np.array([])
+		self.distributions = DistributionLoader(SphereDistribution, "model.distributions.sphere").get_distributions()
 
 	def generate_xyz(self, resolution=50, radius=1):
 		phi = np.linspace(0, np.pi, resolution)
