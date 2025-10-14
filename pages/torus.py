@@ -23,9 +23,9 @@ fig = go.Figure(
 			showscale=False
 		),
 		go.Scatter3d(
-			x=torus.samples[:, 0] if torus.samples.size else [],
-			y=torus.samples[:, 1] if torus.samples.size else [],
-			z=torus.samples[:, 2] if torus.samples.size else [],
+			x=(Torus.t_p_to_xyz(torus.samples[:, 0], torus.samples[:, 1]))[0] if torus.samples.size else [],
+			y=(Torus.t_p_to_xyz(torus.samples[:, 0], torus.samples[:, 1]))[1] if torus.samples.size else [],
+			z=(Torus.t_p_to_xyz(torus.samples[:, 0], torus.samples[:, 1]))[2] if torus.samples.size else [],
 			mode="markers",
 			marker=dict(size=4, color="red")
 		)
@@ -71,9 +71,9 @@ def update_plot(options, selected_distribution, _):
 			colorscale="Viridis",
 		),
 		go.Scatter3d(
-			x=torus.samples[:, 0] if torus.samples.size else [],
-			y=torus.samples[:, 1] if torus.samples.size else [],
-			z=torus.samples[:, 2] if torus.samples.size else [],
+			x=(Torus.t_p_to_xyz(torus.samples[:, 0], torus.samples[:, 1]))[0] if torus.samples.size else [],
+			y=(Torus.t_p_to_xyz(torus.samples[:, 0], torus.samples[:, 1]))[1] if torus.samples.size else [],
+			z=(Torus.t_p_to_xyz(torus.samples[:, 0], torus.samples[:, 1]))[2] if torus.samples.size else [],
 			mode="markers",
 			marker=dict(size=4, color="red")
 		)

@@ -10,7 +10,8 @@ class TorusDistribution(ABC):
 	def get_name(self):
 		pass
 	
-	# returns samples as a TODO
+	# returns samples as a numpy array of shape (n, 2)
+	# where (2)	are the parameters (t, p) on the torus
 	@abstractmethod
 	def sample(self, sample_options):
 		pass

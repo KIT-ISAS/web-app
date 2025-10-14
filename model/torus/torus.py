@@ -18,8 +18,8 @@ class Torus:
 		return self.t_p_to_xyz(t, p, r, R)
 
 
-	@classmethod
-	def t_p_to_xyz(self, t, p, r=1, R=3):
+	@staticmethod
+	def t_p_to_xyz(t, p, r=1, R=3):
 		x = (R + r * np.cos(p)) * np.cos(t)
 		y = (R + r * np.cos(p)) * np.sin(t)
 		z = r * np.sin(p)

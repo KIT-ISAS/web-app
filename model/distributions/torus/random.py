@@ -14,7 +14,14 @@ class SphereDistribution(TorusDistribution):
 		return "Random"
 	
 	def sample(self, sample_options):
-		return np.array([])
+		sample_count = sample_options[0].state
+
+		t = np.random.uniform(0, 2 * np.pi, sample_count)
+		p = np.random.uniform(0, 2 * np.pi, sample_count)
+
+		samples = np.column_stack((t, p))
+
+		return samples
 
 	def generate_mesh(self, distribution_options):
 		pass
