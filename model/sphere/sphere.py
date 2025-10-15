@@ -1,8 +1,8 @@
 import numpy as np
 from model.distributions.distribution_loader import DistributionLoader
 from model.distributions.sphere.sphere_distribution import SphereDistribution
-
-class Sphere:
+from model.manifold import Manifold
+class Sphere(Manifold):
 	def __init__(self, resolution=50, radius=1):
 		self.xyz = self.generate_xyz(resolution, radius)
 		self.mesh = np.array([])
@@ -19,3 +19,6 @@ class Sphere:
 		z = radius * np.cos(phi)
 
 		return x, y, z
+	
+	def update_sample(self, selected_distribution, sample_options):
+		self.samples = self.distributions[selected_distribution].sample(sample_options)

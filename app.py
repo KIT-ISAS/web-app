@@ -12,14 +12,20 @@ external_stylesheets = [dbc.themes.CERULEAN]  # CERULEAN, DARKLY, PULSE
 
 server = flask.Flask(__name__)
 
-app = Dash(__name__, external_stylesheets=external_stylesheets, server=server, use_pages=True)  # , suppress_callback_exceptions=True
+app = Dash(
+	__name__, 
+	external_stylesheets=external_stylesheets,
+	server=server,
+	use_pages=True,
+	suppress_callback_exceptions=True # this is needed because renderer generate callbacks dynamically with per instance uuids	
+) 
 
 app.layout = dbc.Container([
 	html.H1('ISAS Interactive', 
 		style={
 			"caretColor": "transparent",
 			"userSelect": "none"
-    	}
+		}
 	),
 	dbc.Nav([
 		dbc.NavLink(
