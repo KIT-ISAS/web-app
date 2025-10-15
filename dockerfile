@@ -10,5 +10,9 @@ RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 COPY ./app.py /code/app.py
 COPY ./assets /code/assets
 COPY ./pages  /code/pages
+COPY ./util /code/util
+COPY ./components /code/components
+COPY ./renderer /code/renderer
+COPY ./model /code/model
 
 CMD ["python","app.py"]
