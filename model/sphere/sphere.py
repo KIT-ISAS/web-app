@@ -1,7 +1,12 @@
 import numpy as np
+import numpy as np
+from scipy.spatial import Delaunay
+import plotly.figure_factory as ff
+
 from model.distributions.distribution_loader import DistributionLoader
 from model.distributions.sphere.sphere_distribution import SphereDistribution
 from model.manifold import Manifold
+
 class Sphere(Manifold):
 	def __init__(self, resolution=50, radius=1):
 		self.xyz = self.generate_xyz(resolution, radius)
@@ -24,4 +29,42 @@ class Sphere(Manifold):
 		dist = self.distributions[selected_distribution]
 		sampling_method = dist.sampling_method_dict[selected_sampling_method]
 		self.samples = sampling_method.sample(sample_options, distribution_options)
+
+
+	def generate_trisurf(self, pdf, resolution=50, radius=1, alpha=0.5):
+		phi = np.linspace(0, np.pi, resolution)
+		theta = np.linspace(0, 2 * np.pi, resolution)
+		phi, theta = np.meshgrid(phi, theta)
+
+		phi = phi.flatten()
+		theta = theta.flatten()
+
+		x = radius * np.sin(phi) * np.cos(theta)
+		y = radius * np.sin(phi) * np.sin(theta)
+		z = radius * np.cos(phi)
+
+		points2D = np.vstack([phi,theta]).T
+		tri = Delaunay(points2D)
+		simplices = tri.simplices
+
+		xzy = np.column_stack((x, y, z))
+		dens = np.apply_along_axis(pdf, 1, xzy).astype(float)
+
+		
+		# extrude by multiplying by 1 + dens * alpha
+		# not to scale, but the alpha makes the density function look more clearly
+		xzy_extruded =  xzy * (1 + alpha * dens[:, np.newaxis])
+		x, y, z = xzy_extruded[:,0], xzy_extruded[:,1], xzy_extruded[:,2]
+
+		fig = ff.create_trisurf(x=x, y=y, z=z,
+								simplices=simplices,
+								show_colorbar=False,
+								)
+		fig.data[0].update(
+			opacity=0,
+			color='black'
+		)
+
+		
+		return fig.data
 

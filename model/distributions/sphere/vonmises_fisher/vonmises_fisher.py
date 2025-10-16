@@ -21,4 +21,7 @@ class vonMisesFisherDistribution(SphereDistribution):
 		return "von Mises-Fisher"
 
 	def get_pdf(self, distribution_options):
-		pass
+		kappa = distribution_options[0].state
+		def pdf(x):
+			return scipy.stats.vonmises_fisher.pdf(x, mu=[0,0,1], kappa=kappa)
+		return pdf

@@ -1,7 +1,8 @@
 from dash import html, dcc, callback, Input, Output, ALL, State
+import numpy as np
 import plotly.graph_objects as go
 import uuid
-
+import plotly.figure_factory as ff
 class Object3DRenderer:
 	def __init__(self, object_3D):
 		# dash doesnt like duplicate calback functions
@@ -102,6 +103,7 @@ class Object3DRenderer:
 			for opt, (id, new_state) in zip(dist_options, options_dist):
 				opt.update_state(new_state)
 
+			# samples 
 			self.object.update_sample(selected_distribution, selected_sampling, sampling_options, dist_options)
 
 			data =  [
@@ -116,8 +118,15 @@ class Object3DRenderer:
 					z=self.object.samples[:, 2],
 					mode="markers",
 					marker=dict(size=4, color="red")
-				)
+				),
 			]
+
+			# meshed density function plot plot
+			pdf = self.object.distributions[selected_distribution].get_pdf(dist_options)
+			if pdf is not None:
+				mesh_data = self.object.generate_trisurf(pdf)
+				data.extend(mesh_data)
+
 			return go.Figure(data=data, layout=self.fig.layout)
 		
 	def get_layout_components(self):

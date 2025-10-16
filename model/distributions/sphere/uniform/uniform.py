@@ -18,4 +18,7 @@ class SphereUniformDistribution(SphereDistribution):
 		return "Uniform"
 
 	def get_pdf(self, distribution_options):
-		pass
+		# https://math.stackexchange.com/questions/2315341/how-to-write-a-proper-definition-of-the-uniform-distribution-on-unit-sphere
+		def pdf(x):
+			return 1/ (4*np.pi)
+		return pdf

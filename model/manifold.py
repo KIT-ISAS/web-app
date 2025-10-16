@@ -12,3 +12,6 @@ class Manifold(ABC):
 	@abstractmethod
 	def update_sample(self,  selected_distribution, sample_options):
 		pass
+
+	def generate_trisurf(self, pdf, *args, **kwargs):
+		pass
