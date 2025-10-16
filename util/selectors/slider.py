@@ -61,6 +61,7 @@ class Slider(Selector):
 				tooltip={"placement": "bottom", "always_visible": True},
 				step=self.calculate_step(),
 				marks=self.calculate_marks(),
+				updatemode="drag",
 			)
 		])
 	
