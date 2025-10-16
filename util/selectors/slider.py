@@ -10,6 +10,8 @@ class Slider(Selector):
 		self.min = min
 		self.state = state
 		self.max = max
+
+		self.id = None
 		
 		
 	def calculate_step(self):
@@ -47,6 +49,7 @@ class Slider(Selector):
 
 
 	def to_dash_component(self, id):
+		self.id = id
 		return html.Div([
 			html.Label(self.name),
 

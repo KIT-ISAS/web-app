@@ -20,5 +20,8 @@ class Sphere(Manifold):
 
 		return x, y, z
 	
-	def update_sample(self, selected_distribution, sample_options):
-		self.samples = self.distributions[selected_distribution].sample(sample_options)
+	def update_sample(self, selected_distribution, selected_sampling_method, sample_options, distribution_options):
+		dist = self.distributions[selected_distribution]
+		sampling_method = dist.sampling_method_dict[selected_sampling_method]
+		self.samples = sampling_method.sample(sample_options, distribution_options)
+

@@ -22,10 +22,8 @@ class DistributionLoader:
 		if not hasattr(pkg, "__path__"):
 			raise ValueError(f"'{self.distribution_package}' is not a package (missing __path__).")
 		
-		for finder, name, ispkg in pkgutil.iter_modules(pkg.__path__):
-			if ispkg:
-				continue
-			module = importlib.import_module(f"{pkg.__name__}.{name}")
+		for finder, name, ispkg in pkgutil.walk_packages(pkg.__path__, prefix=pkg.__name__ + "."):
+			module = importlib.import_module(name)
 
 			for _, obj in inspect.getmembers(module, inspect.isclass):
 				# skip abstract, parametered intervace and non-subclasses

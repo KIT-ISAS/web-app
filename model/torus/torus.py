@@ -21,8 +21,10 @@ class Torus(Manifold):
 
 		return self.t_p_to_xyz(t, p, r, R)
 	
-	def update_sample(self, selected_distribution, sample_options):
-		new_sample = self.distributions[selected_distribution].sample(sample_options)
+	def update_sample(self, selected_distribution, selected_sampling_method, sample_options, distribution_options):
+		dist = self.distributions[selected_distribution]
+		sampling_method = dist.sampling_method_dict[selected_sampling_method]
+		new_sample = sampling_method.sample(sample_options, distribution_options)
 
 		if new_sample.size == 0:
 			self.samples = np.empty((0, 3), dtype=float)
