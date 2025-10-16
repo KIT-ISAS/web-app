@@ -10,7 +10,7 @@ from components.split_pane import SplitPane
 from model.sphere.sphere import Sphere
 
 
-dash.register_page(__name__)
+#dash.register_page(__name__)
 
 
 sphere = Sphere()
