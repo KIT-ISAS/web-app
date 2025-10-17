@@ -49,6 +49,6 @@ tzdata==2024.1
 urllib3==2.2.1
 vtk==9.5.2
 websockets==15.0.1
-Werkzeug==3.0.2
+Werkzeug==3.0.3
 yt-dlp==2025.9.26
 zipp==3.18.1
