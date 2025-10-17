@@ -47,18 +47,26 @@ class Sphere(Manifold):
 		tri = Delaunay(points2D)
 		simplices = tri.simplices
 
-		xzy = np.column_stack((x, y, z))
-		dens = np.apply_along_axis(pdf, 1, xzy).astype(float)
+		xyz = np.column_stack((x, y, z))
+		dens = np.apply_along_axis(pdf, 1, xyz).astype(float)
+
+		# clamp color function just below max
+		# even though colorscale is not shown, this prevents ff.create_trisurf from crashing due to an overflow
+		def cf(xi, yi, zi, zmin=np.min(z), zmax=np.max(z)):
+			if zi > zmax:
+				zi = np.nextafter(zmax, zmin)
+			return zi
 
 		
 		# extrude by multiplying by 1 + dens * alpha
 		# not to scale, but the alpha makes the density function look more clearly
-		xzy_extruded =  xzy * (1 + alpha * dens[:, np.newaxis])
-		x, y, z = xzy_extruded[:,0], xzy_extruded[:,1], xzy_extruded[:,2]
+		xyz_extruded =  xyz * (1 + alpha * dens[:, np.newaxis])
+		x, y, z = xyz_extruded[:,0], xyz_extruded[:,1], xyz_extruded[:,2]
 
 		fig = ff.create_trisurf(x=x, y=y, z=z,
 								simplices=simplices,
 								show_colorbar=False,
+								color_func=cf
 								)
 		fig.data[0].update(
 			opacity=0,
