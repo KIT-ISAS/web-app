@@ -15,7 +15,7 @@ dash.register_page(__name__)
 
 torus = Torus()
 
-renderer = Object3DRenderer(torus)
+renderer = Object3DRenderer(torus, "torus")
 options, graph = renderer.get_layout_components()
 
 layout = SplitPane(

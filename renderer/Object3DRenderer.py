@@ -2,13 +2,12 @@ from functools import lru_cache
 from dash import html, dcc, callback, Input, Output, ALL, State, Patch
 import numpy as np
 import plotly.graph_objects as go
-import uuid
 import plotly.figure_factory as ff
 class Object3DRenderer:
-	def __init__(self, object_3D):
+	def __init__(self, object_3D, id):
 		# dash doesnt like duplicate calback functions
 		# so each renderer instance gets a uuid for suffixing
-		self.uuid = str(uuid.uuid4()) 
+		self.id = id
 
 		# objects should have atleast one corresponding distribution
 		self.object = object_3D
@@ -52,7 +51,7 @@ class Object3DRenderer:
 
 		# updates wich sampling methods are available once distribution is selected
 		@callback(
-			Output(f"sampling-selector-{self.uuid}", "options"),
+			Output(f"sampling-selector-{self.id}", "options"),
 			Input("distribution-selector", "value"),
 		)
 		def update_sampling_methods(selected_distribution):
@@ -61,10 +60,10 @@ class Object3DRenderer:
 
 		# updates the options (silders, etc) for the selected distribution and sampling method
 		@callback(
-			Output(f"distribution-options-{self.uuid}", "children"),
-			Output(f"sampling-options-{self.uuid}", "children"),
+			Output(f"distribution-options-{self.id}", "children"),
+			Output(f"sampling-options-{self.id}", "children"),
 			Input("distribution-selector", "value"),
-			Input(f"sampling-selector-{self.uuid}", "value")
+			Input(f"sampling-selector-{self.id}", "value")
 		)
 		def update_curr_distribution(selected_distribution, selected_sampling):
 			# ids are given in the same order as options_dist and options_sampling
@@ -77,14 +76,14 @@ class Object3DRenderer:
 		
 		# updates the plot based on selected sampling options
 		@callback(
-			Output(f"graph-{self.uuid}", "figure"),
+			Output(f"graph-{self.id}", "figure"),
 			Input({"type": "dist", "index": ALL}, "value"),
 			State({"type": "dist", "index": ALL}, "id"),
 			Input({"type": "sampling", "index": ALL}, "value"),
 			State({"type": "sampling", "index": ALL}, "id"),
 			Input("distribution-selector", "value"),
-			Input(f"sampling-selector-{self.uuid}", "value"),
-			Input(f"distribution-options-{self.uuid}", "children"),
+			Input(f"sampling-selector-{self.id}", "value"),
+			Input(f"distribution-options-{self.id}", "children"),
 		)
 		def update_plot_sample(values_dist, ids_dist, values_samp, ids_samp, selected_distribution, selected_sampling, _):
 			dist_options =  self.object.distributions[selected_distribution].distribution_options
@@ -139,14 +138,14 @@ class Object3DRenderer:
 
 		# updates the plot based on selected sampling options
 		@callback(
-			Output(f"graph-{self.uuid}", "figure", allow_duplicate=True),
+			Output(f"graph-{self.id}", "figure", allow_duplicate=True),
 			Input({"type": "dist", "index": ALL}, "value"),
 			State({"type": "dist", "index": ALL}, "id"),
 			Input({"type": "sampling", "index": ALL}, "value"),
 			State({"type": "sampling", "index": ALL}, "id"),
 			Input("distribution-selector", "value"),
-			Input(f"sampling-selector-{self.uuid}", "value"),
-			Input(f"distribution-options-{self.uuid}", "children"),
+			Input(f"sampling-selector-{self.id}", "value"),
+			Input(f"distribution-options-{self.id}", "children"),
 			prevent_initial_call='initial_duplicate'
 		)
 		def update_plot_sample(values_dist, ids_dist, values_samp, ids_samp, selected_distribution, selected_sampling, _):
@@ -194,12 +193,12 @@ class Object3DRenderer:
 		
 	# updates the plot based on selected distribution options
 		@callback(
-			Output(f"graph-{self.uuid}", "figure", allow_duplicate=True),
+			Output(f"graph-{self.id}", "figure", allow_duplicate=True),
 			Input({"type": "dist", "index": ALL}, "value"),
 			State({"type": "dist", "index": ALL}, "id"),
 			Input("distribution-selector", "value"),
-			Input(f"sampling-selector-{self.uuid}", "value"),
-			Input(f"distribution-options-{self.uuid}", "children"),
+			Input(f"sampling-selector-{self.id}", "value"),
+			Input(f"distribution-options-{self.id}", "children"),
 			prevent_initial_call='initial_duplicate'
 		)
 		def update_plot_dist(values_dist, ids_dist, selected_distribution, selected_sampling, _):
@@ -247,7 +246,7 @@ class Object3DRenderer:
 			),
 			html.Br(),
 			dcc.RadioItems(
-				id=f"sampling-selector-{self.uuid}",
+				id=f"sampling-selector-{self.id}",
 				options=(list(initial_sampling_options)),
 				value=initial_sampling_method,
 			),
@@ -255,10 +254,10 @@ class Object3DRenderer:
 			html.Hr(),
 			html.Br(),
 
-			html.Div(id=f"distribution-options-{self.uuid}"),
-			html.Div(id=f"sampling-options-{self.uuid}"),
+			html.Div(id=f"distribution-options-{self.id}"),
+			html.Div(id=f"sampling-options-{self.id}"),
 		]
 
-		graph = [dcc.Graph(id=f"graph-{self.uuid}", figure=self.fig)]
+		graph = [dcc.Graph(id=f"graph-{self.id}", figure=self.fig)]
 
 		return options, graph

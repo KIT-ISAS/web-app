@@ -17,6 +17,7 @@ app = Dash(
 	external_stylesheets=external_stylesheets,
 	server=server,
 	use_pages=True,
+	serve_locally=True,
 	suppress_callback_exceptions=True # this is needed because renderer generate callbacks dynamically with per instance uuids	
 ) 
 

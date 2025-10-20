@@ -14,7 +14,7 @@ dash.register_page(__name__)
 
 sphere = Sphere()
 
-renderer = Object3DRenderer(sphere)
+renderer = Object3DRenderer(sphere, "sphere")
 options, graph = renderer.get_layout_components()
 
 

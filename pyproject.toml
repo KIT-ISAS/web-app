@@ -16,7 +16,8 @@ dependencies = [
     "pandas (>=2.2,<3.0)",
     "dash-vtk (>=0.0.9,<0.0.10)",
     "dash-resizable-panels (>=0.1.0,<0.2.0)",
-    "scipy (>=1.13,<2.0)"
+    "scipy (>=1.13,<2.0)",
+    "gunicorn (>=23.0.0,<24.0.0)"
 ]
 
 [dependency-groups]
