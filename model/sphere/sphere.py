@@ -14,6 +14,8 @@ class Sphere(Manifold):
 		self.samples = np.array([])
 		self.distributions = DistributionLoader(SphereDistribution, "model.distributions.sphere").get_distributions()
 
+		self.dist_cache = {}
+
 	def generate_xyz(self, resolution=50, radius=1):
 		phi = np.linspace(0, np.pi, resolution)
 		theta = np.linspace(0, 2 * np.pi, resolution)
@@ -31,7 +33,7 @@ class Sphere(Manifold):
 		self.samples = sampling_method.sample(sample_options, distribution_options)
 
 
-	def generate_trisurf(self, pdf, resolution=50, radius=1, alpha=0.5):
+	def generate_trisurf(self, pdf, resolution=30, radius=1, alpha=0.5):
 		phi = np.linspace(0, np.pi, resolution)
 		theta = np.linspace(0, 2 * np.pi, resolution)
 		phi, theta = np.meshgrid(phi, theta)
@@ -48,7 +50,7 @@ class Sphere(Manifold):
 		simplices = tri.simplices
 
 		xyz = np.column_stack((x, y, z))
-		dens = np.apply_along_axis(pdf, 1, xyz).astype(float)
+		dens = pdf(xyz)
 
 		# clamp color function just below max
 		# even though colorscale is not shown, this prevents ff.create_trisurf from crashing due to an overflow

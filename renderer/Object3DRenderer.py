@@ -1,4 +1,5 @@
-from dash import html, dcc, callback, Input, Output, ALL, State
+from functools import lru_cache
+from dash import html, dcc, callback, Input, Output, ALL, State, Patch
 import numpy as np
 import plotly.graph_objects as go
 import uuid
@@ -68,39 +69,41 @@ class Object3DRenderer:
 		def update_curr_distribution(selected_distribution, selected_sampling):
 			# ids are given in the same order as options_dist and options_sampling
 			options_dist = self.object.distributions[selected_distribution].distribution_options
-			options_dist_dcc = [opt.to_dash_component(f"dist-{id}") for id, opt in enumerate(options_dist)]
+			options_dist_dcc = [opt.to_dash_component("dist", id) for id, opt in enumerate(options_dist)]
 
 			options_sampling = self.object.distributions[selected_distribution].sampling_method_dict[selected_sampling]
-			options_sampling_dcc = [opt.to_dash_component(f"sampling-{id}") for id, opt in enumerate(options_sampling.sample_options)]
+			options_sampling_dcc = [opt.to_dash_component("sampling", id) for id, opt in enumerate(options_sampling.sample_options)]
 			return options_dist_dcc, options_sampling_dcc
 		
-		# updates the plot based on selected options
+		# updates the plot based on selected sampling options
 		@callback(
 			Output(f"graph-{self.uuid}", "figure"),
-			Input({"type": "dynamic-option", "index": ALL}, "value"),
-			State({"type": "dynamic-option", "index": ALL}, "id"),
+			Input({"type": "dist", "index": ALL}, "value"),
+			State({"type": "dist", "index": ALL}, "id"),
+			Input({"type": "sampling", "index": ALL}, "value"),
+			State({"type": "sampling", "index": ALL}, "id"),
 			Input("distribution-selector", "value"),
 			Input(f"sampling-selector-{self.uuid}", "value"),
 			Input(f"distribution-options-{self.uuid}", "children"),
 		)
-		def update_plot(values, ids, selected_distribution, selected_sampling, _):
+		def update_plot_sample(values_dist, ids_dist, values_samp, ids_samp, selected_distribution, selected_sampling, _):
 			dist_options =  self.object.distributions[selected_distribution].distribution_options
 			sampling_options = self.object.distributions[selected_distribution].sampling_method_dict[selected_sampling].sample_options
 
 			# the order of options might not be guaranteed, so we map them by their ids
-			id_value = {id_["index"]: v for id_, v in zip(ids, values)}
-			options_samp = [(k, v) for k, v in id_value.items() if str(k).startswith("sampling-")]
-			options_dist = [(k, v) for k, v in id_value.items() if str(k).startswith("dist-")]
+			id_value_dist = [(id,v) for id, v in zip(ids_dist, values_dist)]
+			id_value_samp = [(id,v) for id, v in zip(ids_samp, values_samp)]
+			
 
 			# and them sort them, so they are in the same order as sampling_options and dist_options
-			options_samp = sorted(options_samp, key=lambda x: int(x[0].split("-")[1]))
-			options_dist = sorted(options_dist, key=lambda x: int(x[0].split("-")[1]))
+			options_samp_new = sorted(id_value_samp, key=lambda x: int(x[0]["index"]))
+			options_dist_new = sorted(id_value_dist, key=lambda x: int(x[0]["index"]))
 
 
-			for opt, (id, new_state) in zip(sampling_options, options_samp):
+			for opt, (id, new_state) in zip(sampling_options, options_samp_new):
 				opt.update_state(new_state)
 
-			for opt, (id, new_state) in zip(dist_options, options_dist):
+			for opt, (id, new_state) in zip(dist_options, options_dist_new):
 				opt.update_state(new_state)
 
 			# samples 
@@ -122,12 +125,112 @@ class Object3DRenderer:
 			]
 
 			# meshed density function plot plot
-			pdf = self.object.distributions[selected_distribution].get_pdf(dist_options)
+			
+			mesh_data = []
+			pdf = self.object.distributions[selected_distribution].get_pdf(list(dist_options))
 			if pdf is not None:
 				mesh_data = self.object.generate_trisurf(pdf)
-				data.extend(mesh_data)
+			data.extend(mesh_data)
 
 			return go.Figure(data=data, layout=self.fig.layout)
+
+
+
+
+		# updates the plot based on selected sampling options
+		@callback(
+			Output(f"graph-{self.uuid}", "figure", allow_duplicate=True),
+			Input({"type": "dist", "index": ALL}, "value"),
+			State({"type": "dist", "index": ALL}, "id"),
+			Input({"type": "sampling", "index": ALL}, "value"),
+			State({"type": "sampling", "index": ALL}, "id"),
+			Input("distribution-selector", "value"),
+			Input(f"sampling-selector-{self.uuid}", "value"),
+			Input(f"distribution-options-{self.uuid}", "children"),
+			prevent_initial_call='initial_duplicate'
+		)
+		def update_plot_sample(values_dist, ids_dist, values_samp, ids_samp, selected_distribution, selected_sampling, _):
+			dist_options =  self.object.distributions[selected_distribution].distribution_options
+			sampling_options = self.object.distributions[selected_distribution].sampling_method_dict[selected_sampling].sample_options
+
+			# the order of options might not be guaranteed, so we map them by their ids
+			id_value_dist = [(id,v) for id, v in zip(ids_dist, values_dist)]
+			id_value_samp = [(id,v) for id, v in zip(ids_samp, values_samp)]
+			
+
+			# and them sort them, so they are in the same order as sampling_options and dist_options
+			options_samp_new = sorted(id_value_samp, key=lambda x: int(x[0]["index"]))
+			options_dist_new = sorted(id_value_dist, key=lambda x: int(x[0]["index"]))
+
+
+			for opt, (id, new_state) in zip(sampling_options, options_samp_new):
+				opt.update_state(new_state)
+
+			for opt, (id, new_state) in zip(dist_options, options_dist_new):
+				opt.update_state(new_state)
+
+			# samples 
+			self.object.update_sample(selected_distribution, selected_sampling, sampling_options, dist_options)
+
+
+			patched_figure = Patch()
+			
+			surface = go.Surface(
+					x=self.x, y=self.y, z=self.z,
+					showscale=False,
+					colorscale="Viridis",
+			)
+			points = go.Scatter3d(
+					x=self.object.samples[:, 0],
+					y=self.object.samples[:, 1],
+					z=self.object.samples[:, 2],
+					mode="markers",
+					marker=dict(size=4, color="red")
+			)
+			patched_figure["data"][0] = surface
+			patched_figure["data"][1] = points
+
+			return patched_figure
+		
+	# updates the plot based on selected distribution options
+		@callback(
+			Output(f"graph-{self.uuid}", "figure", allow_duplicate=True),
+			Input({"type": "dist", "index": ALL}, "value"),
+			State({"type": "dist", "index": ALL}, "id"),
+			Input("distribution-selector", "value"),
+			Input(f"sampling-selector-{self.uuid}", "value"),
+			Input(f"distribution-options-{self.uuid}", "children"),
+			prevent_initial_call='initial_duplicate'
+		)
+		def update_plot_dist(values_dist, ids_dist, selected_distribution, selected_sampling, _):
+			dist_options =  self.object.distributions[selected_distribution].distribution_options
+
+			# the order of options might not be guaranteed, so we map them by their ids
+			# and them sort them, so they are in the same order as sampling_options and dist_options
+			id_value_dist = [(id,v) for id, v in zip(ids_dist, values_dist)]
+			options_dist_new = sorted(id_value_dist, key=lambda x: int(x[0]["index"]))
+
+
+			for opt, (id, new_state) in zip(dist_options, options_dist_new):
+				opt.update_state(new_state)
+
+
+			# meshed density function plot plot
+			patched_figure = Patch()
+
+			
+			pdf = self.object.distributions[selected_distribution].get_pdf(list(dist_options))
+			if pdf is not None:
+				mesh_data = self.object.generate_trisurf(pdf)[0]
+				patched_figure["data"][2] = mesh_data
+
+			else:
+				del patched_figure["data"][2] 
+
+			return patched_figure
+		
+		
+		
 		
 	def get_layout_components(self):
 		initial_distribution = self.object.distributions[list(self.object.distributions.keys())[0]]

@@ -7,7 +7,7 @@ from util.selectors.slider import Slider
 class SphereUniformRandomSampling(SphereSamplingSchema):
 	def __init__(self):
 		self.sample_options = [
-			Slider("Number of Samples", 10, 100, 1000)
+			Slider("Number of Samples", 10, 100, 500)
 		]
 		
 	def get_name(self):

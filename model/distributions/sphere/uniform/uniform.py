@@ -20,5 +20,6 @@ class SphereUniformDistribution(SphereDistribution):
 	def get_pdf(self, distribution_options):
 		# https://math.stackexchange.com/questions/2315341/how-to-write-a-proper-definition-of-the-uniform-distribution-on-unit-sphere
 		def pdf(x):
-			return 1/ (4*np.pi)
+			N = np.shape(x)[0]
+			return (1/ (4*np.pi)) * np.ones(N)
 		return pdf

@@ -9,7 +9,7 @@ from util.selectors.slider import Slider
 class VonMisesRandomSampling(SphereSamplingSchema):
 	def __init__(self):
 		self.sample_options = [
-			Slider("Number of Samples", 1, 50, 1000),
+			Slider("Number of Samples", 1, 50, 500),
 		]
 		
 	def get_name(self):

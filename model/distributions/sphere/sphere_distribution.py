@@ -19,7 +19,7 @@ class SphereDistribution(ABC):
 	def sampling_method_dict(self):
 		return {m.get_name(): m for m in self.sampling_methods}
 
-	# returns a functions that takes a point [x, y, z] and returns the pdf value at that point
+	# returns a functions that takes a (N, 3) shape nparray and returns the pdf value at the points
 	@abstractmethod
 	def get_pdf(self, distribution_options):
 		pass
