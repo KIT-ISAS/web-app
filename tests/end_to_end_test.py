@@ -35,7 +35,7 @@ def test_003_has_one_slider(dash_duo, path):
 	link = dash_duo.wait_for_element(f'a.nav-link[href="{path}"]', timeout=10)
 	link.click()
 
-	# a plot should appear
+	# a slider should appear
 	dash_duo.wait_for_element("div.rc-slider", timeout=10)
 
 	assert dash_duo.get_logs() == [], "browser console should contain no error"
