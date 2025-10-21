@@ -38,7 +38,7 @@ sudo usermod -aG docker $USER
 
 # run with docker 
 ('docker-compose' for old docker version from debian repos, 'docker compose' for newer versions like ubuntu-latest github runner)
-docker-compose up -d --build
+docker-compose --profile default up -d --build
 
 run tests:
 docker compose --profile test build tests
