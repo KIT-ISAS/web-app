@@ -22,4 +22,4 @@ COPY ./tests /code/tests
 CMD ["poetry", "run", "pytest", "--headless"]
 
 FROM base AS prod
-CMD ["poetry", "run", "gunicorn", "--workers", "32", "--bind", "0.0.0.0:8080", "app:server"]
+CMD ["poetry", "run", "gunicorn", "--workers", "1", "--bind", "0.0.0.0:8080", "app:server"]

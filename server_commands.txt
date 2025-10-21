@@ -29,15 +29,22 @@ nohup python app.py &
 nohup gunicorn --bind 0.0.0.0:8080 --workers 32 app:server &
 TODO use daemon
 
+# install docker
+sudo apt update
+sudo apt install -y docker.io docker-compose
+sudo systemctl enable --now docker
+sudo usermod -aG docker $USER
+(then exit ssh and log back in)
+
 # run with docker 
-(install docker (compose before))
-docker compose up -d --build
+('docker-compose' for old docker version from debian repos, 'docker compose' for newer versions like ubuntu-latest github runner)
+docker-compose up -d --build
 
 run tests:
 docker compose --profile test build tests
 docker compose --profile test run --rm tests
 
-turn server off (not needed updating image):
+turn server off (not needed for updating image):
 docker compose down
 
 # Test in Browser
