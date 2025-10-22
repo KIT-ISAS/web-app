@@ -5,7 +5,7 @@ SLIDER_OPT_AMOUNT = 100
 SLIDER_MARK_AMOUNT = 5
 
 class Slider(Selector):
-	def __init__(self, name, min, state, max):
+	def __init__(self, name, min, state, max, custom_constraints=id):
 		self.name = name
 		self.min = min
 		self.state = state

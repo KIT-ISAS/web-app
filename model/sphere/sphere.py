@@ -77,4 +77,12 @@ class Sphere(Manifold):
 
 		
 		return fig.data
+	
+	@staticmethod
+	def spherical_to_cartesian(theta, phi, r=1):
+		x = r * np.sin(theta) * np.cos(phi)
+		y = r * np.sin(theta) * np.sin(phi)
+		z = r * np.cos(theta)
+
+		return x, y, z
 
