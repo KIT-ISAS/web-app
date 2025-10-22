@@ -1,0 +1,24 @@
+
+
+- Touch-Bedienung 
+- reverse proxy 
+- watchdog (Mail if down) 
+- touch Bedienung 
+
+
+alternatives
+Clientseitige Berechnung: D3/JavaScript
+https://observablehq.com/@d3/orthographic-to-equirectangular
+
+GeoGebra: https://www.geogebra.org/m/zxUzwgkH
+
+CindyJS: https://cindyjs.org/gallery/main/Regression/
+
+http://www.infinitecuriosity.org/vizgp/
+
+https://probstats.org/normal.html
+
+https://socr.umich.edu/HTML5/BivariateNormal/TVN/
+
+https://distill.pub/2019/visual-exploration-gaussian-processes/
+
