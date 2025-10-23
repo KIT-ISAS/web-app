@@ -15,21 +15,32 @@ class Object3DRenderer:
 		self.x, self.y, self.z = self.object.xyz
 	
 
-
+		# inital figure
 		self.fig = go.Figure(
 			data=[
 				go.Surface(
+					name="Surface",
 					x=self.x, y=self.y, z=self.z,
 					colorscale="Viridis",
-					showscale=False
+					showscale=False,
+					showlegend=True,
 				),
 				go.Scatter3d(
+					name="Samples",
 					x=self.object.samples[:, 0] if self.object.samples.size else [],
 					y=self.object.samples[:, 1] if self.object.samples.size else [],
 					z=self.object.samples[:, 2] if self.object.samples.size else [],
 					mode="markers",
-					marker=dict(size=4, color="red")
-				)
+					marker=dict(size=4, color="red"),
+				),
+				go.Scatter3d(
+					name="Density",
+					x=[], y=[], z=[],
+					mode="lines",
+					line=dict(color="black", width=1),
+					showlegend=True,
+					
+				),
 			]
 		)
 
@@ -73,67 +84,6 @@ class Object3DRenderer:
 			options_sampling = self.object.distributions[selected_distribution].sampling_method_dict[selected_sampling]
 			options_sampling_dcc = [opt.to_dash_component("sampling", id) for id, opt in enumerate(options_sampling.sample_options)]
 			return options_dist_dcc, options_sampling_dcc
-		
-		# updates the plot based on selected sampling options
-		@callback(
-			Output(f"graph-{self.id}", "figure"),
-			Input({"type": "dist", "index": ALL}, "value"),
-			State({"type": "dist", "index": ALL}, "id"),
-			Input({"type": "sampling", "index": ALL}, "value"),
-			State({"type": "sampling", "index": ALL}, "id"),
-			Input("distribution-selector", "value"),
-			Input(f"sampling-selector-{self.id}", "value"),
-			Input(f"distribution-options-{self.id}", "children"),
-		)
-		def update_plot_sample(values_dist, ids_dist, values_samp, ids_samp, selected_distribution, selected_sampling, _):
-			dist_options =  self.object.distributions[selected_distribution].distribution_options
-			sampling_options = self.object.distributions[selected_distribution].sampling_method_dict[selected_sampling].sample_options
-
-			# the order of options might not be guaranteed, so we map them by their ids
-			id_value_dist = [(id,v) for id, v in zip(ids_dist, values_dist)]
-			id_value_samp = [(id,v) for id, v in zip(ids_samp, values_samp)]
-			
-
-			# and them sort them, so they are in the same order as sampling_options and dist_options
-			options_samp_new = sorted(id_value_samp, key=lambda x: int(x[0]["index"]))
-			options_dist_new = sorted(id_value_dist, key=lambda x: int(x[0]["index"]))
-
-
-			for opt, (id, new_state) in zip(sampling_options, options_samp_new):
-				opt.update_state(new_state)
-
-			for opt, (id, new_state) in zip(dist_options, options_dist_new):
-				opt.update_state(new_state)
-
-			# samples 
-			self.object.update_sample(selected_distribution, selected_sampling, sampling_options, dist_options)
-
-			data =  [
-				go.Surface(
-					x=self.x, y=self.y, z=self.z,
-					showscale=False,
-					colorscale="Viridis",
-				),
-				go.Scatter3d(
-					x=self.object.samples[:, 0],
-					y=self.object.samples[:, 1],
-					z=self.object.samples[:, 2],
-					mode="markers",
-					marker=dict(size=4, color="red")
-				),
-			]
-
-			# meshed density function plot plot
-			
-			mesh_data = []
-			pdf = self.object.distributions[selected_distribution].get_pdf(list(dist_options))
-			if pdf is not None:
-				mesh_data = self.object.generate_trisurf(pdf)
-			data.extend(mesh_data)
-
-			return go.Figure(data=data, layout=self.fig.layout)
-
-
 
 
 		# updates the plot based on selected sampling options
@@ -173,21 +123,11 @@ class Object3DRenderer:
 
 
 			patched_figure = Patch()
-			
-			surface = go.Surface(
-					x=self.x, y=self.y, z=self.z,
-					showscale=False,
-					colorscale="Viridis",
-			)
-			points = go.Scatter3d(
-					x=self.object.samples[:, 0],
-					y=self.object.samples[:, 1],
-					z=self.object.samples[:, 2],
-					mode="markers",
-					marker=dict(size=4, color="red")
-			)
-			patched_figure["data"][0] = surface
-			patched_figure["data"][1] = points
+
+
+			patched_figure["data"][1].x = self.object.samples[:, 0]
+			patched_figure["data"][1].y = self.object.samples[:, 1]
+			patched_figure["data"][1].z = self.object.samples[:, 2]
 
 			return patched_figure
 		
@@ -220,11 +160,13 @@ class Object3DRenderer:
 			
 			pdf = self.object.distributions[selected_distribution].get_pdf(list(dist_options))
 			if pdf is not None:
-				mesh_data = self.object.generate_trisurf(pdf)[0]
-				patched_figure["data"][2] = mesh_data
-
+				x, y, z  = self.object.generate_mesh(pdf)
 			else:
-				del patched_figure["data"][2] 
+				x, y, z = [], [], []
+
+			patched_figure["data"][2].x = x
+			patched_figure["data"][2].y = y
+			patched_figure["data"][2].z = z
 
 			return patched_figure
 		

@@ -33,7 +33,7 @@ class Sphere(Manifold):
 		self.samples = sampling_method.sample(sample_options, distribution_options)
 
 
-	def generate_trisurf(self, pdf, resolution=30, radius=1, alpha=0.5):
+	def generate_mesh(self, pdf, resolution=30, radius=1, alpha=0.5):
 		phi = np.linspace(0, np.pi, resolution)
 		theta = np.linspace(0, 2 * np.pi, resolution)
 		phi, theta = np.meshgrid(phi, theta)
@@ -76,7 +76,7 @@ class Sphere(Manifold):
 		)
 
 		
-		return fig.data
+		return fig.data[1].x, fig.data[1].y, fig.data[1].z
 	
 	@staticmethod
 	def spherical_to_cartesian(theta, phi, r=1):
