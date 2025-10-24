@@ -1,7 +1,7 @@
 from dash import dcc, html
 from util.selectors.selector import Selector
 
-SLIDER_OPT_AMOUNT = 100
+SLIDER_OPT_AMOUNT = 30
 SLIDER_MARK_AMOUNT = 5
 
 class Slider(Selector):
