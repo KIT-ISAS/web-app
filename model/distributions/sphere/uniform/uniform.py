@@ -4,6 +4,7 @@ import numpy as np
 
 from model.distributions.sphere.sphere_distribution import SphereDistribution
 from model.distributions.sphere.uniform.random import SphereUniformRandomSampling
+from model.distributions.sphere.uniform.fibonachi_lattice import SphereUniformFibSampling
 
 
 class SphereUniformDistribution(SphereDistribution):
@@ -11,6 +12,7 @@ class SphereUniformDistribution(SphereDistribution):
 		self.distribution_options = []
 		self.sampling_methods = [
 			SphereUniformRandomSampling(),
+			SphereUniformFibSampling()
 		]
 
 

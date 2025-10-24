@@ -3,6 +3,7 @@ from dash import html, dcc, callback, Input, Output, ALL, State, Patch
 import numpy as np
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
+import dash
 class Object3DRenderer:
 	def __init__(self, object_3D, id):
 		# dash doesnt like duplicate calback functions
@@ -70,11 +71,15 @@ class Object3DRenderer:
 		# updates wich sampling methods are available once distribution is selected
 		@callback(
 			Output(f"sampling-selector-{self.id}", "options"),
+			Output(f"sampling-selector-{self.id}", "value"),
 			Input("distribution-selector", "value"),
 		)
 		def update_sampling_methods(selected_distribution):
 			options = list(self.object.distributions[selected_distribution].sampling_method_dict.keys())
-			return options
+
+			# set safe initial value
+			initial_value = options[0] 
+			return options, initial_value
 
 		# updates the options (silders, etc) for the selected distribution and sampling method
 		@callback(
@@ -106,9 +111,13 @@ class Object3DRenderer:
 			prevent_initial_call='initial_duplicate'
 		)
 		def update_plot_sample(values_dist, ids_dist, values_samp, ids_samp, selected_distribution, selected_sampling, _):
-			dist_options =  self.object.distributions[selected_distribution].distribution_options
-			sampling_options = self.object.distributions[selected_distribution].sampling_method_dict[selected_sampling].sample_options
-
+			try:
+				dist_options =  self.object.distributions[selected_distribution].distribution_options
+				sampling_options = self.object.distributions[selected_distribution].sampling_method_dict[selected_sampling].sample_options
+			except KeyError:
+				# got stale values, ignore
+				return dash.no_update
+			
 			# the order of options might not be guaranteed, so we map them by their ids
 			id_value_dist = [(id,v) for id, v in zip(ids_dist, values_dist)]
 			id_value_samp = [(id,v) for id, v in zip(ids_samp, values_samp)]

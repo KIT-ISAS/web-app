@@ -1909,7 +1909,7 @@ healpy-support = []
 [package.source]
 type = "git"
 url = "https://github.com/KIT-ISAS/pyRecEst.git"
-reference = "7ee536d"
+reference = "0.1.1"
 resolved_reference = "7ee536d3da48f05855d2d4d2eec6321e065e9a85"
 
 [[package]]
