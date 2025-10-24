@@ -38,7 +38,7 @@ class Object3DRenderer:
 					name="Density",
 					x=[], y=[], z=[],
 					mode="lines",
-					line=dict(color="black", width=1),
+					line=dict(color="#212121", width=0.5),
 					showlegend=True,
 					
 				),
