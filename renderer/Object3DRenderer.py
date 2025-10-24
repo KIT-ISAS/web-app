@@ -54,6 +54,13 @@ class Object3DRenderer:
 			margin=dict(l=0, r=0, t=0, b=0)
 		)
 
+		self.fig.update_layout(legend=dict(
+			yanchor="top",
+			y=0.99,
+			xanchor="right",
+			x=0.0
+		))
+
 		self._register_callbacks()
 
 	
