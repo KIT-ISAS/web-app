@@ -17,6 +17,11 @@ class Object3DRenderer:
 	
 
 		# inital figure
+		self.config = {
+			'responsive': True,
+			'scrollZoom': True,
+		}
+
 		self.fig = go.Figure(
 			data=[
 				go.Surface(
@@ -65,12 +70,6 @@ class Object3DRenderer:
 			xanchor="right",
 			x=0.0
 		))
-		config = {
-			'responsive': True,
-			'scrollZoom': True,
-		}
-		self.fig.show(config=config)
-
 		self._register_callbacks()
 
 	
@@ -232,6 +231,6 @@ class Object3DRenderer:
 			html.Div(id=f"sampling-options-{self.id}"),
 		]
 
-		graph = [dcc.Graph(id=f"graph-{self.id}", figure=self.fig)]
+		graph = [dcc.Graph(id=f"graph-{self.id}", figure=self.fig, config=self.config)]
 
 		return options, graph
