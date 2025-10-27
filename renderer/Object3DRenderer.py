@@ -150,6 +150,13 @@ class Object3DRenderer:
 			patched_figure["data"][1].y = self.object.samples[:, 1]
 			patched_figure["data"][1].z = self.object.samples[:, 2]
 
+			# set size based on number of samples
+			sample_count = self.object.samples.shape[0]
+			marker_size = (1/ np.sqrt(sample_count) ) * 30 # about 3 for sample size 100; scaled by sqrt
+			marker_size = np.minimum(4.7,marker_size) 
+			
+
+			patched_figure["data"][1].marker.size = marker_size	
 			return patched_figure
 		
 	# updates the plot based on selected distribution options
