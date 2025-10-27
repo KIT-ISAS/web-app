@@ -22,7 +22,16 @@ class vonMisesFisherDistribution(SphereDistribution):
 		return "von Mises-Fisher"
 
 	def get_pdf(self, distribution_options):
+		alpha = 0.7 # scale
+
 		kappa = distribution_options[0].state
 		def pdf(x):
-			return scipy.stats.vonmises_fisher.pdf(x, mu=[0,0,1], kappa=kappa)
+			 
+			misf = scipy.stats.vonmises_fisher.pdf(x, mu=[0,0,1], kappa=kappa)
+			max = np.max(misf)
+
+			norm = misf / max
+			norm = norm * alpha
+			return norm
+
 		return pdf

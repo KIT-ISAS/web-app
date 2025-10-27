@@ -61,6 +61,11 @@ class Object3DRenderer:
 			xanchor="right",
 			x=0.0
 		))
+		config = {
+			'responsive': True,
+			'scrollZoom': True,
+		}
+		self.fig.show(config=config)
 
 		self._register_callbacks()
 

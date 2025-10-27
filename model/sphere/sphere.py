@@ -49,7 +49,7 @@ class Sphere(Manifold):
 		xyz_extruded[mask] =  self.mesh_xyz[mask] * (1 + alpha * dens[:, np.newaxis])
 		return xyz_extruded[:,0], xyz_extruded[:,1], xyz_extruded[:,2]
 
-	def _init_mesh(self, resolution=1000):
+	def _init_mesh(self, resolution=3000):
 		xyz = SphereUniformFibSampling.sample(None, [Slider("Number of Samples", 10, resolution, resolution)] , [])
 		x, y, z = xyz[:,0], xyz[:,1], xyz[:,2]
 
