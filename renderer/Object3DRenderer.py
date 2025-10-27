@@ -32,7 +32,11 @@ class Object3DRenderer:
 					y=self.object.samples[:, 1] if self.object.samples.size else [],
 					z=self.object.samples[:, 2] if self.object.samples.size else [],
 					mode="markers",
-					marker=dict(size=4, color="red"),
+					marker=dict(
+						size=4,
+						color="red",
+						line=dict(width=1, color="black")
+					),
 				),
 				go.Scatter3d(
 					name="Density",
