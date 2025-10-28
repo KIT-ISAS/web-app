@@ -16,7 +16,8 @@ def SplitPane(children1, children2, default_size):
 					children=[
 						html.Div([
 							dbc.Container(children1, fluid=True)
-						], className="bg-light h-100 w-100 rounded-3") 
+						], className="bg-light h-100 w-100 rounded-3", style={'overflowY': 'auto'})
+						
 					],
 				),
 				PanelResizeHandle(

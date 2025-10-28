@@ -20,8 +20,8 @@ class WatsonRandomSampling(SphereSamplingSchema):
 	def sample(self, sample_options, distribution_options):
 		kappa = distribution_options[0].state
 		
-		theta = distribution_options[1].state
-		phi = distribution_options[2].state
+		theta = 0 # can be hardcoded because the user can just turn the sphere
+		phi = 0
 
 		numsamp = sample_options[0].state
 

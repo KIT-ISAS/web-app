@@ -9,8 +9,8 @@ from model.distributions.sphere.bingham.random import BinghamRandomSampling
 class BinghampDistribution(SphereDistribution):
 	def __init__(self):
 		self.distribution_options = [
-			FloatSlider("Lambda 1 (λ₁)", -0.49, 0, 0),
-			FloatSlider("Lambda 2 (λ₂)", -0.49, 0, 0),
+			FloatSlider("Lambda 1 (λ₁)", 0, 0, 10),
+			FloatSlider("Lambda 2 (λ₂)", 0, 0, 10),
 		]
 		
 		self.sampling_methods = [

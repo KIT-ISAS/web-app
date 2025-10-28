@@ -231,6 +231,6 @@ class Object3DRenderer:
 			html.Div(id=f"sampling-options-{self.id}"),
 		]
 
-		graph = [dcc.Graph(id=f"graph-{self.id}", figure=self.fig, config=self.config)]
+		graph = [dcc.Graph(id=f"graph-{self.id}", figure=self.fig, config=self.config, style={'height': '100%'})]
 
 		return options, graph
