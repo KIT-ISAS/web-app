@@ -22,10 +22,13 @@ class KentRandomSampling(SphereSamplingSchema):
 		beta = distribution_options[1].state
 		beta = min(beta, kappa / 2) # TODO make this dynamic
 
-		mu_theta = distribution_options[2].state
-		mu_phi = distribution_options[3].state
-		mu0_theta = distribution_options[4].state
-		mu0_phi = distribution_options[5].state
+
+		# can be hardcoded because the user can just turn the sphere 
+		# (only affects where the distribution is centered)
+		mu_theta = 0
+		mu_phi = 0	
+		mu0_theta = distribution_options[2].state
+		mu0_phi = distribution_options[3].state
 
 		mu1, mu2, mu3 = Sphere.spherical_to_cartesian(mu_theta, mu_phi)
 		mu0_1, mu0_2, mu0_3 = Sphere.spherical_to_cartesian(mu0_theta, mu0_phi)
