@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from model.distributions.sphere.sphere_distribution import SphereDistribution
-from util.selectors.slider_float import FloatSlider 
+from util.selectors.slider import Slider 
 import numpy as np
 
 import pyrecest._backend
@@ -13,8 +13,8 @@ from model.distributions.sphere.bingham.random import BinghamRandomSampling
 class BinghampDistribution(SphereDistribution):
 	def __init__(self):
 		self.distribution_options = [
-			FloatSlider("Lambda 1 (λ₁)", 0, 0, 10),
-			FloatSlider("Lambda 2 (λ₂)", 0, 0, 10),
+			Slider("Lambda 1 (λ₁)", 0, 0, 10),
+			Slider("Lambda 2 (λ₂)", 0, 0, 10),
 		]
 		
 		self.sampling_methods = [
@@ -24,7 +24,9 @@ class BinghampDistribution(SphereDistribution):
 	def get_name(self):
 		return "Bingham"
 
-	def get_pdf(self, distribution_options):			
+	def get_pdf(self, distribution_options):
+		alpha = 0.7 # scale
+
 		l1 = distribution_options[0].state
 		l2 = distribution_options[1].state
 
@@ -36,5 +38,9 @@ class BinghampDistribution(SphereDistribution):
 
 
 		def pdf(x):
-			return bingham_dist.pdf(array(x))
+			bing = bingham_dist.pdf(array(x))
+			max = np.max(bing)
+			norm = bing / max
+			norm = norm * alpha
+			return norm
 		return pdf
