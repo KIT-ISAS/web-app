@@ -68,7 +68,7 @@ class Object3DRenderer:
 			yanchor="top",
 			y=0.99,
 			xanchor="right",
-			x=0.0
+			x=0.1,
 		))
 		self._register_callbacks()
 
