@@ -32,7 +32,6 @@ class BinghampDistribution(SphereDistribution):
 
 		lambdas = np.sort(np.array([l1, l2, 0]))[::-1]
 		lambdas = -lambdas
-		print(lambdas)
 		M = np.eye(3)
 		bingham_dist = BinghamDistribution(M=array(M), Z=array(lambdas))
 
