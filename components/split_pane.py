@@ -14,10 +14,10 @@ def SplitPane(children1, children2, default_size):
 					minSizePercentage=15,
 					defaultSizePercentage=default_size,
 					children=[
-						html.Div([
-							dbc.Container(children1, fluid=True)
-						], className="bg-light h-100 w-100 rounded-3", style={'overflowY': 'auto'})
-						
+						html.Div(
+							children1,
+							className="bg-light h-100 w-100 rounded-3 p-3 pb-5", style={'overflowY': 'scroll', 'overflowX': 'hidden', 'minHeight': '0'},
+							)
 					],
 				),
 				PanelResizeHandle(
@@ -35,14 +35,15 @@ def SplitPane(children1, children2, default_size):
 				Panel(
 					id='plot-panel',
 					minSizePercentage=15,
-					children=[
-						dbc.Container(children2, fluid=True)
-					],
+					children=children2,
 				)
 			], 
 			direction='horizontal',
-			className='h-100 w-100 px-0',
+			className='w-100 px-0 pb-2',
+			style={'minHeight': '0'}
 		)
 	], 
-	className='h-100 px-0',
+	className='px-0 flex-grow-1 d-flex flex-column',
+	id='pangelgroup-parent-container',
+	style={'minHeight': '0'}
 	)

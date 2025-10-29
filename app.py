@@ -39,7 +39,7 @@ app.layout = dbc.Container([
 		for page in dash.page_registry.values()
 	], pills=True, className='bg-light rounded-3'),
 	html.P(),
-	html.Div(dash.page_container, className="flex-grow-1")
+	html.Div(dash.page_container, className="flex-grow-1 d-flex flex-column", id="outer-page-container", style={'minHeight': '0'})
 ], 
 fluid=True,
 className="vh-100 d-flex flex-column"

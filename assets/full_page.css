@@ -1,0 +1,13 @@
+/* Dash puts pages inside 2 divs that are not styleable otherwise */
+#outer-page-container > * { /* this is the empty div dash puts pages inside */
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+}
+#_pages_content {
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+}
