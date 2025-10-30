@@ -8,6 +8,7 @@ from pyrecest.backend import array
 from pyrecest.distributions import WatsonDistribution as WatsonDistributionPyrecest
 
 from model.distributions.sphere.watson.random import WatsonRandomSampling
+from model.distributions.sphere.watson.fibonachi import WatsonFibonachiSampling
 
 
 class WatsonDistribution(SphereDistribution):
@@ -17,7 +18,8 @@ class WatsonDistribution(SphereDistribution):
 		]
 		
 		self.sampling_methods = [
-			WatsonRandomSampling()
+			WatsonRandomSampling(),
+			WatsonFibonachiSampling(),
 		]
 
 	def get_name(self):

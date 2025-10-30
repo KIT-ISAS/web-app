@@ -47,6 +47,9 @@ docker compose --profile test run --rm tests
 turn server off (not needed for updating image):
 docker compose down
 
+clean up onld images:
+docker image prune -a -f
+
 # Test in Browser
 http://193.196.39.120:8080
 
