@@ -10,7 +10,48 @@ class Object3DAnd2DRenderer(Object3DRenderer):
 		self.register_plot_callbacks()
 		self.register_mode_callbacks()
 
-		self.fig_2d = go.Figure()
+		self.fig_2d = go.Figure(
+			data=[
+				go.Scatter(
+					name="Samples",
+					x=[],
+					y=[],
+					mode="markers",
+					marker=dict(
+						size=6,
+						color="red",
+						line=dict(width=1, color="black")
+					),
+					marker_color="red",
+					marker_size=6,
+					marker_line_color="black",
+					showlegend=True,
+				),
+			]
+		)
+		self.fig_2d.update_layout(legend=dict(
+			yanchor="top",
+			y=0.99,
+			xanchor="left",
+			x=0.01,
+		))
+		self.fig_2d.update_layout(dragmode="pan")
+
+		if object.axes_2d is not None:
+			self.fig_2d.update_xaxes(
+				title_text="t",
+				tickmode="array",
+				tickvals=object.axes_2d[0],
+				ticktext=object.axes_2d[1],
+				zeroline=False,
+			)
+			self.fig_2d.update_yaxes(
+				title_text="p",
+				tickmode="array",
+				tickvals=object.axes_2d[0],
+				ticktext=object.axes_2d[1],
+				zeroline=False,
+			)
 
 	def register_plot_callbacks(self):
 		# updates the plot based on selected sampling options
@@ -67,7 +108,41 @@ class Object3DAnd2DRenderer(Object3DRenderer):
 				return self.fig_2d, new_data
 
 	def update_plot_sample_2d(self, values_dist, ids_dist, values_samp, ids_samp, selected_distribution, selected_sampling, _):
-		return no_update
+		try:
+			dist_options =  self.object.distributions[selected_distribution].distribution_options
+			sampling_options = self.object.distributions[selected_distribution].sampling_method_dict[selected_sampling].sample_options
+		except KeyError:
+			# got stale values, ignore
+			return no_update
+		
+		# the order of options might not be guaranteed, so we map them by their ids
+		id_value_dist = [(id,v) for id, v in zip(ids_dist, values_dist)]
+		id_value_samp = [(id,v) for id, v in zip(ids_samp, values_samp)]
+		
+
+		# and them sort them, so they are in the same order as sampling_options and dist_options
+		options_samp_new = sorted(id_value_samp, key=lambda x: int(x[0]["index"]))
+		options_dist_new = sorted(id_value_dist, key=lambda x: int(x[0]["index"]))
+
+
+		for opt, (id, new_state) in zip(sampling_options, options_samp_new):
+			opt.update_state(new_state)
+
+		for opt, (id, new_state) in zip(dist_options, options_dist_new):
+			opt.update_state(new_state)
+
+		# samples 
+		self.object.update_sample(selected_distribution, selected_sampling, sampling_options, dist_options)
+
+		patched_figure = Patch()
+		tp = self.object.samples_2d
+
+		# x is p, y is t
+		patched_figure["data"][0].x = tp[:, 1]
+		patched_figure["data"][0].y = tp[:, 0]
+
+		return patched_figure
+
 
 	def update_plot_dist_2d(self, values_dist, ids_dist, selected_distribution, selected_sampling, _):
 		return no_update

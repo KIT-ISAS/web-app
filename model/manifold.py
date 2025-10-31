@@ -1,6 +1,9 @@
 from abc import ABC, abstractmethod
 
 class Manifold(ABC):
+	def __init__(self):
+		# optional axis labels if the manifold supports 2D rendering
+		self.axes_2d = None
 
 	# generates renderable xyz grid
 	@abstractmethod

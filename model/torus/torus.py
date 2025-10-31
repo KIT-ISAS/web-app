@@ -8,10 +8,16 @@ class Torus(Manifold):
 		self.xyz = self.generate_xyz(resolution, r, R)
 		self.mesh = np.array([])
 		self.samples = np.array([])
+		self.samples_2d = np.array([])
 		self.distributions = DistributionLoader(TorusDistribution, "model.distributions.torus").get_distributions()
 
 		self.r = r
 		self.R = R
+
+		self.axes_2d = (
+			np.arange(0, 2.5 * np.pi, np.pi / 2), # 0, π/2, π, 3π/2, 2π
+			["0", "π/2", "π", "3π/2", "2π"]
+		)
 
 	def generate_xyz(self, resolution=50, r=1, R=3):
 		t = np.linspace(0, 2*np.pi, resolution)
@@ -33,6 +39,7 @@ class Torus(Manifold):
 		x, y, z = self.t_p_to_xyz(new_sample[:,0], new_sample[:,1], self.r, self.R)
 
 		self.samples = np.column_stack((x, y, z))
+		self.samples_2d = new_sample
 
 
 	@staticmethod
