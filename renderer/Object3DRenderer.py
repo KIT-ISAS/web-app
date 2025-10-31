@@ -20,6 +20,7 @@ class Object3DRenderer:
 		self.config = {
 			'responsive': True,
 			'scrollZoom': True,
+			"modeBarButtonsToRemove": ["select2d", "lasso2d"],
 		}
 
 		self.fig = go.Figure(
