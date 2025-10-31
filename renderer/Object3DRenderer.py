@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 import plotly.figure_factory as ff
 import dash
 class Object3DRenderer:
-	def __init__(self, object_3D, id):
+	def __init__(self, object_3D, id, register_3d_callbacks=True):
 		# dash doesnt like duplicate calback functions
 		# so each renderer instance gets a uuid for suffixing
 		self.id = id
@@ -71,6 +71,8 @@ class Object3DRenderer:
 			x=0.1,
 		))
 		self._register_callbacks()
+		if register_3d_callbacks:
+			self._register_3d_plot_callbacks()
 
 	
 	def _register_callbacks(self):
@@ -105,6 +107,7 @@ class Object3DRenderer:
 			options_sampling_dcc = [opt.to_dash_component("sampling", id) for id, opt in enumerate(options_sampling.sample_options)]
 			return options_dist_dcc, options_sampling_dcc
 
+	def _register_3d_plot_callbacks(self):
 
 		# updates the plot based on selected sampling options
 		@callback(
@@ -118,51 +121,10 @@ class Object3DRenderer:
 			Input(f"distribution-options-{self.id}", "children"),
 			prevent_initial_call='initial_duplicate'
 		)
-		def update_plot_sample(values_dist, ids_dist, values_samp, ids_samp, selected_distribution, selected_sampling, _):
-			try:
-				dist_options =  self.object.distributions[selected_distribution].distribution_options
-				sampling_options = self.object.distributions[selected_distribution].sampling_method_dict[selected_sampling].sample_options
-			except KeyError:
-				# got stale values, ignore
-				return dash.no_update
-			
-			# the order of options might not be guaranteed, so we map them by their ids
-			id_value_dist = [(id,v) for id, v in zip(ids_dist, values_dist)]
-			id_value_samp = [(id,v) for id, v in zip(ids_samp, values_samp)]
-			
-
-			# and them sort them, so they are in the same order as sampling_options and dist_options
-			options_samp_new = sorted(id_value_samp, key=lambda x: int(x[0]["index"]))
-			options_dist_new = sorted(id_value_dist, key=lambda x: int(x[0]["index"]))
-
-
-			for opt, (id, new_state) in zip(sampling_options, options_samp_new):
-				opt.update_state(new_state)
-
-			for opt, (id, new_state) in zip(dist_options, options_dist_new):
-				opt.update_state(new_state)
-
-			# samples 
-			self.object.update_sample(selected_distribution, selected_sampling, sampling_options, dist_options)
-
-
-			patched_figure = Patch()
-
-
-			patched_figure["data"][1].x = self.object.samples[:, 0]
-			patched_figure["data"][1].y = self.object.samples[:, 1]
-			patched_figure["data"][1].z = self.object.samples[:, 2]
-
-			# set size based on number of samples
-			sample_count = self.object.samples.shape[0]
-			marker_size = (1/ np.sqrt(sample_count) ) * 30 # about 3 for sample size 100; scaled by sqrt
-			marker_size = np.minimum(4.7,marker_size) 
-			
-
-			patched_figure["data"][1].marker.size = marker_size	
-			return patched_figure
+		def update_plot_sample_callback(values_dist, ids_dist, values_samp, ids_samp, selected_distribution, selected_sampling, _):
+			return self.update_plot_sample(values_dist, ids_dist, values_samp, ids_samp, selected_distribution, selected_sampling, _)
 		
-	# updates the plot based on selected distribution options
+		# updates the plot based on selected distribution options
 		@callback(
 			Output(f"graph-{self.id}", "figure", allow_duplicate=True),
 			Input({"type": "dist", "index": ALL}, "value"),
@@ -172,7 +134,56 @@ class Object3DRenderer:
 			Input(f"distribution-options-{self.id}", "children"),
 			prevent_initial_call='initial_duplicate'
 		)
-		def update_plot_dist(values_dist, ids_dist, selected_distribution, selected_sampling, _):
+		def update_plot_dist_callback(values_dist, ids_dist, selected_distribution, selected_sampling, _):
+			return self.update_plot_dist(values_dist, ids_dist, selected_distribution, selected_sampling, _)
+
+		
+		
+	def update_plot_sample(self, values_dist, ids_dist, values_samp, ids_samp, selected_distribution, selected_sampling, _):
+		try:
+			dist_options =  self.object.distributions[selected_distribution].distribution_options
+			sampling_options = self.object.distributions[selected_distribution].sampling_method_dict[selected_sampling].sample_options
+		except KeyError:
+			# got stale values, ignore
+			return dash.no_update
+		
+		# the order of options might not be guaranteed, so we map them by their ids
+		id_value_dist = [(id,v) for id, v in zip(ids_dist, values_dist)]
+		id_value_samp = [(id,v) for id, v in zip(ids_samp, values_samp)]
+		
+
+		# and them sort them, so they are in the same order as sampling_options and dist_options
+		options_samp_new = sorted(id_value_samp, key=lambda x: int(x[0]["index"]))
+		options_dist_new = sorted(id_value_dist, key=lambda x: int(x[0]["index"]))
+
+
+		for opt, (id, new_state) in zip(sampling_options, options_samp_new):
+			opt.update_state(new_state)
+
+		for opt, (id, new_state) in zip(dist_options, options_dist_new):
+			opt.update_state(new_state)
+
+		# samples 
+		self.object.update_sample(selected_distribution, selected_sampling, sampling_options, dist_options)
+
+
+		patched_figure = Patch()
+
+
+		patched_figure["data"][1].x = self.object.samples[:, 0]
+		patched_figure["data"][1].y = self.object.samples[:, 1]
+		patched_figure["data"][1].z = self.object.samples[:, 2]
+
+		# set size based on number of samples
+		sample_count = self.object.samples.shape[0]
+		marker_size = (1/ np.sqrt(sample_count) ) * 30 # about 3 for sample size 100; scaled by sqrt
+		marker_size = np.minimum(4.7,marker_size) 
+		
+
+		patched_figure["data"][1].marker.size = marker_size	
+		return patched_figure
+	
+	def update_plot_dist(self, values_dist, ids_dist, selected_distribution, selected_sampling, _):
 			dist_options =  self.object.distributions[selected_distribution].distribution_options
 
 			# the order of options might not be guaranteed, so we map them by their ids

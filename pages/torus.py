@@ -8,14 +8,14 @@ import numpy as np
 
 from components.split_pane import SplitPane
 from model.torus.torus import Torus
-from renderer.Object3DRenderer import Object3DRenderer
+from renderer.Object3DAnd2DRenderer import Object3DAnd2DRenderer
 
 
 dash.register_page(__name__)
 
 torus = Torus()
 
-renderer = Object3DRenderer(torus, "torus")
+renderer = Object3DAnd2DRenderer(torus, "torus")
 options, graph = renderer.get_layout_components()
 
 layout = SplitPane(
