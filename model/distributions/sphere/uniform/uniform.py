@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from util.selectors.slider import Slider 
 import numpy as np
 
 from model.distributions.sphere.sphere_distribution import SphereDistribution

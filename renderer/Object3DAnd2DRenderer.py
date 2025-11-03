@@ -12,7 +12,7 @@ class Object3DAnd2DRenderer(Object3DRenderer):
 
 		self.fig_2d = go.Figure(
 			data=[
-				go.Scatter(
+				go.Scattergl(
 					name="Samples",
 					x=[],
 					y=[],

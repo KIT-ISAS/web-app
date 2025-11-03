@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
 from model.distributions.torus.torus_sampling_schema import TorusSamplingSchema
-from util.selectors.slider import Slider 
+from util.selectors.silder_log import LogSlider 
 import numpy as np
 
 class TorusRandomUniformSampling(TorusSamplingSchema):
 	def __init__(self):
 		self.sample_options = [
-			Slider("Number of Samples", 10, 100, 500)
+			LogSlider("Number of Samples", 10, 100, 10000)
 		]
 
 	def get_name(self):

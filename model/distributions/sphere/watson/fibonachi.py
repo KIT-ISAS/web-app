@@ -8,14 +8,14 @@ from pyrecest.backend import array
 from pyrecest.distributions import WatsonDistribution as WatsonDistributionPyrecest
 
 from model.distributions.sphere.sphere_sampling_schema import SphereSamplingSchema
-from util.selectors.slider import Slider 
+from util.selectors.silder_log import LogSlider
 from model.sphere.sphere import Sphere
 
 
 class WatsonFibonachiSampling(SphereSamplingSchema):
 	def __init__(self):
 		self.sample_options = [
-			Slider("Number of Samples", 1, 50, 100),
+			LogSlider("Number of Samples", 10, 100, 10000),
 		]
 		
 	def get_name(self):

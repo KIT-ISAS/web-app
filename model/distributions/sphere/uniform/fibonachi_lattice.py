@@ -3,12 +3,12 @@ import numpy as np
 
 
 from model.distributions.sphere.sphere_sampling_schema import SphereSamplingSchema
-from util.selectors.slider import Slider 
+from util.selectors.silder_log import LogSlider 
 
 class SphereUniformFibSampling(SphereSamplingSchema):
 	def __init__(self):
 		self.sample_options = [
-			Slider("Number of Samples", 10, 100, 500)
+			LogSlider("Number of Samples", 10, 100, 10000)
 		]
 		
 	def get_name(self):
