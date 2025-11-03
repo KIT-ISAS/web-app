@@ -1,4 +1,5 @@
 from dash import html, dcc, callback, Input, Output, ALL, State, Patch, no_update
+import numpy as np
 import plotly.graph_objects as go
 
 from renderer.Object3DRenderer import Object3DRenderer
@@ -66,13 +67,14 @@ class Object3DAnd2DRenderer(Object3DRenderer):
 			Input("distribution-selector", "value"),
 			Input(f"sampling-selector-{self.id}", "value"),
 			Input(f"distribution-options-{self.id}", "children"),
+			State(f"device-pixel-ratio-{self.id}", "data"),
 			prevent_initial_call='initial_duplicate'
 		)
-		def update_plot_sample_callback(mode, _mode_counter, values_dist, ids_dist, values_samp, ids_samp, selected_distribution, selected_sampling, _):
+		def update_plot_sample_callback(mode, _mode_counter, values_dist, ids_dist, values_samp, ids_samp, selected_distribution, selected_sampling, _, dpr):
 			if mode == "3D View":
-				return self.update_plot_sample(values_dist, ids_dist, values_samp, ids_samp, selected_distribution, selected_sampling, _)
+				return self.update_plot_sample(values_dist, ids_dist, values_samp, ids_samp, selected_distribution, selected_sampling, _, dpr)
 			else:
-				return self.update_plot_sample_2d(values_dist, ids_dist, values_samp, ids_samp, selected_distribution, selected_sampling, _)
+				return self.update_plot_sample_2d(values_dist, ids_dist, values_samp, ids_samp, selected_distribution, selected_sampling, _, dpr)
 		
 		# updates the plot based on selected distribution options
 		@callback(
@@ -107,7 +109,7 @@ class Object3DAnd2DRenderer(Object3DRenderer):
 			else:
 				return self.fig_2d, new_data
 
-	def update_plot_sample_2d(self, values_dist, ids_dist, values_samp, ids_samp, selected_distribution, selected_sampling, _):
+	def update_plot_sample_2d(self, values_dist, ids_dist, values_samp, ids_samp, selected_distribution, selected_sampling, _, dpr):
 		try:
 			dist_options =  self.object.distributions[selected_distribution].distribution_options
 			sampling_options = self.object.distributions[selected_distribution].sampling_method_dict[selected_sampling].sample_options
@@ -137,6 +139,13 @@ class Object3DAnd2DRenderer(Object3DRenderer):
 		patched_figure = Patch()
 		tp = self.object.samples_2d
 
+		# marker size scaling
+		sample_count = self.object.samples.shape[0]
+		marker_size = (10 * (sample_count / 100) ** (-0.35)) / dpr
+		marker_size = np.minimum(10,marker_size)
+
+		patched_figure["data"][0].marker.size = marker_size
+
 		# x is p, y is t
 		patched_figure["data"][0].x = tp[:, 1]
 		patched_figure["data"][0].y = tp[:, 0]
@@ -153,6 +162,8 @@ class Object3DAnd2DRenderer(Object3DRenderer):
 		initial_sampling_options = [x.get_name() for x in initial_distribution.sampling_methods]
 		
 		options = [
+			dcc.Store(id=f"device-pixel-ratio-{self.id}", data=1),
+
 			html.P("Select Visualization Mode:"),
 
 			# needed to create dependecy between mode selector and plot update callbacks

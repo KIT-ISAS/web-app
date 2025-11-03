@@ -1,5 +1,5 @@
 from functools import lru_cache
-from dash import html, dcc, callback, Input, Output, ALL, State, Patch
+from dash import html, dcc, callback, Input, Output, ALL, State, Patch, clientside_callback, ClientsideFunction
 import numpy as np
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
@@ -9,6 +9,7 @@ class Object3DRenderer:
 		# dash doesnt like duplicate calback functions
 		# so each renderer instance gets a uuid for suffixing
 		self.id = id
+		self.device_pixel_ratio = 1.0
 
 		# objects should have atleast one corresponding distribution
 		self.object = object_3D
@@ -78,6 +79,12 @@ class Object3DRenderer:
 	
 	def _register_callbacks(self):
 
+		# gets device pixel ratio from scaling of samples
+		clientside_callback(
+			ClientsideFunction(namespace="utils", function_name="getDevicePixelRatio"),
+			Output(f"device-pixel-ratio-{self.id}", "data"),
+			Input(f"graph-{self.id}", "figure"),
+		)
 
 		# updates wich sampling methods are available once distribution is selected
 		@callback(
@@ -120,10 +127,11 @@ class Object3DRenderer:
 			Input("distribution-selector", "value"),
 			Input(f"sampling-selector-{self.id}", "value"),
 			Input(f"distribution-options-{self.id}", "children"),
+			State(f"device-pixel-ratio-{self.id}", "data"),
 			prevent_initial_call='initial_duplicate'
 		)
-		def update_plot_sample_callback(values_dist, ids_dist, values_samp, ids_samp, selected_distribution, selected_sampling, _):
-			return self.update_plot_sample(values_dist, ids_dist, values_samp, ids_samp, selected_distribution, selected_sampling, _)
+		def update_plot_sample_callback(values_dist, ids_dist, values_samp, ids_samp, selected_distribution, selected_sampling, _, dpr):
+			return self.update_plot_sample(values_dist, ids_dist, values_samp, ids_samp, selected_distribution, selected_sampling, _, dpr)
 		
 		# updates the plot based on selected distribution options
 		@callback(
@@ -140,7 +148,7 @@ class Object3DRenderer:
 
 		
 		
-	def update_plot_sample(self, values_dist, ids_dist, values_samp, ids_samp, selected_distribution, selected_sampling, _):
+	def update_plot_sample(self, values_dist, ids_dist, values_samp, ids_samp, selected_distribution, selected_sampling, _, dpr):
 		try:
 			dist_options =  self.object.distributions[selected_distribution].distribution_options
 			sampling_options = self.object.distributions[selected_distribution].sampling_method_dict[selected_sampling].sample_options
@@ -177,8 +185,8 @@ class Object3DRenderer:
 
 		# set size based on number of samples
 		sample_count = self.object.samples.shape[0]
-		marker_size = (1/ np.sqrt(sample_count) ) * 30 # about 3 for sample size 100; scaled by sqrt
-		marker_size = np.minimum(4.7,marker_size) 
+		marker_size = (10 * (sample_count / 100) ** (-0.35)) / dpr
+		marker_size = np.minimum(10,marker_size) 
 		
 
 		patched_figure["data"][1].marker.size = marker_size	
@@ -222,6 +230,7 @@ class Object3DRenderer:
 		initial_sampling_options = [x.get_name() for x in initial_distribution.sampling_methods]
 		
 		options = [
+			dcc.Store(id=f"device-pixel-ratio-{self.id}", data=1),
 			html.Br(),
 			html.P("Select Distribution and Sampling Method:"),
 			dcc.RadioItems(
