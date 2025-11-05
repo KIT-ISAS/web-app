@@ -13,8 +13,6 @@ class KentDistribution(SphereDistribution):
 		self.distribution_options = [
 			Slider("κ (kappa)", 0.0, 10.0, 50.0),
 			Slider("β (beta)", 0.0, 2.0, 25.0),
-			FloatSlider("mu0: Mean vector of the Fisher part: (θ)", 0, np.pi, np.pi), # default values so that distibution is initially visible
-			FloatSlider("mu0: Mean vector of the Fisher part: (φ)", 0, 0, 2 * np.pi),
 		]
 		
 		self.sampling_methods = [
@@ -34,26 +32,6 @@ class KentDistribution(SphereDistribution):
 		beta = min(beta, kappa / 2)
 
 		# hardcoded, same as in kent random sampling
-		mu_theta = 0
-		mu_phi = 0	
-		mu0_theta = distribution_options[2].state
-		mu0_phi = distribution_options[3].state
-
-		mu1, mu2, mu3 = Sphere.spherical_to_cartesian(mu_theta, mu_phi)
-		mu0_1, mu0_2, mu0_3 = Sphere.spherical_to_cartesian(mu0_theta, mu0_phi)
-
-		y1 = mu = [mu1, mu2, mu3]
-		y2 = mu0 = [mu0_1, mu0_2, mu0_3]
-
-		y1 = np.array(y1).reshape(3, 1)
-		y2 = np.array(y2).reshape(3, 1)
-		y1 = y1 / np.linalg.norm(y1)
-		y2 = y2 / np.linalg.norm(y2)
-
-		y3 = np.cross(mu, mu0)
-		y3 = y3 / np.linalg.norm(y3)
-
-
 		y3 = np.array([1, 0, 0]).reshape(3, 1)
 		y2 = np.array([0, 1, 0]).reshape(3, 1)
 		y1 = np.array([0, 0, 1]).reshape(3, 1)

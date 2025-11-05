@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 import scipy
 import sphstat
+from kent_distribution import kent2
 
 from model.distributions.sphere.sphere_sampling_schema import SphereSamplingSchema
 from util.selectors.silder_log import LogSlider
@@ -22,22 +23,8 @@ class KentRandomSampling(SphereSamplingSchema):
 		beta = distribution_options[1].state
 		beta = min(beta, kappa / 2) # TODO make this dynamic
 
-
-		# can be hardcoded because the user can just turn the sphere 
-		# (only affects where the distribution is centered)
-		mu_theta = 0
-		mu_phi = 0	
-		mu0_theta = distribution_options[2].state
-		mu0_phi = distribution_options[3].state
-
-		mu1, mu2, mu3 = Sphere.spherical_to_cartesian(mu_theta, mu_phi)
-		mu0_1, mu0_2, mu0_3 = Sphere.spherical_to_cartesian(mu0_theta, mu0_phi)
-
-		mu = [mu1, mu2, mu3]
-		mu0 = [mu0_1, mu0_2, mu0_3]
-
+		kent = kent2([1, 0, 0], [0, 1, 0], [0, 0, 1], kappa, beta)
 		numsamp = sample_options[0].state
-		samples = sphstat.distributions.kent(numsamp, kappa, beta, mu, mu0)["points"]
-		samples_array = np.vstack(samples)
-
-		return samples_array
+		samp = kent.rvs(n_samples=numsamp)
+		xyz = samp[:, [2, 1, 0]] # samples get returned in z,y,x order
+		return xyz
