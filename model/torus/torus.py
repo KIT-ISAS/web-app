@@ -4,7 +4,7 @@ from model.distributions.torus.torus_distribution import TorusDistribution
 from model.manifold import Manifold
 
 class Torus(Manifold):
-	def __init__(self, resolution=50, r=1, R=3):
+	def __init__(self, resolution=100, r=1, R=3):
 		self.xyz = self.generate_xyz(resolution, r, R)
 		self.mesh = np.array([])
 		self.samples = np.array([])

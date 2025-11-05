@@ -11,7 +11,7 @@ from model.distributions.sphere.uniform.fibonachi_lattice import SphereUniformFi
 from util.selectors.slider import Slider
 
 class Sphere(Manifold):
-	def __init__(self, resolution=50, radius=1):
+	def __init__(self, resolution=200, radius=1):
 		self.xyz = self.generate_xyz(resolution, radius)
 		self.mesh = np.array([])
 		self.samples = np.array([])
