@@ -7,14 +7,14 @@ import pyrecest._backend
 from pyrecest.backend import array
 from pyrecest.distributions import WatsonDistribution as WatsonDistributionPyrecest
 
-from model.distributions.sphere.watson.random import WatsonRandomSampling
+from model.distributions.sphere.watson.random_sampling import WatsonRandomSampling
 from model.distributions.sphere.watson.fibonachi import WatsonFibonachiSampling
 
 
 class WatsonDistribution(SphereDistribution):
 	def __init__(self):
 		self.distribution_options = [
-			Slider("κ (kappa)", 1.0, 10.0, 50.0),
+			Slider("κ (kappa)", -50, 10.0, 50.0),
 		]
 		
 		self.sampling_methods = [

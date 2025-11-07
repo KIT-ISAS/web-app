@@ -2116,6 +2116,24 @@ files = [
 diagrams = ["jinja2", "railroad-diagrams"]
 
 [[package]]
+name = "pyperf"
+version = "2.9.0"
+description = "Python module to run and analyze benchmarks"
+optional = false
+python-versions = ">=3.9"
+groups = ["dev"]
+files = [
+    {file = "pyperf-2.9.0-py3-none-any.whl", hash = "sha256:215673fb60f3fbbc6c7a90b609b0806d8466fded8dd502bf5731e2b92506076e"},
+    {file = "pyperf-2.9.0.tar.gz", hash = "sha256:dbe0feef8ec1a465df191bba2576149762d15a8c9985c9fea93ab625d875c362"},
+]
+
+[package.dependencies]
+psutil = ">=5.9.0"
+
+[package.extras]
+dev = ["tox"]
+
+[[package]]
 name = "pyrecest"
 version = "0.8.0"
 description = "Framework for recursive Bayesian estimation in Python."

@@ -24,6 +24,10 @@ class WatsonRandomSampling(SphereSamplingSchema):
 		phi = 0
 
 		numsamp = sample_options[0].state
+		if kappa == 0: # become uniform distribution
+			samples = np.random.normal(size=(numsamp, 3))
+			samples /= np.linalg.norm(samples, axis=1)[:, np.newaxis]
+			return samples
 
 		lamb, mu, nu = Sphere.spherical_to_cartesian(theta, phi)
 
