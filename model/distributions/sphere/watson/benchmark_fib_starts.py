@@ -28,15 +28,15 @@ def bench_single_kappa(kappa, sample_count):
 	results = {}
 	for method_name, method in methods.items():
 		bench_name = f"Watson Fibonacci Sampling: {method_name} (kappa={kappa})"
-		benchmark = runner.bench_func(bench_name, benchmark_kappa, method, kappa, sample_count, 1) # TODO: make this higher
+		benchmark = runner.bench_func(bench_name, benchmark_kappa, method, kappa, sample_count, 5)
 		results[method_name] = benchmark
 
 	return results
 
 def bench_multiple_kappa():
-	sample_count = 1000
+	sample_count = 10000
 	all_results = {}
-	for kappa in range(-30, 31, 10): # TODO: set step lower 
+	for kappa in range(-30, 31, 2):
 		res = bench_single_kappa(kappa, sample_count)
 		for name, bench in res.items():
 			if name not in all_results:
@@ -46,7 +46,7 @@ def bench_multiple_kappa():
 
 def bench_multiple_sample_counts(kappa):
 	all_results = {}
-	for sample_count in range(100, 1001, 100): # TODO: set step lower 
+	for sample_count in range(100, 1001, 10):
 		res = bench_single_kappa(kappa, sample_count)
 		for name, bench in res.items():
 			if name not in all_results:
@@ -55,11 +55,11 @@ def bench_multiple_sample_counts(kappa):
 	return all_results
 
 
-def plot_benches(results):
+def plot_benches(results, title):
 	import plotly.express as px
 	
 	rows = [dict(name=n, kappa=k, time=t.mean()) for n, pts in results.items() for k, t in pts]
-	px.line(rows, x="kappa", y="time", color="name", markers=True).show()
+	px.line(rows, x="kappa", y="time", color="name", markers=True, title=title).show()
 		
 
 			
@@ -68,7 +68,12 @@ def plot_benches(results):
 if __name__ == "__main__":
 	runner = pyperf.Runner()
 	mult_kappa = bench_multiple_kappa()
+	mult_samples = bench_multiple_sample_counts(-10)
+	mult_samples = bench_multiple_sample_counts(10)
+
 	if not runner.args.worker:
-		plot_benches(mult_kappa)
+		plot_benches(mult_kappa, "Watson Fibonacci Sampling Benchmark: time taken for various kappa values (10000 samples)")
+		plot_benches(mult_samples, "Watson Fibonacci Sampling Benchmark: time taken for various sample counts (kappa=-10)")
+		plot_benches(mult_samples, "Watson Fibonacci Sampling Benchmark: time taken for various sample counts (kappa=10)")
 		
 	
