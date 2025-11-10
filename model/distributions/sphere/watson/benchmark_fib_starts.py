@@ -1,7 +1,13 @@
+'''
+Run this file directly from project root with:
+PYTHONPATH=$PWD poetry run python model/distributions/sphere/watson/benchmark_fib_starts.py
+'''
+
 from model.distributions.sphere.watson.fibonachi import WatsonFibonachiSampling
 from util.selectors.slider_float import FloatSlider
 import pyperf
 import statistics
+
 
 sampler = WatsonFibonachiSampling()
 methods = {
