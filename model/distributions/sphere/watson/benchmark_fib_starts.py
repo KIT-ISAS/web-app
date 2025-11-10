@@ -57,11 +57,9 @@ def bench_multiple_sample_counts(kappa):
 
 def plot_benches(results):
 	import plotly.express as px
-	for bench in results:
-		print("plotting")
-		print("bench:", bench.mean())
-		rows = [dict(name=n, kappa=k, time=t.mean()) for n, pts in results.items() for k, t in pts]
-		px.line(rows, x="kappa", y="time", color="name", markers=True).show()
+	
+	rows = [dict(name=n, kappa=k, time=t.mean()) for n, pts in results.items() for k, t in pts]
+	px.line(rows, x="kappa", y="time", color="name", markers=True).show()
 		
 
 			
