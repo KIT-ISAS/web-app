@@ -245,8 +245,16 @@ class WatsonFibonachiSampling(SphereSamplingSchema):
 
 
 		sol = scipy.integrate.solve_ivp(f, t_span, [y0], events=events)
+		try:
+			event_thetas_i = np.array(sol.t_events).squeeze()
+		except ValueError:
+			# this sometimes happens for large samples counts, like kappa=-30 with 10k samples misses 2points
+			# its probably fine to continue
+			print("Warning: some points might have been missed")
+			event_thetas_i = np.array([te[0] if te.size else np.nan for te in sol.t_events], float)
+			event_thetas_i = event_thetas_i[~np.isnan(event_thetas_i)]
 
-		event_thetas_i = np.array(sol.t_events).squeeze()
+			sample_count = event_thetas_i.shape[0]
 
 		w = np.cos(event_thetas_i)
 
