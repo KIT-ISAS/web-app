@@ -2,6 +2,7 @@ import numpy as np
 from model.distributions.distribution_loader import DistributionLoader
 from model.distributions.torus.torus_distribution import TorusDistribution
 from model.manifold import Manifold
+from renderer.PlotSettings2d import PlotSettings2D
 
 class Torus(Manifold):
 	def __init__(self, resolution=100, r=1, R=3):
@@ -14,9 +15,14 @@ class Torus(Manifold):
 		self.r = r
 		self.R = R
 
-		self.axes_2d = (
+		axes_2d = (
 			np.arange(0, 2.5 * np.pi, np.pi / 2), # 0, π/2, π, 3π/2, 2π
 			["0", "π/2", "π", "3π/2", "2π"]
+		)
+		self.plot_settings_2d = PlotSettings2D(
+			axes_2d_x=axes_2d,
+			axes_2d_y=axes_2d,
+			lock_aspect_ratio=True
 		)
 
 	def generate_xyz(self, resolution=50, r=1, R=3):

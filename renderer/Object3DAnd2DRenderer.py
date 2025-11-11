@@ -38,19 +38,19 @@ class Object3DAnd2DRenderer(Object3DRenderer):
 		))
 		self.fig_2d.update_layout(dragmode="pan")
 
-		if object.axes_2d is not None:
+		if object.plot_settings_2d is not None:
 			self.fig_2d.update_xaxes(
 				title_text="t",
 				tickmode="array",
-				tickvals=object.axes_2d[0],
-				ticktext=object.axes_2d[1],
+				tickvals=object.plot_settings_2d.axes_2d_x[0],
+				ticktext=object.plot_settings_2d.axes_2d_x[1],
 				zeroline=False,
 			)
 			self.fig_2d.update_yaxes(
 				title_text="p",
 				tickmode="array",
-				tickvals=object.axes_2d[0],
-				ticktext=object.axes_2d[1],
+				tickvals=object.plot_settings_2d.axes_2d_y[0],
+				ticktext=object.plot_settings_2d.axes_2d_y[1],
 				zeroline=False,
 			)
 
