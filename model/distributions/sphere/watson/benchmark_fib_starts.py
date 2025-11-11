@@ -67,6 +67,8 @@ def plot_benches(results, title, x_label):
 	except Exception as e:
 		print("Generating plot failed, dumping data:", e)
 		print(results.items())
+		print("Trying to save html as fallback")
+		fig.write_html(f"{title.replace(' ', '_').replace(':', '')}.html", include_plotlyjs="cdn", full_html=True)
 
 
 
