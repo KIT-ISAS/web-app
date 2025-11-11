@@ -57,8 +57,10 @@ def bench_multiple_sample_counts(kappa):
 
 def plot_benches(results, title, x_label):
 	import plotly.express as px
-	
-	rows = [dict(name=n, kappa=k, time=t.mean()) for n, pts in results.items() for k, t in pts]
+	if x_label == "sample_count":
+		rows = [dict(name=n, sample_count=k, time=t.mean()) for n, pts in results.items() for k, t in pts]
+	else:
+		rows = [dict(name=n, kappa=k, time=t.mean()) for n, pts in results.items() for k, t in pts]
 	px.line(rows, x=x_label, y="time", color="name", markers=True, title=title).show()
 		
 
@@ -73,7 +75,7 @@ if __name__ == "__main__":
 
 	if not runner.args.worker:
 		plot_benches(mult_kappa, "Watson Fibonacci Sampling Benchmark: time taken for various kappa values (10000 samples)", "kappa")
-		plot_benches(mult_samples_neg_10, "Watson Fibonacci Sampling Benchmark: time taken for various sample counts (kappa=-10)", "sample count")
-		plot_benches(mult_samples_10, "Watson Fibonacci Sampling Benchmark: time taken for various sample counts (kappa=10)", "sample count")
+		plot_benches(mult_samples_neg_10, "Watson Fibonacci Sampling Benchmark: time taken for various sample counts (kappa=-10)", "sample_count")
+		plot_benches(mult_samples_10, "Watson Fibonacci Sampling Benchmark: time taken for various sample counts (kappa=10)", "sample_count")
 		
 	
