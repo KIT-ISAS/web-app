@@ -57,14 +57,17 @@ def bench_multiple_sample_counts(kappa):
 
 def plot_benches(results, title, x_label):
 	import plotly.express as px
-	if x_label == "sample_count":
-		rows = [dict(name=n, sample_count=k, time=t.mean()) for n, pts in results.items() for k, t in pts]
-	else:
-		rows = [dict(name=n, kappa=k, time=t.mean()) for n, pts in results.items() for k, t in pts]
-	px.line(rows, x=x_label, y="time", color="name", markers=True, title=title).show()
-		
+	try:
+		if x_label == "sample_count":
+			rows = [dict(name=n, sample_count=k, time=t.mean()) for n, pts in results.items() for k, t in pts]
+		else:
+			rows = [dict(name=n, kappa=k, time=t.mean()) for n, pts in results.items() for k, t in pts]
+		fig = px.line(rows, x=x_label, y="time", color="name", markers=True, title=title)
+		fig.write_image(f"{title.replace(' ', '_').replace(':', '')}.svg")
+	except Exception as e:
+		print("Generating plot failed, dumping data:", e)
+		print(results.items())
 
-			
 
 
 if __name__ == "__main__":

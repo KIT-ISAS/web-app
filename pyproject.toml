@@ -27,7 +27,8 @@ dependencies = [
 dev = [
     "pytest (>=8.4.2,<9.0.0)",
     "dash[testing] (>=2.16,<3.0)",
-    "pyperf (>=2.9.0,<3.0.0)"
+    "pyperf (>=2.9.0,<3.0.0)",
+    "kaleido (>=1.2.0,<2.0.0)"
 ]
 
 
