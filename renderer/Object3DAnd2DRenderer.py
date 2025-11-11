@@ -54,6 +54,12 @@ class Object3DAnd2DRenderer(Object3DRenderer):
 				zeroline=False,
 			)
 
+			if object.plot_settings_2d.lock_aspect_ratio:
+				self.fig_2d.update_yaxes(
+					scaleanchor = "x",
+					scaleratio = 1,
+				)
+
 	def register_plot_callbacks(self):
 		# updates the plot based on selected sampling options
 		@callback(
