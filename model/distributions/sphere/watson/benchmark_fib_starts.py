@@ -24,10 +24,10 @@ def benchmark_kappa(method, kappa, sample_count, times=50):
 	for time in range(times):
 		method(sampling_options, distribution_options)
 
-def bench_single_kappa(kappa, sample_count):
+def bench_single_kappa(kappa, sample_count, id):
 	results = {}
 	for method_name, method in methods.items():
-		bench_name = f"Watson Fibonacci Sampling: {method_name} (kappa={kappa})"
+		bench_name = f"Watson Fibonacci Sampling: {method_name} (kappa={kappa}) [{id}]"
 		benchmark = runner.bench_func(bench_name, benchmark_kappa, method, kappa, sample_count, 5)
 		results[method_name] = benchmark
 
@@ -37,7 +37,7 @@ def bench_multiple_kappa():
 	sample_count = 10000
 	all_results = {}
 	for kappa in range(-30, 31, 2):
-		res = bench_single_kappa(kappa, sample_count)
+		res = bench_single_kappa(kappa, sample_count, "Multiple Kappa")
 		for name, bench in res.items():
 			if name not in all_results:
 				all_results[name] = []
@@ -47,7 +47,7 @@ def bench_multiple_kappa():
 def bench_multiple_sample_counts(kappa):
 	all_results = {}
 	for sample_count in range(100, 1001, 10):
-		res = bench_single_kappa(kappa, sample_count)
+		res = bench_single_kappa(kappa, sample_count, f"Multiple Sample Counts (kappa={kappa})")
 		for name, bench in res.items():
 			if name not in all_results:
 				all_results[name] = []
@@ -59,7 +59,7 @@ def plot_benches(results, title, x_label):
 	import plotly.express as px
 	
 	rows = [dict(name=n, kappa=k, time=t.mean()) for n, pts in results.items() for k, t in pts]
-	px.line(rows, x="kappa", y="time", color="name", markers=True, title=title).show()
+	px.line(rows, x=x_label, y="time", color="name", markers=True, title=title).show()
 		
 
 			
