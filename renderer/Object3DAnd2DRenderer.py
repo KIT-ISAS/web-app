@@ -11,6 +11,14 @@ class Object3DAnd2DRenderer(Object3DRenderer):
 		self.register_plot_callbacks()
 		self.register_mode_callbacks()
 
+		self.per_x = object.plot_settings_2d.periodic_x
+		self.per_y = object.plot_settings_2d.periodic_y
+
+		self.perx_x_amount = object.plot_settings_2d.periodic_x_amount
+		self.pery_y_amount = object.plot_settings_2d.periodic_y_amount
+
+		padd = 0.5
+
 		self.fig_2d = go.Figure(
 			data=[
 				go.Scattergl(
@@ -23,11 +31,21 @@ class Object3DAnd2DRenderer(Object3DRenderer):
 						color="red",
 						line=dict(width=1, color="black")
 					),
-					marker_color="red",
-					marker_size=6,
-					marker_line_color="black",
 					showlegend=True,
 				),
+				
+				go.Scattergl(
+					name="Samples (periodic extension)",
+					x=[],
+					y=[],
+					mode="markers",
+					marker=dict(
+						size=6,
+						color="#a2acbd",
+						line=dict(width=1, color="#a2acbd")
+					),
+					showlegend=(object.plot_settings_2d.periodic_x or object.plot_settings_2d.periodic_y)
+				)
 			]
 		)
 		self.fig_2d.update_layout(legend=dict(
@@ -59,6 +77,19 @@ class Object3DAnd2DRenderer(Object3DRenderer):
 					scaleanchor = "x",
 					scaleratio = 1,
 				)
+
+			# so that it doent autoscale for periodicity points
+			padd = 0.5
+			if self.per_x: 
+				self.fig_2d.update_xaxes(
+					range=[0 - padd, self.perx_x_amount + padd],
+				)
+			if self.per_y:
+				self.fig_2d.update_yaxes(
+					range=[0 - padd, self.pery_y_amount + padd],
+				)
+		
+				
 
 	def register_plot_callbacks(self):
 		# updates the plot based on selected sampling options
@@ -150,12 +181,26 @@ class Object3DAnd2DRenderer(Object3DRenderer):
 		marker_size = (10 * (sample_count / 100) ** (-0.35)) / dpr
 		marker_size = np.minimum(10,marker_size)
 
-		patched_figure["data"][0].marker.size = marker_size
+		patched_figure["data"][0].marker.size = marker_size * 1.5
+		patched_figure["data"][1].marker.size = marker_size
 
 		# x is p, y is t
 		patched_figure["data"][0].x = tp[:, 1]
 		patched_figure["data"][0].y = tp[:, 0]
 
+		ext_x = np.array([])
+		ext_y = np.array([])
+		if self.per_x:
+			ext_x = np.concatenate([tp[:,1] - self.perx_x_amount, tp[:,1] + self.perx_x_amount])
+			ext_y = np.concatenate([tp[:,0], tp[:,0]])
+			
+		if self.per_y:
+			ext_x = np.concatenate([ext_x, tp[:,1], tp[:,1]])
+			ext_y = np.concatenate([ext_y, tp[:,0] - self.pery_y_amount, tp[:,0] + self.pery_y_amount])
+			
+		if self.per_x or self.per_y:
+			patched_figure["data"][1].x = ext_x
+			patched_figure["data"][1].y = ext_y
 		return patched_figure
 
 

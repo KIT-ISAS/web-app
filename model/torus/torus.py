@@ -22,7 +22,11 @@ class Torus(Manifold):
 		self.plot_settings_2d = PlotSettings2D(
 			axes_2d_x=axes_2d,
 			axes_2d_y=axes_2d,
-			lock_aspect_ratio=True
+			lock_aspect_ratio=True,
+			periodic_x=True,
+			periodic_y=True,
+			periodic_x_amount=2 * np.pi,
+			periodic_y_amount=2 * np.pi,
 		)
 
 	def generate_xyz(self, resolution=50, r=1, R=3):
