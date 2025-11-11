@@ -47,7 +47,7 @@ def bench_multiple_kappa():
 def bench_multiple_sample_counts(kappa):
 	all_results = {}
 	for sample_count in range(100, 1001, 10):
-		res = bench_single_kappa(kappa, sample_count, f"Multiple Sample Counts (kappa={kappa})")
+		res = bench_single_kappa(kappa, sample_count, f"Multiple Sample Counts (kappa={kappa}, sample_count={sample_count})")
 		for name, bench in res.items():
 			if name not in all_results:
 				all_results[name] = []
