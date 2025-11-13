@@ -197,7 +197,25 @@ class Object3DAnd2DRenderer(Object3DRenderer):
 		if self.per_y:
 			ext_x = np.concatenate([ext_x, tp[:,1], tp[:,1]])
 			ext_y = np.concatenate([ext_y, tp[:,0] - self.pery_y_amount, tp[:,0] + self.pery_y_amount])
-			
+		
+		if self.per_x and self.per_y: # all four corners
+			ext_x = np.concatenate([
+				ext_x,
+				tp[:,1] + self.perx_x_amount,
+				tp[:,1] + self.perx_x_amount,
+				tp[:,1] - self.perx_x_amount,
+				tp[:,1] - self.perx_x_amount
+			])
+
+			ext_y = np.concatenate([
+				ext_y,
+				tp[:,0] + self.pery_y_amount,
+				tp[:,0] - self.pery_y_amount,
+				tp[:,0] + self.pery_y_amount,
+				tp[:,0] - self.pery_y_amount
+			])
+
+
 		if self.per_x or self.per_y:
 			patched_figure["data"][1].x = ext_x
 			patched_figure["data"][1].y = ext_y
