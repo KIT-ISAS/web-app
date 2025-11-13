@@ -23,6 +23,8 @@ class DistributionLoader:
 			raise ValueError(f"'{self.distribution_package}' is not a package (missing __path__).")
 		
 		for finder, name, ispkg in pkgutil.walk_packages(pkg.__path__, prefix=pkg.__name__ + "."):
+			if "benchmark" in name:
+				continue
 			module = importlib.import_module(name)
 
 			for _, obj in inspect.getmembers(module, inspect.isclass):
