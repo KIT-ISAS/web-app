@@ -30,7 +30,7 @@ class WatsonFibonachiSampling(SphereSamplingSchema):
 		elif kappa < 30:
 			return self.sample_inverse_ode(sample_options, distribution_options)
 		else:
-			return self.sample_closed(sample_options, distribution_options)
+			return self.sample_inverse_interpolation(sample_options, distribution_options)
 	def sample_inverse_interpolation(self, sample_options, distribution_options):
 		kappa = distribution_options[0].state
 		sample_count = sample_options[0].state
@@ -61,7 +61,7 @@ class WatsonFibonachiSampling(SphereSamplingSchema):
 		t_span = (0, np.pi) # theta from 0 to pi
 		y0 = 0 # the value of the integrated pdf at 0 is 0
 
-		sol = scipy.integrate.solve_ivp(f, t_span, [y0])
+		sol = scipy.integrate.solve_ivp(f, t_span, [y0], rtol=1e-9, atol=1e-12)
 
 		x = sol.t
 		y = sol.y[0]
@@ -69,13 +69,10 @@ class WatsonFibonachiSampling(SphereSamplingSchema):
 		
 		# due to numerical issues, for large kappa and samplecount, y can be slightly non monotonic
 		# monotonicity is needed for interpolation, so maximum.accumulate then bump by eps
-		y = np.maximum.accumulate(y) 	
-		diffs = np.diff(y)
-		mask = diffs <= 0
-		if np.any(mask):
-			eps = 1e-10
-			y = y + eps * np.arange(len(x))
-			y = np.maximum.accumulate(y)
+		y = np.maximum.accumulate(y) 
+		y /= y[-1] # normalize to [0,1]
+		eps = 1e-14
+		y += eps * np.arange(len(y)) 
 	
 		# now interpolate, but we swamp x and y so whe get the inverse function
 		# this works because the function is monotonic
