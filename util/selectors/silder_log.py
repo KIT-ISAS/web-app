@@ -31,8 +31,10 @@ class LogSlider(Selector):
 
 			if position % 1 == 0: # it doesnt like float keys for "integer" values
 				position = int(position)
+			else:
+				position = float(position)
 
-			value = self.transfrom_up(position)
+			value = int(self.transfrom_up(position)) if float(self.transfrom_up(position)).is_integer() else float(self.transfrom_up(position))
 			marks[position] = f"{value:.6g}" # 6 significant digits
 		return marks
 
