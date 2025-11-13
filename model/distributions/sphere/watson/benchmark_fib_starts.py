@@ -81,8 +81,8 @@ if __name__ == "__main__":
 	mult_samples_10 = bench_multiple_sample_counts(10)
 
 	if not runner.args.worker:
-		plot_benches(mult_kappa, "Watson Fibonacci Sampling Benchmark: time taken for various kappa values (10000 samples)", "kappa")
-		plot_benches(mult_samples_neg_10, "Watson Fibonacci Sampling Benchmark: time taken for various sample counts (kappa=-10)", "sample_count")
-		plot_benches(mult_samples_10, "Watson Fibonacci Sampling Benchmark: time taken for various sample counts (kappa=10)", "sample_count")
+		plot_benches(mult_kappa, "time taken for various kappa values (10000 samples)", "kappa")
+		plot_benches(mult_samples_neg_10, "time taken for various sample counts (kappa=-10)", "sample_count")
+		plot_benches(mult_samples_10, "time taken for various sample counts (kappa=10)", "sample_count")
 		
 	
