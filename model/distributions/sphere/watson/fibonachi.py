@@ -24,8 +24,13 @@ class WatsonFibonachiSampling(SphereSamplingSchema):
 
 
 	def sample(self, sample_options, distribution_options):
-		return self.sample_events(sample_options, distribution_options)
-	
+		kappa = distribution_options[0].state
+		if kappa < 0:
+			return self.sample_closed(sample_options, distribution_options)
+		elif kappa < 30:
+			return self.sample_inverse_ode(sample_options, distribution_options)
+		else:
+			return self.sample_closed(sample_options, distribution_options)
 	def sample_inverse_interpolation(self, sample_options, distribution_options):
 		kappa = distribution_options[0].state
 		sample_count = sample_options[0].state
