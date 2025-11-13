@@ -1,5 +1,7 @@
 '''
 Run this file directly from project root with:
+
+sudo "$(poetry run which python)" -m pyperf system tune
 PYTHONPATH=$PWD poetry run python model/distributions/sphere/watson/benchmark_fib_starts.py
 '''
 
