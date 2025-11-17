@@ -1,6 +1,5 @@
 import numpy as np
 import numpy as np
-from scipy.spatial import Delaunay
 from scipy.spatial import ConvexHull
 import plotly.figure_factory as ff
 

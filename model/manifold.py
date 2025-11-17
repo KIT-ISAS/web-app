@@ -30,5 +30,5 @@ class Manifold(ABC):
 	def update_sample(self,  selected_distribution, sample_options):
 		pass
 
-	def generate_trisurf(self, pdf, *args, **kwargs):
+	def generate_mesh(self, pdf, *args, **kwargs):
 		pass
