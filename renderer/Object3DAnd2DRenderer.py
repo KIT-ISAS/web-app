@@ -58,14 +58,14 @@ class Object3DAnd2DRenderer(Object3DRenderer):
 
 		if object.plot_settings_2d is not None:
 			self.fig_2d.update_xaxes(
-				title_text="t",
+				title_text=object.plot_settings_2d.x_title,
 				tickmode="array",
 				tickvals=object.plot_settings_2d.axes_2d_x[0],
 				ticktext=object.plot_settings_2d.axes_2d_x[1],
 				zeroline=False,
 			)
 			self.fig_2d.update_yaxes(
-				title_text="p",
+				title_text=object.plot_settings_2d.y_title,
 				tickmode="array",
 				tickvals=object.plot_settings_2d.axes_2d_y[0],
 				ticktext=object.plot_settings_2d.axes_2d_y[1],

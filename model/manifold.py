@@ -1,9 +1,23 @@
 from abc import ABC, abstractmethod
 
 class Manifold(ABC):
-	def __init__(self):
-		# optional, setting for if the manifold supports 2d plotting
-		self.plot_settings_2d = None
+	# optional initial settings for 3d camera
+	@property
+	def camera_settings_3d(self):
+		return getattr(self, "_camera_settings_3d", None)
+
+	@camera_settings_3d.setter
+	def camera_settings_3d(self, value):
+		self._camera_settings_3d = value
+
+	# optional, setting for if the manifold supports 2d plotting
+	@property
+	def plot_settings_2d(self):
+		return getattr(self, "_plot_settings_2d", None)
+
+	@plot_settings_2d.setter
+	def plot_settings_2d(self, value):
+		self._plot_settings_2d = value
 
 	# generates renderable xyz grid
 	@abstractmethod

@@ -10,3 +10,6 @@ class PlotSettings2D:
 	periodic_y: bool = False
 	periodic_x_amount: float = 0.0 # amount to shift for periodicity
 	periodic_y_amount: float = 0.0
+
+	x_title: str = "" # title for axis
+	y_title: str = ""

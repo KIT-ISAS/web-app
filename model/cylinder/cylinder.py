@@ -4,16 +4,15 @@ from model.distributions.torus.torus_distribution import TorusDistribution
 from model.manifold import Manifold
 from renderer.PlotSettings2d import PlotSettings2D
 
-class Torus(Manifold):
-	def __init__(self, resolution=100, r=1, R=3):
-		self.xyz = self.generate_xyz(resolution, r, R)
+class Cylinder(Manifold):
+	def __init__(self, resolution=100, r=1):
+		self.xyz = self.generate_xyz(resolution, r)
 		self.mesh = np.array([])
 		self.samples = np.array([])
 		self.samples_2d = np.array([])
 		self.distributions = DistributionLoader(TorusDistribution, "model.distributions.torus").get_distributions()
 
 		self.r = r
-		self.R = R
 
 		axes_2d = (
 			np.arange(0, 2.5 * np.pi, np.pi / 2), # 0, π/2, π, 3π/2, 2π
@@ -22,22 +21,26 @@ class Torus(Manifold):
 		self.plot_settings_2d = PlotSettings2D(
 			axes_2d_x=axes_2d,
 			axes_2d_y=axes_2d,
-			lock_aspect_ratio=True,
+			lock_aspect_ratio=False,
 			periodic_x=True,
-			periodic_y=True,
+			periodic_y=False,
 			periodic_x_amount=2 * np.pi,
-			periodic_y_amount=2 * np.pi,
-			x_title="t",
-			y_title="p",
+			x_title="p",
+			y_title="z",
 		)
 
-	def generate_xyz(self, resolution=50, r=1, R=3):
-		t = np.linspace(0, 2*np.pi, resolution)
+		self.camera_settings_3d = dict(
+			eye=dict(x=2, y=2, z=2),
+			center=dict(x=0, y=0, z=0),
+		)
+
+	def generate_xyz(self, resolution=50, r=1):
 		p = np.linspace(0, 2*np.pi, resolution)
-		t,p = np.meshgrid(t,p)
+		z = np.linspace(0, 2*np.pi, resolution)
+		t,p = np.meshgrid(p,z)
 
 
-		return self.t_p_to_xyz(t, p, r, R)
+		return self.t_p_to_xyz(t, p, r)
 	
 	def update_sample(self, selected_distribution, selected_sampling_method, sample_options, distribution_options):
 		dist = self.distributions[selected_distribution]
@@ -48,16 +51,16 @@ class Torus(Manifold):
 			self.samples = np.empty((0, 3), dtype=float)
 			return
 
-		x, y, z = self.t_p_to_xyz(new_sample[:,0], new_sample[:,1], self.r, self.R)
+		x, y, z = self.t_p_to_xyz(new_sample[:,0], new_sample[:,1], self.r)
 
 		self.samples = np.column_stack((x, y, z))
 		self.samples_2d = new_sample
 
 
 	@staticmethod
-	def t_p_to_xyz(t, p, r=1, R=3):
-		x = (R + r * np.cos(p)) * np.cos(t)
-		y = (R + r * np.cos(p)) * np.sin(t)
-		z = r * np.sin(p)
+	def t_p_to_xyz(p, z, r=1):
+		x = r * np.cos(p)
+		y = r * np.sin(p)
+		z = r * z
 
 		return x, y, z

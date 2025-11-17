@@ -72,6 +72,10 @@ class Object3DRenderer:
 			xanchor="right",
 			x=0.1,
 		))
+
+		if (self.object.camera_settings_3d is not None):
+			self.fig.update_layout(scene=dict(camera=self.object.camera_settings_3d))
+
 		self._register_callbacks()
 		if register_3d_callbacks:
 			self._register_3d_plot_callbacks()
