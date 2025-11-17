@@ -12,7 +12,7 @@ class SphereUniformFibSampling(SphereSamplingSchema):
 		]
 		
 	def get_name(self):
-		return "Fibonacci Lattice"
+		return "Fibonacci-Kronecker Lattice"
 	
 	def sample(self, sample_options, distribution_options):
 		sample_count = sample_options[0].state

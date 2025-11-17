@@ -1,6 +1,6 @@
 import numpy as np
 from model.distributions.distribution_loader import DistributionLoader
-from model.distributions.torus.torus_distribution import TorusDistribution
+from model.distributions.cylinder.cylinder_distribution import CylinderDistribution
 from model.manifold import Manifold
 from renderer.PlotSettings2d import PlotSettings2D
 
@@ -10,7 +10,7 @@ class Cylinder(Manifold):
 		self.mesh = np.array([])
 		self.samples = np.array([])
 		self.samples_2d = np.array([])
-		self.distributions = DistributionLoader(TorusDistribution, "model.distributions.torus").get_distributions()
+		self.distributions = DistributionLoader(CylinderDistribution, "model.distributions.cylinder").get_distributions()
 
 		self.r = r
 
