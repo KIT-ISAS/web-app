@@ -21,6 +21,7 @@ dependencies = [
     "sphstat (>=1.0.6,<2.0.0)",
     "pyrecest @ git+https://github.com/KIT-ISAS/pyRecEst.git@002c7757e2a5a81e4e57da5c1b657c5f9bd5cf6e",
     "kent-distribution @ git+https://github.com/Vlad-Kor/kent_distribution",
+    "sympy (>=1.14.0,<2.0.0)",
 ]
 
 [dependency-groups]

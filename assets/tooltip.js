@@ -20,3 +20,12 @@ window.dccFunctions.transform_log_nice = function(value) {
     nice_value = Number(nice_value.toFixed(4));
     return nice_value;
 }
+
+window.dccFunctions.transform_fib = function(value) {
+    function fibonacci(n) {
+        return n < 1 ? 0
+             : n <= 2 ? 1
+             : fibonacci(n - 1) + fibonacci(n - 2)
+     }
+     return fibonacci(value);
+}
