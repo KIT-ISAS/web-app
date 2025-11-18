@@ -18,4 +18,8 @@ class UniformTorusDistribution(TorusDistribution):
 		return "Uniform"
 
 	def get_pdf(self, distribution_options):
-		pass
+		scaling_factor = 5 # pdf plotted not to scale
+		def pdf(x):
+			N = np.shape(x)[0]
+			return (1 / (4 * np.pi * np.pi)) * np.ones(N) * scaling_factor
+		return pdf
