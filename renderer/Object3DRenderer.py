@@ -23,6 +23,12 @@ class Object3DRenderer:
 			'scrollZoom': True,
 			"modeBarButtonsToRemove": ["select2d", "lasso2d"],
 		}
+		if self.object.samples.size:
+			sample_count = self.object.samples.shape[0]
+			marker_size = (10 * (sample_count / 100) ** (-0.35)) / self.device_pixel_ratio
+			marker_size = np.minimum(10,marker_size)
+		else:
+			marker_size = 4
 
 		self.fig = go.Figure(
 			data=[
@@ -40,7 +46,7 @@ class Object3DRenderer:
 					z=self.object.samples[:, 2] if self.object.samples.size else [],
 					mode="markers",
 					marker=dict(
-						size=4,
+						size=marker_size,
 						color="red",
 						line=dict(width=1, color="black")
 					),
