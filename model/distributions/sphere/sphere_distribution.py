@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
 from functools import cached_property
+from model.distribution import Distribution
 
 
-class SphereDistribution(ABC):
+class SphereDistribution(Distribution):
 	def __init__(self):
 		self.distribution_options = []
 		# a list of objects that implement the torus_sampling_schema interface

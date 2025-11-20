@@ -268,6 +268,16 @@ class Object3DAnd2DRenderer(Object3DRenderer):
 
 			html.Div(id=f"distribution-options-{self.id}"),
 			html.Div(id=f"sampling-options-{self.id}"),
+
+			html.Hr(id=f"distribution-info-divider-{self.id}", hidden=True),
+
+			dcc.Markdown(id=f"distribution-info-markdown-{self.id}", mathjax=True), 
+
+			html.Hr(id=f"sampling-method-info-divider-{self.id}", hidden=True),
+
+			dcc.Markdown(id=f"sampling-method-info-markdown-{self.id}", mathjax=True),
+
+			dcc.Markdown(id=f"sampling-method-info-markdown-{self.id}", mathjax=True),
 		]
 
 		graph = [dcc.Graph(id=f"graph-{self.id}", figure=self.fig, config=self.config, style={'height': '100%'})]

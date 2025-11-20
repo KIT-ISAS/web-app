@@ -110,9 +110,14 @@ class Object3DRenderer:
 			return options, initial_value
 
 		# updates the options (silders, etc) for the selected distribution and sampling method
+		# also updates the info markdowns and their hr lines
 		@callback(
 			Output(f"distribution-options-{self.id}", "children"),
 			Output(f"sampling-options-{self.id}", "children"),
+			Output(f"distribution-info-markdown-{self.id}", "children"),
+			Output(f"sampling-method-info-markdown-{self.id}", "children"),
+			Output(f"distribution-info-divider-{self.id}", "hidden"),
+			Output(f"sampling-method-info-divider-{self.id}", "hidden"),
 			Input("distribution-selector", "value"),
 			Input(f"sampling-selector-{self.id}", "value")
 		)
@@ -123,7 +128,15 @@ class Object3DRenderer:
 
 			options_sampling = self.object.distributions[selected_distribution].sampling_method_dict[selected_sampling]
 			options_sampling_dcc = [opt.to_dash_component("sampling", id) for id, opt in enumerate(options_sampling.sample_options)]
-			return options_dist_dcc, options_sampling_dcc
+
+			dist_info_md = self.object.distributions[selected_distribution].info_md
+			sampling_info_md = options_sampling.info_md
+
+			dist_hidden = dist_info_md is None or dist_info_md.strip() == ""
+			sampling_hidden = sampling_info_md is None or sampling_info_md.strip() == ""
+
+
+			return options_dist_dcc, options_sampling_dcc, dist_info_md, sampling_info_md, dist_hidden, sampling_hidden
 
 	def _register_3d_plot_callbacks(self):
 
@@ -260,6 +273,16 @@ class Object3DRenderer:
 
 			html.Div(id=f"distribution-options-{self.id}"),
 			html.Div(id=f"sampling-options-{self.id}"),
+
+			html.Hr(id=f"distribution-info-divider-{self.id}", hidden=True),
+
+			dcc.Markdown(id=f"distribution-info-markdown-{self.id}", mathjax=True), 
+
+			html.Hr(id=f"sampling-method-info-divider-{self.id}", hidden=True),
+
+			dcc.Markdown(id=f"sampling-method-info-markdown-{self.id}", mathjax=True),
+
+
 		]
 
 		graph = [dcc.Graph(id=f"graph-{self.id}", figure=self.fig, config=self.config, style={'height': '100%'})]

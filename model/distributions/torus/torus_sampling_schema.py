@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
+from model.sampling_schema import SamplingSchema
 
-class TorusSamplingSchema(ABC):
+class TorusSamplingSchema(SamplingSchema):
 	def __init__(self):
 		self.sample_options = []
 

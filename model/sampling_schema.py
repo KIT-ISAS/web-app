@@ -1,17 +1,22 @@
 from abc import ABC, abstractmethod
-from model.sampling_schema import SamplingSchema
 
-class SphereSamplingSchema(SamplingSchema):
+class SamplingSchema(ABC):
 	def __init__(self):
 		self.sample_options = []
-
 
 	# Returns the name of the sampling method
 	@abstractmethod
 	def get_name(self):
 		pass
 	
-	# returns samples as a numpy array of shape (n, 3)
 	@abstractmethod
 	def sample(self, sample_options, distribution_options):
 		pass
+
+	@property
+	def info_md(self):
+		return getattr(self, "_info_md", "")
+
+	@info_md.setter
+	def info_md(self, value):
+		self._info_md = value

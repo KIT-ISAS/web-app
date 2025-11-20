@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
-
-class CylinderSamplingSchema(ABC):
+from model.sampling_schema import SamplingSchema
+class CylinderSamplingSchema(SamplingSchema):
 	def __init__(self):
 		self.sample_options = []
 
