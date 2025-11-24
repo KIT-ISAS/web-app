@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import numpy as np
 
 @dataclass
 class PlotSettings2D:
@@ -15,3 +16,5 @@ class PlotSettings2D:
 	y_title: str = ""
 
 	reverse_x_y_axis: bool = False # if set to True in the (n,2) shaped data, first column is y and second is x
+
+	color_location: tuple = (0,0,2*np.pi, 2*np.pi) # location of where pdf is mapped: (min_x, min_y, max_x, max_y)

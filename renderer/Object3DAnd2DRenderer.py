@@ -19,6 +19,11 @@ class Object3DAnd2DRenderer(Object3DRenderer):
 
 		self.reverse_x_y_axis = object.plot_settings_2d.reverse_x_y_axis
 
+		x_min, y_min, x_max, y_max = object.plot_settings_2d.color_location
+		self.color_heatmap_x = np.linspace(x_min, x_max, 100)
+		self.color_heatmap_y = np.linspace(y_min, y_max, 100)
+		self.color_meshgrid = np.meshgrid(self.color_heatmap_x, self.color_heatmap_y, indexing="xy")
+
 		padd = 0.5
 
 		self.fig_2d = go.Figure(
@@ -47,6 +52,20 @@ class Object3DAnd2DRenderer(Object3DRenderer):
 						line=dict(width=1, color="#a2acbd")
 					),
 					showlegend=(object.plot_settings_2d.periodic_x or object.plot_settings_2d.periodic_y)
+				),
+
+				go.Heatmap(
+					name="PDF",
+					x=self.color_heatmap_x,
+					y=self.color_heatmap_y,
+					z=np.zeros((100,100)),
+					colorscale="Plasma",
+					zmin=0.0,
+					zmax=1.0,
+					zsmooth="best",
+					colorbar=dict(title="pdf"),
+					showscale=True,
+					showlegend=True,
 				)
 			]
 		)
@@ -231,11 +250,45 @@ class Object3DAnd2DRenderer(Object3DRenderer):
 		if self.per_x or self.per_y:
 			patched_figure["data"][1].x = ext_x
 			patched_figure["data"][1].y = ext_y
+
 		return patched_figure
 
 
 	def update_plot_dist_2d(self, values_dist, ids_dist, selected_distribution, selected_sampling, _):
-		return no_update
+		patched_figure = Patch()
+		try:
+			dist_options =  self.object.distributions[selected_distribution].distribution_options
+		except KeyError:
+			# got stale values, ignore
+			return no_update
+		
+		# the order of options might not be guaranteed, so we map them by their ids
+		id_value_dist = [(id,v) for id, v in zip(ids_dist, values_dist)]
+		
+
+		# and them sort them, so they are in the same order as sampling_options and dist_options
+		options_dist_new = sorted(id_value_dist, key=lambda x: int(x[0]["index"]))
+
+
+		for opt, (id, new_state) in zip(dist_options, options_dist_new):
+			opt.update_state(new_state)
+
+		pdf = self.object.distributions[selected_distribution].get_pdf(list(dist_options))
+
+		# pdf heatmap
+		X, Y = self.color_meshgrid
+		if self.reverse_x_y_axis:
+			xy = np.column_stack((Y.ravel(), X.ravel()))
+		else:
+			xy = np.column_stack((X.ravel(), Y.ravel()))
+		z_flat = self.object.pdf_2d(xy, pdf).reshape(X.shape)
+
+		z = z_flat.reshape(X.shape)
+		print("2D PDF min/max:", np.min(z), np.max(z))
+
+		patched_figure["data"][2].z = z
+
+		return patched_figure
 
 	def get_layout_components(self):
 		initial_distribution = self.object.distributions[list(self.object.distributions.keys())[0]]

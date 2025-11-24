@@ -36,6 +36,7 @@ class Cylinder(Manifold):
 			x_title="p",
 			y_title="z",
 			reverse_x_y_axis=False,
+			color_location=(0,0,2*np.pi, 2*np.pi),
 		)
 
 		self.camera_settings_3d = dict(
@@ -79,6 +80,10 @@ class Cylinder(Manifold):
 		p = np.arctan2(y, x) % (2 * np.pi)
 
 		return p, z
+	
+	def pdf_2d(self, xy, pdf):
+		x, y, z = self.p_z_to_xyz(xy[:,0], xy[:,1], self.r)
+		return pdf(np.column_stack((x, y, z)))
 	
 	def generate_mesh(self, pdf, alpha=1):
 		# mesh_xyz has nans for line segments, mask before passing to pdf

@@ -37,6 +37,7 @@ class Torus(Manifold):
 			x_title="t",
 			y_title="p",
 			reverse_x_y_axis=True, # x is p, y is t
+			color_location=(0,0,2*np.pi, 2*np.pi),
 		)
 
 	def generate_xyz(self, resolution=50, r=1, R=3):
@@ -46,6 +47,11 @@ class Torus(Manifold):
 
 
 		return self.t_p_to_xyz(t, p, r, R)
+	
+	def pdf_2d(self, xy, pdf):
+		x, y, z = self.t_p_to_xyz(xy[:,0], xy[:,1], self.r, self.R)
+		return pdf(np.column_stack((x, y, z)))
+
 	
 	def update_sample(self, selected_distribution, selected_sampling_method, sample_options, distribution_options):
 		dist = self.distributions[selected_distribution]

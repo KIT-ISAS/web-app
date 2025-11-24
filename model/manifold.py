@@ -32,3 +32,8 @@ class Manifold(ABC):
 
 	def generate_mesh(self, pdf, *args, **kwargs):
 		pass
+	
+	# uses the objects pararametrization to convert 2d coords to 3d coords and apply pdf
+	# optional, only if the manifold supports 2d plotting
+	def pdf_2d(self, xy, pdf):
+		pass
