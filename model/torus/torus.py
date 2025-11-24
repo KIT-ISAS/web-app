@@ -36,6 +36,7 @@ class Torus(Manifold):
 			periodic_y_amount=2 * np.pi,
 			x_title="t",
 			y_title="p",
+			reverse_x_y_axis=True, # x is p, y is t
 		)
 
 	def generate_xyz(self, resolution=50, r=1, R=3):
@@ -51,7 +52,7 @@ class Torus(Manifold):
 		sampling_method = dist.sampling_method_dict[selected_sampling_method]
 		new_sample = sampling_method.sample(sample_options, distribution_options)
 
-		if new_sample.size == 0:
+		if (new_sample is None) or new_sample.size == 0:
 			self.samples = np.empty((0, 3), dtype=float)
 			return
 

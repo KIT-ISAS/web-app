@@ -13,3 +13,5 @@ class PlotSettings2D:
 
 	x_title: str = "" # title for axis
 	y_title: str = ""
+
+	reverse_x_y_axis: bool = False # if set to True in the (n,2) shaped data, first column is y and second is x

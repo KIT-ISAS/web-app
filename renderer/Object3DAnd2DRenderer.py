@@ -17,6 +17,8 @@ class Object3DAnd2DRenderer(Object3DRenderer):
 		self.perx_x_amount = object.plot_settings_2d.periodic_x_amount
 		self.pery_y_amount = object.plot_settings_2d.periodic_y_amount
 
+		self.reverse_x_y_axis = object.plot_settings_2d.reverse_x_y_axis
+
 		padd = 0.5
 
 		self.fig_2d = go.Figure(
@@ -178,15 +180,25 @@ class Object3DAnd2DRenderer(Object3DRenderer):
 
 		# marker size scaling
 		sample_count = self.object.samples.shape[0]
-		marker_size = (10 * (sample_count / 100) ** (-0.35)) / dpr
-		marker_size = np.minimum(10,marker_size)
+		if sample_count == 0:
+			marker_size = 0 # no samples, no size
+		else:
+			marker_size = (10 * (sample_count / 100) ** (-0.35)) / dpr
+			marker_size = np.minimum(10,marker_size)
 
 		patched_figure["data"][0].marker.size = marker_size * 1.5
 		patched_figure["data"][1].marker.size = marker_size
 
-		# x is p, y is t
+		if not self.reverse_x_y_axis:
+			# True: (eg torus: x is p, y is t)
+			# False: (eg cylinder: x is p, y is z)
+			tp[:, [0, 1]] = tp[:, [1, 0]] # swap order, below code assumes self.reverse_x_y_axis is True
+
 		patched_figure["data"][0].x = tp[:, 1]
 		patched_figure["data"][0].y = tp[:, 0]
+		
+
+
 
 		ext_x = np.array([])
 		ext_y = np.array([])

@@ -23,7 +23,7 @@ class Object3DRenderer:
 			'scrollZoom': True,
 			"modeBarButtonsToRemove": ["select2d", "lasso2d"],
 		}
-		if self.object.samples.size:
+		if self.object.samples.size and self.object.samples.shape[0] != 0:
 			sample_count = self.object.samples.shape[0]
 			marker_size = (10 * (sample_count / 100) ** (-0.35)) / self.device_pixel_ratio
 			marker_size = np.minimum(10,marker_size)
@@ -207,9 +207,12 @@ class Object3DRenderer:
 		patched_figure["data"][1].z = self.object.samples[:, 2]
 
 		# set size based on number of samples
-		sample_count = self.object.samples.shape[0]
-		marker_size = (10 * (sample_count / 100) ** (-0.35)) / dpr
-		marker_size = np.minimum(10,marker_size) 
+		if self.object.samples.size == 0:
+			marker_size = 0 
+		else:
+			sample_count = self.object.samples.shape[0]
+			marker_size = (10 * (sample_count / 100) ** (-0.35)) / dpr
+			marker_size = np.minimum(10,marker_size) 
 		
 
 		patched_figure["data"][1].marker.size = marker_size	
