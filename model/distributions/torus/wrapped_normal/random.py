@@ -15,13 +15,13 @@ class TorusRandomWrappedSampling(TorusSamplingSchema):
 	def sample(self, sample_options, distribution_options):
 		sample_count = sample_options[0].state
 
-		sigma_x = distribution_options[0].state
-		sigma_y = distribution_options[1].state
+		sigma_t = distribution_options[0].state
+		sigma_p = distribution_options[1].state
 		correlation = distribution_options[2].state
 
 		Cov = np.array([
-			[sigma_x**2, correlation * sigma_x * sigma_y],
-			[correlation * sigma_x * sigma_y, sigma_y**2]
+			[sigma_t**2, correlation * sigma_t * sigma_p],
+			[correlation * sigma_t * sigma_p, sigma_p**2]
 		])
 
 		mean = np.array([np.pi, np.pi])

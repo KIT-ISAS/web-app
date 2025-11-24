@@ -11,7 +11,7 @@ from util.selectors.slider import Slider
 
 class Torus(Manifold):
 	def __init__(self, resolution=100, r=1, R=3):
-		self.xyz = self.generate_xyz(resolution, r, R)
+		self.xyz = self.generate_xyz(resolution, r - 0.01, R - 0.01) # slightly smaller to avoid artifacts from mesh
 		self.mesh = np.array([])
 		self.samples = np.array([])
 		self.samples_2d = np.array([])
