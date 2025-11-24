@@ -13,7 +13,7 @@ from util.selectors.slider import Slider
 
 class Cylinder(Manifold):
 	def __init__(self, resolution=100, r=1):
-		self.xyz = self.generate_xyz(resolution, r)
+		self.xyz = self.generate_xyz(resolution, 0.999)
 		self.mesh = np.array([])
 		self.samples = np.array([])
 		self.samples_2d = np.array([])
@@ -73,6 +73,12 @@ class Cylinder(Manifold):
 		z = r * z
 
 		return x, y, z
+	
+	@staticmethod
+	def xyz_to_p_z(x, y, z):
+		p = np.arctan2(y, x) % (2 * np.pi)
+
+		return p, z
 	
 	def generate_mesh(self, pdf, alpha=1):
 		# mesh_xyz has nans for line segments, mask before passing to pdf
