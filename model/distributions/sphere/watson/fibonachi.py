@@ -148,9 +148,8 @@ class WatsonFibonachiSampling(SphereSamplingSchema):
 		x_i_f = np.column_stack((x_i_f_1, x_i_f_2, x_i_f_0)) # order so that mu=[0, 0, 1]
 		return x_i_f
 
-
-	def sample_closed(self, sample_options, distribution_options):
-		def erfi_inv(x):
+	@staticmethod
+	def erfi_inv(x):
 			x = np.asarray(x, dtype=float)
 
 			def _scalar_inv(y):
@@ -174,6 +173,8 @@ class WatsonFibonachiSampling(SphereSamplingSchema):
 			return np.vectorize(_scalar_inv, otypes=[float])(x)
 
 
+	def sample_closed(self, sample_options, distribution_options):
+
 		sample_count = sample_options[0].state
 		k = distribution_options[0].state # kappa
 
@@ -183,7 +184,7 @@ class WatsonFibonachiSampling(SphereSamplingSchema):
 
 		
 		if k > 0:
-			w = 1 / (np.sqrt(k)) * erfi_inv( ((1-2*indices + sample_count)/ sample_count) * erfi(np.sqrt(k)) )
+			w = 1 / (np.sqrt(k)) * self.erfi_inv( ((1-2*indices + sample_count)/ sample_count) * erfi(np.sqrt(k)) )
 		elif k < 0:
 			la = -k
 			w = 1 / (np.sqrt(la)) * erfinv( ((2*indices +1 - sample_count)/ sample_count) * erf(np.sqrt(la)) )
