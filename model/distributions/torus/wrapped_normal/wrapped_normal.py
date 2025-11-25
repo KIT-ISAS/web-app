@@ -33,7 +33,7 @@ class UniformTorusDistribution(TorusDistribution):
 
 		mean = np.array([np.pi, np.pi])
 
-		dist = multivariate_normal(mean=mean, cov=Cov)
+		dist = multivariate_normal(mean=mean, cov=Cov, allow_singular=True)
 
 		def pdf(x):
 			alpha = 0.7 # scale

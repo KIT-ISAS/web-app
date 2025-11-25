@@ -284,7 +284,6 @@ class Object3DAnd2DRenderer(Object3DRenderer):
 		z_flat = self.object.pdf_2d(xy, pdf).reshape(X.shape)
 
 		z = z_flat.reshape(X.shape)
-		print("2D PDF min/max:", np.min(z), np.max(z))
 
 		patched_figure["data"][2].z = z
 
