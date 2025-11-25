@@ -1,0 +1,25 @@
+from abc import ABC, abstractmethod
+import numpy as np
+
+from model.distributions.cylinder.cylinder_sampling_schema import CylinderSamplingSchema
+from util.selectors.slider_square import SliderSquare
+from util.cartesian_util import CartesianUtil as cu
+
+
+class CylinderCartesianUniformSampling(CylinderSamplingSchema):
+	def __init__(self):
+		self.sample_options = [
+			SliderSquare("Number of Samples", 4, 64, 100, 4)
+		]
+		self.info_md = """
+		> Warning: Using the Cartesian Grid is not recomended in practise, as it yields bad results. 
+		It is included for demonstration purposes only."""
+
+	def get_name(self):
+		return "Cartesian Grid"
+	
+	def sample(self, sample_options, distribution_options):
+		sample_count = sample_options[0].state
+
+		n = int(np.sqrt(sample_count))
+		return cu.generate_cartesian_grid(n, (2 * np.pi, 2 * np.pi))

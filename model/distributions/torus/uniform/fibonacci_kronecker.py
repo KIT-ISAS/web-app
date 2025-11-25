@@ -11,7 +11,7 @@ class TorusKroneckerUniformSampling(TorusSamplingSchema):
 		]
 		self.info_md = """
 		> Warning: Mapping the Kronecker lattice to the torus is not recommended in practice, as it is only periodic on one axis. 
-		It is included for educational purposes only."""
+		It is included for demonstration purposes only."""
 
 	def get_name(self):
 		return "Fibonacci-Kronecker Lattice"

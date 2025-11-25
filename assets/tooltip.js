@@ -29,3 +29,7 @@ window.dccFunctions.transform_fib = function(value) {
      }
      return fibonacci(value);
 }
+
+window.dccFunctions.transform_square = function(value) {
+    return value * value;
+}

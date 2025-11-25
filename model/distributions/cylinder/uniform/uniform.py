@@ -6,6 +6,7 @@ from model.distributions.cylinder.cylinder_distribution import CylinderDistribut
 from model.distributions.cylinder.uniform.random import CylinderRandomUniformSampling
 from model.distributions.cylinder.uniform.fibonacci_kronecker import CylinderFibUniformSampling
 from model.distributions.cylinder.uniform.fibonacci_rank_1 import CylinderFibRank1UniformSampling
+from model.distributions.cylinder.uniform.cartesian import CylinderCartesianUniformSampling
 class UniformCylinderDistribution(CylinderDistribution):
 	def __init__(self):
 		self.distribution_options = []
@@ -13,6 +14,7 @@ class UniformCylinderDistribution(CylinderDistribution):
 			CylinderRandomUniformSampling(),
 			CylinderFibUniformSampling(),
 			CylinderFibRank1UniformSampling(),
+			CylinderCartesianUniformSampling(),
 		]
 
 	def get_name(self):
