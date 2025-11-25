@@ -6,7 +6,7 @@ import scipy
 
 from model.distributions.sphere.vonmises_fisher.random import VonMisesRandomSampling
 from model.distributions.sphere.vonmises_fisher.fibonachi import VonMisesFibSampling
-
+from model.distributions.sphere.vonmises_fisher.cartesian import VonMisesCartesianSampling
 class vonMisesFisherDistribution(SphereDistribution):
 	def __init__(self):
 		self.distribution_options = [
@@ -15,7 +15,8 @@ class vonMisesFisherDistribution(SphereDistribution):
 		
 		self.sampling_methods = [
 			VonMisesRandomSampling(),
-			VonMisesFibSampling()
+			VonMisesFibSampling(),
+			VonMisesCartesianSampling(),
 		]
 
 	def get_name(self):
