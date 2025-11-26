@@ -5,6 +5,7 @@ from scipy.stats import multivariate_normal
 
 from model.distributions.torus.torus_distribution import TorusDistribution
 from model.distributions.torus.wrapped_normal.random import TorusRandomWrappedSampling
+from model.distributions.torus.wrapped_normal.fibonacci import TorusFibRank1WNSampling
 from model.torus.torus import Torus
 class UniformTorusDistribution(TorusDistribution):
 	def __init__(self):
@@ -15,6 +16,7 @@ class UniformTorusDistribution(TorusDistribution):
 		]
 		self.sampling_methods = [
 			TorusRandomWrappedSampling(),
+			TorusFibRank1WNSampling(),
 		]
 		
 
