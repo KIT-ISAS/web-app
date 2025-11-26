@@ -15,18 +15,20 @@ class FloatSlider(Selector):
 		self.transform_tooltip = transform_tooltip
 
 
-	def to_dash_component(self, _type, id, renderer_id):
+	def to_dash_component(self, _type, id, renderer_id, manual=False):
 		if self.transform_tooltip is None:
 			tooltip = {"placement": "bottom", "always_visible": True}
 		else:
 			tooltip = {"placement": "bottom", "always_visible": True, "transform": self.transform_tooltip}
 
 		self.id = id
+		slider_id = {"type": _type, "index": id, "renderer": renderer_id, "manual": manual}
+
 		return html.Div([
 			html.Label(self.name),
 
 			dcc.Slider(
-				id={"type": _type, "index": id, "renderer": renderer_id},
+				id=slider_id,
 				min=self.min,
 				max=self.max,
 				value=self.state,

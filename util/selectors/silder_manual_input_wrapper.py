@@ -9,14 +9,13 @@ class SliderManualInputWrapper():
 		self.check_input = check_input
 
 	def to_dash_component(self, _type, id, renderer_id):
-		slider_component = self.slider.to_dash_component(_type, id, renderer_id)
+		slider_component = self.slider.to_dash_component(_type, id, renderer_id, manual=True)
 		self.id = id
 		self.renderer_id = renderer_id
 		
 		component = html.Div([
 			html.Div(
 				children=[slider_component],
-				#style={"flex": "1"}
 				style={"display": "inline-block", "width": r"calc(100% - 5rem)", "verticalAlign": "bottom"}
 			),
 			html.Div(
@@ -24,7 +23,6 @@ class SliderManualInputWrapper():
 					id={"type": f"manual_input-{_type}", "index": id, "renderer": renderer_id},
 					type="number",
 					value=self.slider.state,
-					#style={"width": "5rem"},
 					style={"width": "100%"},
 				)],
 				style={"display": "inline-block", "width": "5rem", "verticalAlign": "bottom", "margin-bottom": "1rem"}

@@ -11,17 +11,17 @@ class Selector(ABC):
 	def to_dash_component(self, _type, id, renderer_id):
 		pass
 
-	def transfrom_down(x):
+	def transfrom_down(self, x):
 		# identity by default, override in subclasses if needed
 		# does need to be defined if dash slider_values do not correspond to self.state
 		return x
 	
-	def transfrom_up(x):
+	def transfrom_up(self, x):
 		# identity by default, override in subclasses if needed
 		# does need to be defined if dash slider_values do not correspond to self.state
 		return x
 
-	def is_valid(x):
+	def is_valid(self, x):
 		# by default all values are valid
 		# override in subclasses if needed
 		return True

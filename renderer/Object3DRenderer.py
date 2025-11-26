@@ -141,10 +141,10 @@ class Object3DRenderer:
 
 		# optional manual input
 		@callback(
-			Output({"type": "sampling", "renderer": self.id, "index": MATCH}, "value"),
+			Output({"type": "sampling", "renderer": self.id, "index": MATCH, "manual": True}, "value"),
 			Output({"type": "manual_input-sampling", "renderer": self.id, "index": MATCH}, "value"),
 			Input({"type": "manual_input-sampling", "renderer": self.id, "index": MATCH}, "value"),
-			Input({"type": "sampling", "renderer": self.id, "index": MATCH}, "value"),
+			Input({"type": "sampling", "renderer": self.id, "index": MATCH, "manual": True}, "value"),
 			State("distribution-selector", "value"),
 			State(f"sampling-selector-{self.id}", "value"),
 			prevent_initial_call=True,
@@ -170,7 +170,7 @@ class Object3DRenderer:
 			
 			if source == "manual_input-sampling": # manual input changed, update slider
 
-				if wrapper.check_input is None or wrapper.check_input(val):
+				if (wrapper.check_input is None or wrapper.check_input(val)) and wrapper.slider.is_valid(val):
 					slider_value = wrapper.update_state_manual(val)
 					return slider_value, no_update
 				else:
@@ -180,10 +180,10 @@ class Object3DRenderer:
 				return no_update, wrapper.slider.transfrom_up(val_silder)
 
 		@callback(
-			Output({"type": "dist", "renderer": self.id, "index": MATCH}, "value"),
+			Output({"type": "dist", "renderer": self.id, "index": MATCH, "manual": True}, "value"),
 			Output({"type": "manual_input-dist", "renderer": self.id, "index": MATCH}, "value"),
 			Input({"type": "manual_input-dist", "renderer": self.id, "index": MATCH}, "value"),
-			Input({"type": "dist", "renderer": self.id, "index": MATCH}, "value"),
+			Input({"type": "dist", "renderer": self.id, "index": MATCH, "manual": True}, "value"),
 			State("distribution-selector", "value"),
 			State(f"sampling-selector-{self.id}", "value"),
 			prevent_initial_call=True,
@@ -222,10 +222,10 @@ class Object3DRenderer:
 		# updates the plot based on selected sampling options
 		@callback(
 			Output(f"graph-{self.id}", "figure", allow_duplicate=True),
-			Input({"type": "dist", "renderer": self.id, "index": ALL}, "value"),
-			State({"type": "dist", "renderer": self.id, "index": ALL}, "id"),
-			Input({"type": "sampling", "renderer": self.id, "index": ALL}, "value"),
-			State({"type": "sampling", "renderer": self.id, "index": ALL}, "id"),
+			Input({"type": "dist", "renderer": self.id, "index": ALL, "manual": ALL}, "value"),
+			State({"type": "dist", "renderer": self.id, "index": ALL, "manual": ALL}, "id"),
+			Input({"type": "sampling", "renderer": self.id, "index": ALL, "manual": ALL}, "value"),
+			State({"type": "sampling", "renderer": self.id, "index": ALL, "manual": ALL}, "id"),
 			Input("distribution-selector", "value"),
 			Input(f"sampling-selector-{self.id}", "value"),
 			Input(f"distribution-options-{self.id}", "children"),
@@ -238,8 +238,8 @@ class Object3DRenderer:
 		# updates the plot based on selected distribution options
 		@callback(
 			Output(f"graph-{self.id}", "figure", allow_duplicate=True),
-			Input({"type": "dist", "renderer": self.id, "index": ALL}, "value"),
-			State({"type": "dist", "renderer": self.id, "index": ALL}, "id"),
+			Input({"type": "dist", "renderer": self.id, "index": ALL, "manual": ALL}, "value"),
+			State({"type": "dist", "renderer": self.id, "index": ALL, "manual": ALL}, "id"),
 			Input("distribution-selector", "value"),
 			Input(f"sampling-selector-{self.id}", "value"),
 			Input(f"distribution-options-{self.id}", "children"),
@@ -298,33 +298,33 @@ class Object3DRenderer:
 		return patched_figure
 	
 	def update_plot_dist(self, values_dist, ids_dist, selected_distribution, selected_sampling, _):
-			dist_options =  self.object.distributions[selected_distribution].distribution_options
+		dist_options =  self.object.distributions[selected_distribution].distribution_options
 
-			# the order of options might not be guaranteed, so we map them by their ids
-			# and them sort them, so they are in the same order as sampling_options and dist_options
-			id_value_dist = [(id,v) for id, v in zip(ids_dist, values_dist)]
-			options_dist_new = sorted(id_value_dist, key=lambda x: int(x[0]["index"]))
+		# the order of options might not be guaranteed, so we map them by their ids
+		id_value_dist = [(id,v) for id, v in zip(ids_dist, values_dist)]
 
-
-			for opt, (id, new_state) in zip(dist_options, options_dist_new):
-				opt.update_state(new_state)
+		options_dist_new = sorted(id_value_dist, key=lambda x: int(x[0]["index"]))
 
 
-			# meshed density function plot plot
-			patched_figure = Patch()
+		for opt, (id, new_state) in zip(dist_options, options_dist_new):
+			opt.update_state(new_state)
 
-			
-			pdf = self.object.distributions[selected_distribution].get_pdf(list(dist_options))
-			if pdf is not None:
-				x, y, z  = self.object.generate_mesh(pdf)
-			else:
-				x, y, z = [], [], []
 
-			patched_figure["data"][2].x = x
-			patched_figure["data"][2].y = y
-			patched_figure["data"][2].z = z
+		# meshed density function plot plot
+		patched_figure = Patch()
 
-			return patched_figure
+		
+		pdf = self.object.distributions[selected_distribution].get_pdf(list(dist_options))
+		if pdf is not None:
+			x, y, z  = self.object.generate_mesh(pdf)
+		else:
+			x, y, z = [], [], []
+
+		patched_figure["data"][2].x = x
+		patched_figure["data"][2].y = y
+		patched_figure["data"][2].z = z
+
+		return patched_figure
 		
 		
 		

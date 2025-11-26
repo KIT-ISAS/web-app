@@ -62,13 +62,15 @@ class LogSlider(Selector):
 			return 0
 		return np.log10(value)
 
-	def to_dash_component(self, _type, id, renderer_id):
+	def to_dash_component(self, _type, id, renderer_id, manual=False):
 		self.id = id
+		slider_id = {"type": _type, "index": id, "renderer": renderer_id, "manual": manual}
+
 		return html.Div([
 			html.Label(self.name),
 
 			dcc.Slider(
-				id={"type": _type, "index": id, "renderer": renderer_id},
+				id=slider_id,
 				min=self.log_min,
 				max=self.log_max,
 				value=self.transfrom_down(self.state),

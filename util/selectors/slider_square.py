@@ -20,13 +20,15 @@ class SliderSquare(Selector):
 
 		self.id = None
 
-	def to_dash_component(self, _type, id, renderer_id):
+	def to_dash_component(self, _type, id, renderer_id, manual=False):
 		self.id = id
+		slider_id = {"type": _type, "index": id, "renderer": renderer_id, "manual": manual}
+
 		return html.Div([
 			html.Label(self.name),
 
 			dcc.Slider(
-				id={"type": _type, "index": id, "renderer": renderer_id},
+				id=slider_id,
 				min=self.min,
 				max=self.max,
 				value=self.idx,
@@ -60,7 +62,9 @@ class SliderSquare(Selector):
 				return i
 		raise ValueError(f"{x} is not a perfect square number")
 
-	@staticmethod
-	def is_valid(x):
+	def is_valid(self, x):
+		if x < 0:
+			return False
+
 		s = int(np.sqrt(x))
 		return s * s == x

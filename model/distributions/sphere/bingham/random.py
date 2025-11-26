@@ -12,7 +12,7 @@ class BinghamRandomSampling(SphereSamplingSchema):
 	def __init__(self):
 		self.sample_options = [
 			MI(LogSlider("Number of Samples", 10, 100, 10000))	
-	  	]
+		]
 		
 	def get_name(self):
 		return "Random"
