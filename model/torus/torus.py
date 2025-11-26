@@ -6,8 +6,8 @@ from model.distributions.distribution_loader import DistributionLoader
 from model.distributions.torus.torus_distribution import TorusDistribution
 from model.manifold import Manifold
 from renderer.PlotSettings2d import PlotSettings2D
-from model.distributions.cylinder.uniform.fibonacci_kronecker import CylinderFibUniformSampling
-from util.selectors.slider import Slider
+from model.distributions.cylinder.uniform.fibonacci_rank_1 import CylinderFibRank1UniformSampling
+from util.selectors.slider_fib import SliderFib
 
 class Torus(Manifold):
 	def __init__(self, resolution=100, r=1, R=3):
@@ -98,8 +98,14 @@ class Torus(Manifold):
 		return xyz_extruded[:,0], xyz_extruded[:,1], xyz_extruded[:,2]
 	
 
-	def _init_mesh(self, resolution=4000):
-		tp = CylinderFibUniformSampling.sample(None, [Slider("Number of Samples", 10, resolution, resolution)] , [])
+	def _init_mesh(self, resolution=(4181, 19)):
+		
+		#tp = CylinderFibRank1UniformSampling.sample(None, [SliderFib("Number of Samples", 10, resolution[0], resolution[0], resolution[1])] , [])
+		k = resolution[1]
+		samp_count = resolution[0]
+		t, p = CylinderFibRank1UniformSampling.get_rank_1(samp_count, k)
+		tp = np.column_stack((t * 2 * np.pi, p * 2 * np.pi))
+
 		x, y, z = self.t_p_to_xyz(tp[:,0], tp[:,1], self.r)
 
 		
