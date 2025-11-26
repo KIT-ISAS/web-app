@@ -51,10 +51,10 @@ class SliderFib(Selector):
 		self.state = int(sp.fibonacci(new_state))
 		self.idx = int(new_state)
 
-	def transfrom_up(x):
+	def transfrom_up(self, x):
 		return int(sp.fibonacci(x))
 	
-	def transfrom_down(x):
+	def transfrom_down(self, x):
 		for i in range(0, x + 1):
 			if sp.fibonacci(i) == x:
 				return i

@@ -5,11 +5,13 @@ from scipy.stats import norm
 from model.distributions.cylinder.uniform.fibonacci_rank_1 import CylinderFibRank1UniformSampling
 from util.selectors.slider_fib import SliderFib
 from model.distributions.torus.torus_sampling_schema import TorusSamplingSchema
+from util.selectors.silder_manual_input_wrapper import SliderManualInputWrapper as MI
+
 
 class TorusFibRank1WNSampling(TorusSamplingSchema):
 	def __init__(self):
 		self.sample_options = [
-			SliderFib("Number of Samples", 2, 34, 21, 9)
+			MI(SliderFib("Number of Samples", 2, 34, 21, 9))
 		]
 		self.sampler = CylinderFibRank1UniformSampling()
 

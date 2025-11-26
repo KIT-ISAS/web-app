@@ -3,12 +3,12 @@ import numpy as np
 
 from model.distributions.sphere.sphere_sampling_schema import SphereSamplingSchema
 from util.selectors.silder_log import LogSlider
-from util.selectors.silder_manual_input_wrapper import SliderManualInputWrapper
+from util.selectors.silder_manual_input_wrapper import SliderManualInputWrapper as MI
 
 class SphereUniformRandomSampling(SphereSamplingSchema):
 	def __init__(self):
 		self.sample_options = [
-			SliderManualInputWrapper(LogSlider("Number of Samples", 10, 100, 10000), None)
+			MI(LogSlider("Number of Samples", 10, 100, 10000))
 		]
 		
 	def get_name(self):

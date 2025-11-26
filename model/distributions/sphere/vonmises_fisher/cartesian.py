@@ -5,11 +5,13 @@ import scipy
 from model.distributions.sphere.sphere_sampling_schema import SphereSamplingSchema
 from util.selectors.slider_square import SliderSquare
 from util.cartesian_util import CartesianUtil as cu
+from util.selectors.silder_manual_input_wrapper import SliderManualInputWrapper as MI
+
 
 class VonMisesCartesianSampling(SphereSamplingSchema):
 	def __init__(self):
 		self.sample_options = [
-			SliderSquare("Number of Samples", 4, 64, 100, 4)
+			MI(SliderSquare("Number of Samples", 4, 64, 100, 4))
 		]
 		self.info_md = """
 		> Warning: Using the Cartesian Grid is not recomended in practise, as it yields bad results. 

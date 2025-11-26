@@ -3,11 +3,12 @@ import numpy as np
 
 from util.selectors.silder_log import LogSlider 
 from model.distributions.torus.torus_sampling_schema import TorusSamplingSchema
+from util.selectors.silder_manual_input_wrapper import SliderManualInputWrapper as MI
 
 class TorusKroneckerUniformSampling(TorusSamplingSchema):
 	def __init__(self):
 		self.sample_options = [
-			LogSlider("Number of Samples", 10, 100, 10000)
+			MI(LogSlider("Number of Samples", 10, 100, 10000))
 		]
 		self.info_md = """
 		> Warning: Mapping the Kronecker lattice to the torus is not recommended in practice, as it is only periodic on one axis. 

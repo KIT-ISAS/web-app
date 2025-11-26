@@ -51,10 +51,10 @@ class SliderSquare(Selector):
 		self.state = int((new_state**2))
 		self.idx = int(new_state)
 
-	def transfrom_up(x):
+	def transfrom_up(self, x):
 		return int((x**2))
 	
-	def transfrom_down(x):
+	def transfrom_down(self, x):
 		for i in range(0, int(np.sqrt(x)) + 1):
 			if (i**2) == x:
 				return i

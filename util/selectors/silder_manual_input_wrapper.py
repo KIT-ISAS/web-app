@@ -3,7 +3,7 @@ from dash import dcc, html, callback, Input, Output, ALL
 
 
 class SliderManualInputWrapper():
-	def __init__(self, slider, check_input):
+	def __init__(self, slider, check_input=None):
 		self.id = None # unique id for dash callback
 		self.slider = slider
 		self.check_input = check_input
@@ -49,3 +49,7 @@ class SliderManualInputWrapper():
 	@property
 	def state(self):
 		return self.slider.state
+
+	@property
+	def idx(self):
+		return self.slider.idx

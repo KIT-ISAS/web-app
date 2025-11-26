@@ -2,11 +2,12 @@ from abc import ABC, abstractmethod
 from model.distributions.torus.torus_sampling_schema import TorusSamplingSchema
 from util.selectors.silder_log import LogSlider 
 import numpy as np
+from util.selectors.silder_manual_input_wrapper import SliderManualInputWrapper as MI
 
 class TorusRandomWrappedSampling(TorusSamplingSchema):
 	def __init__(self):
 		self.sample_options = [
-			LogSlider("Number of Samples", 10, 100, 10000)
+			MI(LogSlider("Number of Samples", 10, 100, 10000))
 		]
 
 	def get_name(self):

@@ -3,11 +3,12 @@ from model.distributions.cylinder.cylinder_sampling_schema import CylinderSampli
 from util.selectors.slider_fib import SliderFib
 import numpy as np	
 import sympy as sp
+from util.selectors.silder_manual_input_wrapper import SliderManualInputWrapper as MI
 
 class CylinderFibRank1UniformSampling(CylinderSamplingSchema):
 	def __init__(self):
 		self.sample_options = [
-			SliderFib("Number of Samples", 2, 34, 21, 9)
+			MI(SliderFib("Number of Samples", 2, 34, 21, 9))
 		]
 
 	def get_name(self):
