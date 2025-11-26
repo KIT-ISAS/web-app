@@ -48,13 +48,13 @@ class Slider(Selector):
 		return marks
 
 
-	def to_dash_component(self, _type, id):
+	def to_dash_component(self, _type, id, renderer_id):
 		self.id = id
 		return html.Div([
 			html.Label(self.name),
 
 			dcc.Slider(
-				id={"type": _type, "index": id},
+				id={"type": _type, "index": id, "renderer": renderer_id},
 				min=self.min,
 				max=self.max,
 				value=self.state,

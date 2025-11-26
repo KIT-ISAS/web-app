@@ -1,5 +1,5 @@
 from functools import lru_cache
-from dash import html, dcc, callback, Input, Output, ALL, State, Patch, clientside_callback, ClientsideFunction
+from dash import html, dcc, callback, Input, Output, ALL, State, Patch, clientside_callback, ClientsideFunction, MATCH, no_update
 import numpy as np
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
@@ -124,10 +124,10 @@ class Object3DRenderer:
 		def update_curr_distribution(selected_distribution, selected_sampling):
 			# ids are given in the same order as options_dist and options_sampling
 			options_dist = self.object.distributions[selected_distribution].distribution_options
-			options_dist_dcc = [opt.to_dash_component("dist", id) for id, opt in enumerate(options_dist)]
+			options_dist_dcc = [opt.to_dash_component("dist", id, self.id) for id, opt in enumerate(options_dist)]
 
 			options_sampling = self.object.distributions[selected_distribution].sampling_method_dict[selected_sampling]
-			options_sampling_dcc = [opt.to_dash_component("sampling", id) for id, opt in enumerate(options_sampling.sample_options)]
+			options_sampling_dcc = [opt.to_dash_component("sampling", id, self.id) for id, opt in enumerate(options_sampling.sample_options)]
 
 			dist_info_md = self.object.distributions[selected_distribution].info_md
 			sampling_info_md = options_sampling.info_md
@@ -138,15 +138,94 @@ class Object3DRenderer:
 
 			return options_dist_dcc, options_sampling_dcc, dist_info_md, sampling_info_md, dist_hidden, sampling_hidden
 
+
+		# optional manual input
+		@callback(
+			Output({"type": "sampling", "renderer": self.id, "index": MATCH}, "value"),
+			Output({"type": "manual_input-sampling", "renderer": self.id, "index": MATCH}, "value"),
+			Input({"type": "manual_input-sampling", "renderer": self.id, "index": MATCH}, "value"),
+			Input({"type": "sampling", "renderer": self.id, "index": MATCH}, "value"),
+			State("distribution-selector", "value"),
+			State(f"sampling-selector-{self.id}", "value"),
+			prevent_initial_call=True,
+		)
+		def manual_input_changed(val, val_silder, selected_distribution, selected_sampling):
+			source = dash.ctx.triggered_id["type"]
+
+			if val is None and source == "manual_input-sampling":
+				return no_update, no_update
+
+			sampling_options = self.object.distributions[selected_distribution].sampling_method_dict[selected_sampling].sample_options
+
+			# find the wrapper that called this
+			wrapper = None
+			for opt in sampling_options:
+				id = getattr(opt, "id", None)
+				if id is not None and id == dash.ctx.triggered_id["index"]:
+					wrapper = opt
+					break
+
+			if wrapper is None:
+				return no_update, no_update
+			
+			if source == "manual_input-sampling": # manual input changed, update slider
+
+				if wrapper.check_input is None or wrapper.check_input(val):
+					slider_value = wrapper.update_state_manual(val)
+					return slider_value, no_update
+				else:
+					return no_update, no_update
+				
+			else: # slider changed, update manual input
+				return no_update, wrapper.slider.transfrom_up(val_silder)
+
+		@callback(
+			Output({"type": "dist", "renderer": self.id, "index": MATCH}, "value"),
+			Output({"type": "manual_input-dist", "renderer": self.id, "index": MATCH}, "value"),
+			Input({"type": "manual_input-dist", "renderer": self.id, "index": MATCH}, "value"),
+			Input({"type": "dist", "renderer": self.id, "index": MATCH}, "value"),
+			State("distribution-selector", "value"),
+			State(f"sampling-selector-{self.id}", "value"),
+			prevent_initial_call=True,
+		)
+		def manual_input_dist_changed(val_manual, val_slider, selected_distribution, selected_sampling):
+			source = dash.ctx.triggered_id["type"]
+
+			if val_manual is None and source == "manual_input-dist":
+				return no_update, no_update
+
+			dist_options =  self.object.distributions[selected_distribution].distribution_options
+
+			wrapper = None
+			for opt in dist_options:
+				opt_id = getattr(opt, "id", None)
+				if opt_id is not None and opt_id == dash.ctx.triggered_id["index"]:
+					wrapper = opt
+					break
+
+			if wrapper is None:
+				return no_update, no_update
+
+			if source == "manual_input-dist":
+				# check_input is given by distribution/ sampling method, if None, no special constraints are given
+				# slider.is_valid is given by the slider itself, can be less strict
+				if (wrapper.check_input is None or wrapper.check_input(val_manual)) and wrapper.slider.is_valid(val_manual):
+					slider_value = wrapper.update_state_manual(val_manual)
+					return slider_value, no_update
+				return no_update, no_update
+
+			# slider changed, sync manual input display
+			return no_update, wrapper.slider.transfrom_up(val_slider)
+
 	def _register_3d_plot_callbacks(self):
 
 		# updates the plot based on selected sampling options
 		@callback(
 			Output(f"graph-{self.id}", "figure", allow_duplicate=True),
-			Input({"type": "dist", "index": ALL}, "value"),
-			State({"type": "dist", "index": ALL}, "id"),
-			Input({"type": "sampling", "index": ALL}, "value"),
-			State({"type": "sampling", "index": ALL}, "id"),
+			Input({"type": "dist", "renderer": self.id, "index": ALL}, "value"),
+			State({"type": "dist", "renderer": self.id, "index": ALL}, "id"),
+			Input({"type": "sampling", "renderer": self.id, "index": ALL}, "value"),
+			State({"type": "sampling", "renderer": self.id, "index": ALL}, "id"),
 			Input("distribution-selector", "value"),
 			Input(f"sampling-selector-{self.id}", "value"),
 			Input(f"distribution-options-{self.id}", "children"),
@@ -159,8 +238,8 @@ class Object3DRenderer:
 		# updates the plot based on selected distribution options
 		@callback(
 			Output(f"graph-{self.id}", "figure", allow_duplicate=True),
-			Input({"type": "dist", "index": ALL}, "value"),
-			State({"type": "dist", "index": ALL}, "id"),
+			Input({"type": "dist", "renderer": self.id, "index": ALL}, "value"),
+			State({"type": "dist", "renderer": self.id, "index": ALL}, "id"),
 			Input("distribution-selector", "value"),
 			Input(f"sampling-selector-{self.id}", "value"),
 			Input(f"distribution-options-{self.id}", "children"),

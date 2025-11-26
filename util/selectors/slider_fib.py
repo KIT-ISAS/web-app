@@ -20,13 +20,13 @@ class SliderFib(Selector):
 
 		self.id = None
 
-	def to_dash_component(self, _type, id):
+	def to_dash_component(self, _type, id, renderer_id):
 		self.id = id
 		return html.Div([
 			html.Label(self.name),
 
 			dcc.Slider(
-				id={"type": _type, "index": id},
+				id={"type": _type, "index": id, "renderer": renderer_id},
 				min=self.min,
 				max=self.max,
 				value=self.idx,
@@ -50,5 +50,29 @@ class SliderFib(Selector):
 	def update_state(self, new_state):
 		self.state = int(sp.fibonacci(new_state))
 		self.idx = int(new_state)
+
+	def transfrom_up(x):
+		return int(sp.fibonacci(x))
+	
+	def transfrom_down(x):
+		for i in range(0, x + 1):
+			if sp.fibonacci(i) == x:
+				return i
+		raise ValueError(f"{x} is not a Fibonacci number")
+	
+	@staticmethod
+	def is_valid(n):
+		if n < 0:
+			return False
+		# A number is a Fibonacci number if and only if one or both of (5*n^2 + 4) or (5*n^2 - 4) is a perfect square 
+		# https://en.wikipedia.org/wiki/Fibonacci_sequence
+		test1 = 5 * n * n + 4
+		test2 = 5 * n * n - 4
+
+		def is_perfect_square(x):
+			s = int(np.sqrt(x))
+			return s * s == x
+
+		return is_perfect_square(test1) or is_perfect_square(test2)
 
 	
