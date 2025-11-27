@@ -76,6 +76,8 @@ class Object3DAnd2DRenderer(Object3DRenderer):
 			x=0.01,
 		))
 		self.fig_2d.update_layout(dragmode="pan")
+		# keep user zoom/pan while data is being patched
+		self.fig_2d.update_layout(uirevision=f"object-2d-{self.id}")
 
 		if object.plot_settings_2d is not None:
 			self.fig_2d.update_xaxes(

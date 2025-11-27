@@ -73,7 +73,9 @@ class Object3DRenderer:
 				yaxis=dict(visible=False),
 				zaxis=dict(visible=False),
 			),
-			margin=dict(l=0, r=0, t=0, b=0)
+			margin=dict(l=0, r=0, t=0, b=0),
+			# keep camera/zoom/pan while data is patched
+			uirevision=f"object-3d-{self.id}",
 		)
 
 		self.fig.update_layout(legend=dict(
