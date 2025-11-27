@@ -1,8 +1,8 @@
-from util.selectors.slider_float import FloatSlider 
 import numpy as np
 from scipy.stats import multivariate_normal
 
-
+from util.selectors.slider_float import FloatSlider 
+from util.selectors.slider_pi import PiSlider
 from model.distributions.torus.torus_distribution import TorusDistribution
 from model.distributions.torus.wrapped_normal.random import TorusRandomWrappedSampling
 from model.distributions.torus.wrapped_normal.fibonacci import TorusFibRank1WNSampling
@@ -10,8 +10,10 @@ from model.torus.torus import Torus
 class UniformTorusDistribution(TorusDistribution):
 	def __init__(self):
 		self.distribution_options = [
-			FloatSlider("Sigma t (σₜ)", 0, 0.5, 5.0),
+			PiSlider("Mean p (μₚ)", 0, 1, 2),
+			PiSlider("Mean t (μₜ)", 0, 1, 2),
 			FloatSlider("Sigma p (σₚ)", 0, 0.5, 5.0),
+			FloatSlider("Sigma t (σₜ)", 0, 0.5, 5.0),
 			FloatSlider("Correlation (ρ)", -1, 0.1, 1),
 		]
 		self.sampling_methods = [
@@ -24,16 +26,18 @@ class UniformTorusDistribution(TorusDistribution):
 		return "Wrapped Normal"
 
 	def get_pdf(self, distribution_options):
-		sigma_t = distribution_options[0].state
-		sigma_p = distribution_options[1].state
-		correlation = distribution_options[2].state
+		mean_x = distribution_options[0].state
+		mean_y = distribution_options[1].state
+		sigma_t = distribution_options[2].state
+		sigma_p = distribution_options[3].state
+		correlation = distribution_options[4].state
 
 		Cov = np.array([
 			[sigma_t**2, correlation * sigma_t * sigma_p],
 			[correlation * sigma_t * sigma_p, sigma_p**2]
 		])
 
-		mean = np.array([np.pi, np.pi])
+		mean = np.array([mean_x, mean_y])
 
 		dist = multivariate_normal(mean=mean, cov=Cov, allow_singular=True)
 

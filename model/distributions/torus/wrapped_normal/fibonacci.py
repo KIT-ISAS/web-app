@@ -26,16 +26,18 @@ class TorusFibRank1WNSampling(TorusSamplingSchema):
 
 		fib_grid = np.column_stack((t , p))
 
-		sigma_t = distribution_options[0].state
-		sigma_p = distribution_options[1].state
-		correlation = distribution_options[2].state
+		mean_x = distribution_options[0].state
+		mean_y = distribution_options[1].state
+		sigma_t = distribution_options[2].state
+		sigma_p = distribution_options[3].state
+		correlation = distribution_options[4].state
 
 		Cov = np.array([
 			[sigma_t**2, correlation * sigma_t * sigma_p],
 			[correlation * sigma_t * sigma_p, sigma_p**2]
 		])
 		
-		gaus_grid = self.transform_grid_gaussian(fib_grid, np.pi, Cov)
+		gaus_grid = self.transform_grid_gaussian(fib_grid, (mean_x, mean_y), Cov)
 
 		# wrapp
 		gaus_grid[:,0] = gaus_grid[:,0] % (2 * np.pi)
@@ -65,6 +67,7 @@ class TorusFibRank1WNSampling(TorusSamplingSchema):
 
 		gaus = gaus.T # (L,2)
 
-		gaus += mu # mu = [pi, pi]
+		gaus[:,0] += mu[0]
+		gaus[:,1] += mu[1]
 
 		return gaus

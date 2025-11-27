@@ -1,8 +1,8 @@
-from util.selectors.slider_float import FloatSlider 
 import numpy as np
 from scipy.stats import multivariate_normal
 
-
+from util.selectors.slider_float import FloatSlider 
+from util.selectors.slider_pi import PiSlider
 from model.distributions.cylinder.cylinder_distribution import CylinderDistribution
 from model.distributions.cylinder.partially_wraped_normal.random import CylinderRandomPWNSampling
 from model.cylinder.cylinder import Cylinder
@@ -10,6 +10,8 @@ from model.cylinder.cylinder import Cylinder
 class PartiallyWrappedNormalDistribution(CylinderDistribution):
 	def __init__(self):
 		self.distribution_options = [
+			PiSlider("Mean x (μₓ)", 0, 1, 2),
+			PiSlider("Mean y (μᵧ)", 0, 1, 2),
 			FloatSlider("Sigma x (σₓ)", 0, 0.5, 5.0),
 			FloatSlider("Sigma y (σᵧ)", 0, 0.5, 1.0),
 			FloatSlider("Correlation (ρ)", -1, 0.1, 1),
@@ -22,16 +24,18 @@ class PartiallyWrappedNormalDistribution(CylinderDistribution):
 		return "Partially Wrapped Normal"
 
 	def get_pdf(self, distribution_options):
-		sigma_x = distribution_options[0].state
-		sigma_y = distribution_options[1].state
-		correlation = distribution_options[2].state
+		mean_x = distribution_options[0].state
+		mean_y = distribution_options[1].state
+		sigma_x = distribution_options[2].state
+		sigma_y = distribution_options[3].state
+		correlation = distribution_options[4].state
 
 		Cov = np.array([
 			[sigma_x**2, correlation * sigma_x * sigma_y],
 			[correlation * sigma_x * sigma_y, sigma_y**2]
 		])
 
-		mean = np.array([np.pi, np.pi])
+		mean = np.array([mean_x, mean_y])
 
 		dist = multivariate_normal(mean=mean, cov=Cov, allow_singular=True)
 
