@@ -13,7 +13,7 @@ from util.selectors.slider import Slider
 
 class Cylinder(Manifold):
 	def __init__(self, resolution=100, r=1):
-		self.xyz = self.generate_xyz(resolution, 0.999)
+		self.xyz = self.generate_xyz(resolution, 0.998, r_height=1)
 		self.mesh = np.array([])
 		self.samples = np.array([])
 		self.samples_2d = np.array([])
@@ -44,13 +44,21 @@ class Cylinder(Manifold):
 			center=dict(x=0, y=0, z=0),
 		)
 
-	def generate_xyz(self, resolution=50, r=1):
+	def generate_xyz(self, resolution=50, r=1, r_height=None):
+		if r_height is None: # allow pointionally setting height different from radius
+			r_height = r	 # usefull for making cylinders slightly thinner so mesh doesnt interfere
+			
+
 		p = np.linspace(0, 2*np.pi, resolution)
 		z = np.linspace(0, 2*np.pi, resolution)
 		t,p = np.meshgrid(p,z)
 
+		x = r * np.cos(t)
+		y = r * np.sin(t)
+		z = r_height * p
 
-		return self.p_z_to_xyz(t, p, r)
+
+		return x, y, z
 	
 	def update_sample(self, selected_distribution, selected_sampling_method, sample_options, distribution_options):
 		dist = self.distributions[selected_distribution]
@@ -98,7 +106,17 @@ class Cylinder(Manifold):
 	
 	def _init_mesh(self, resolution=3000):
 		pz = CylinderFibUniformSampling.sample(None, [Slider("Number of Samples", 10, resolution, resolution)] , [])
-		pz[:, 1] = -0.1 + (pz[:, 1]) * 1.1 # extend slightly beyond [0, 2pi] so the top and bottom looks better
+		#pz[:, 1] = -0.1 + (pz[:, 1]) * 1.1 # extend slightly beyond [0, 2pi] so the top and bottom looks better
+
+		# add ring at top and bottom
+		z_bottom = 0
+		z_top = 2 * np.pi
+		num_points_ring = int(np.sqrt(resolution))
+		for j in range(num_points_ring):
+			p = (j / num_points_ring) * 2 * np.pi
+			pz = np.vstack((pz, np.array([p, z_bottom])))
+			pz = np.vstack((pz, np.array([p, z_top])))
+
 		x, y, z = self.p_z_to_xyz(pz[:,0], pz[:,1], self.r)
 
 		simplices = Delaunay(pz).simplices
@@ -128,12 +146,12 @@ class Cylinder(Manifold):
 		simplices_merged = np.unique(simplices_merged, axis=0)
 
 		# throw away points at bottom so they dont stretch across
-		eps = 1e-2
-		ok_mask_no_across = (pz[:, 1] > 0 + eps) & (pz[:, 1] < (2 * np.pi - eps))
-		ok_idx_no_across = np.where(ok_mask_no_across)[0]
-		good_vertices_no_across = np.isin(simplices_merged, ok_idx_no_across)
-		good_triangles_no_across = good_vertices_no_across.all(axis=1)
-		simplices_merged = simplices_merged[good_triangles_no_across]
+		# eps = 1e-2
+		# ok_mask_no_across = (pz[:, 1] > 0 + eps) & (pz[:, 1] < (2 * np.pi - eps))
+		# ok_idx_no_across = np.where(ok_mask_no_across)[0]
+		# good_vertices_no_across = np.isin(simplices_merged, ok_idx_no_across)
+		# good_triangles_no_across = good_vertices_no_across.all(axis=1)
+		# simplices_merged = simplices_merged[good_triangles_no_across]
 
 
 
