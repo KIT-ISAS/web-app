@@ -22,6 +22,10 @@ class Object3DRenderer:
 			'responsive': True,
 			'scrollZoom': True,
 			"modeBarButtonsToRemove": ["select2d", "lasso2d"],
+			"toImageButtonOptions": {
+				"format": "png",
+				"scale": 4,
+			}
 		}
 		if self.object.samples.size and self.object.samples.shape[0] != 0:
 			sample_count = self.object.samples.shape[0]
