@@ -1,28 +1,33 @@
-from abc import ABC, abstractmethod
 import numpy as np
-from scipy.stats import norm
 
-from model.distributions.cylinder.uniform.fibonacci_rank_1 import CylinderFibRank1UniformSampling
-from util.selectors.slider_fib import SliderFib
-from model.distributions.torus.torus_sampling_schema import TorusSamplingSchema
+from util.selectors.silder_log import LogSlider
+from model.distributions.cylinder.cylinder_sampling_schema import CylinderSamplingSchema
 from util.selectors.silder_manual_input_wrapper import SliderManualInputWrapper as MI
 from util.gaus_util import GausUtil as gu
 
-class TorusFibRank1WNSampling(TorusSamplingSchema):
+
+class CylinderFibKroneckerPWNSampling(CylinderSamplingSchema):
 	def __init__(self):
 		self.sample_options = [
-			MI(SliderFib("Number of Samples", 2, 34, 21, 9))
+			MI(LogSlider("Number of Samples", 10, 100, 10000))
 		]
-		self.sampler = CylinderFibRank1UniformSampling()
 
 	def get_name(self):
-		return "Fibonacci-Rank-1 Lattice"
+		return "Fibonacci-Kronecker Lattice"
 	
 	def sample(self, sample_options, distribution_options):
 		# see https://isas.iar.kit.edu/pdf/Fusion21_Frisch.pdf
 		sample_count = sample_options[0].state
 
-		t, p = self.sampler.get_rank_1(sample_count, sample_options[0].idx)
+		indices = np.arange(0, sample_count)
+		gol = (1+5**0.5)/2
+		
+		# centered rank-1 lattice generator
+		equidistant_generator = (2 * indices + 1) / (2 * sample_count)
+		
+		t = equidistant_generator
+		p = (indices / gol) % 1
+
 
 		fib_grid = np.column_stack((t , p))
 
@@ -41,8 +46,4 @@ class TorusFibRank1WNSampling(TorusSamplingSchema):
 
 		# wrapp
 		gaus_grid[:,0] = gaus_grid[:,0] % (2 * np.pi)
-		gaus_grid[:,1] = gaus_grid[:,1] % (2 * np.pi)
 		return gaus_grid
-
-
-	

@@ -5,6 +5,9 @@ from util.selectors.slider_float import FloatSlider
 from util.selectors.slider_pi import PiSlider
 from model.distributions.cylinder.cylinder_distribution import CylinderDistribution
 from model.distributions.cylinder.partially_wraped_normal.random import CylinderRandomPWNSampling
+from model.distributions.cylinder.partially_wraped_normal.fibonacci_rank_1 import CylinderFibRank1PWNSampling
+from model.distributions.cylinder.partially_wraped_normal.fibonacci_kronecker import CylinderFibKroneckerPWNSampling
+from model.distributions.cylinder.partially_wraped_normal.cartesian import CylinderFibCartPWNSampling
 from model.cylinder.cylinder import Cylinder
 
 class PartiallyWrappedNormalDistribution(CylinderDistribution):
@@ -18,6 +21,9 @@ class PartiallyWrappedNormalDistribution(CylinderDistribution):
 		]
 		self.sampling_methods = [
 			CylinderRandomPWNSampling(),
+			CylinderFibRank1PWNSampling(),
+			CylinderFibKroneckerPWNSampling(),
+			CylinderFibCartPWNSampling(),
 		]
 
 	def get_name(self):

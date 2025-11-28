@@ -29,8 +29,11 @@ class Object3DRenderer:
 		}
 		if self.object.samples.size and self.object.samples.shape[0] != 0:
 			sample_count = self.object.samples.shape[0]
-			marker_size = (10 * (sample_count / 100) ** (-0.35)) / self.device_pixel_ratio
-			marker_size = np.minimum(10,marker_size)
+			if sample_count == 0:
+				marker_size = 4 # default
+			else:
+				marker_size = (10 * (sample_count / 100) ** (-0.35)) / self.device_pixel_ratio
+				marker_size = np.minimum(10,marker_size)
 		else:
 			marker_size = 4
 

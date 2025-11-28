@@ -6,6 +6,8 @@ from util.selectors.slider_pi import PiSlider
 from model.distributions.torus.torus_distribution import TorusDistribution
 from model.distributions.torus.wrapped_normal.random import TorusRandomWrappedSampling
 from model.distributions.torus.wrapped_normal.fibonacci import TorusFibRank1WNSampling
+from model.distributions.torus.wrapped_normal.fibonacci_kronecker import TorusFibKroneckerWNSampling
+from model.distributions.torus.wrapped_normal.cartesian import TorusFibCartWNSampling
 from model.torus.torus import Torus
 class UniformTorusDistribution(TorusDistribution):
 	def __init__(self):
@@ -19,6 +21,8 @@ class UniformTorusDistribution(TorusDistribution):
 		self.sampling_methods = [
 			TorusRandomWrappedSampling(),
 			TorusFibRank1WNSampling(),
+			TorusFibKroneckerWNSampling(),
+			TorusFibCartWNSampling(),
 		]
 		
 

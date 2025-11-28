@@ -4,11 +4,11 @@ from scipy.stats import norm
 
 from model.distributions.cylinder.uniform.fibonacci_rank_1 import CylinderFibRank1UniformSampling
 from util.selectors.slider_fib import SliderFib
-from model.distributions.torus.torus_sampling_schema import TorusSamplingSchema
+from model.distributions.cylinder.cylinder_sampling_schema import CylinderSamplingSchema
 from util.selectors.silder_manual_input_wrapper import SliderManualInputWrapper as MI
 from util.gaus_util import GausUtil as gu
 
-class TorusFibRank1WNSampling(TorusSamplingSchema):
+class CylinderFibRank1PWNSampling(CylinderSamplingSchema):
 	def __init__(self):
 		self.sample_options = [
 			MI(SliderFib("Number of Samples", 2, 34, 21, 9))
@@ -41,7 +41,7 @@ class TorusFibRank1WNSampling(TorusSamplingSchema):
 
 		# wrapp
 		gaus_grid[:,0] = gaus_grid[:,0] % (2 * np.pi)
-		gaus_grid[:,1] = gaus_grid[:,1] % (2 * np.pi)
+
 		return gaus_grid
 
 
