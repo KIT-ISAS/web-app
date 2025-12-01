@@ -12,8 +12,7 @@ from util.selectors.slider import Slider
 class Sphere(Manifold):
 	def __init__(self, resolution=200, radius=0.999):
 		self.xyz = self.generate_xyz(resolution, radius)
-		self.mesh = np.array([])
-		self.samples = np.array([])
+
 		self.distributions = DistributionLoader(SphereDistribution, "model.distributions.sphere").get_distributions()
 
 
@@ -35,7 +34,7 @@ class Sphere(Manifold):
 	def update_sample(self, selected_distribution, selected_sampling_method, sample_options, distribution_options):
 		dist = self.distributions[selected_distribution]
 		sampling_method = dist.sampling_method_dict[selected_sampling_method]
-		self.samples = sampling_method.sample(sample_options, distribution_options)
+		return (sampling_method.sample(sample_options, distribution_options), None)
 
 
 	def generate_mesh(self, pdf, alpha=1):

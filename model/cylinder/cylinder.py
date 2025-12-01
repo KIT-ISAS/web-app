@@ -14,9 +14,7 @@ from util.selectors.slider import Slider
 class Cylinder(Manifold):
 	def __init__(self, resolution=100, r=1):
 		self.xyz = self.generate_xyz(resolution, 0.998, r_height=1)
-		self.mesh = np.array([])
-		self.samples = np.array([])
-		self.samples_2d = np.array([])
+
 		self.distributions = DistributionLoader(CylinderDistribution, "model.distributions.cylinder").get_distributions()
 
 		self.r = r
@@ -66,13 +64,16 @@ class Cylinder(Manifold):
 		new_sample = sampling_method.sample(sample_options, distribution_options)
 
 		if (new_sample is None) or new_sample.size == 0:
-			self.samples = np.empty((0, 3), dtype=float)
-			return
+			samples = np.empty((0, 3), dtype=float)
+			samples_2d = np.empty((0, 2), dtype=float)
+			return (samples, samples_2d)
 
 		x, y, z = self.p_z_to_xyz(new_sample[:,0], new_sample[:,1], self.r)
 
-		self.samples = np.column_stack((x, y, z))
-		self.samples_2d = new_sample
+		samples = np.column_stack((x, y, z))
+		samples_2d = new_sample
+
+		return (samples, samples_2d)
 
 
 	@staticmethod
@@ -144,16 +145,6 @@ class Cylinder(Manifold):
 		# merge both halves
 		simplices_merged = np.vstack((simplices, simplices_2))
 		simplices_merged = np.unique(simplices_merged, axis=0)
-
-		# throw away points at bottom so they dont stretch across
-		# eps = 1e-2
-		# ok_mask_no_across = (pz[:, 1] > 0 + eps) & (pz[:, 1] < (2 * np.pi - eps))
-		# ok_idx_no_across = np.where(ok_mask_no_across)[0]
-		# good_vertices_no_across = np.isin(simplices_merged, ok_idx_no_across)
-		# good_triangles_no_across = good_vertices_no_across.all(axis=1)
-		# simplices_merged = simplices_merged[good_triangles_no_across]
-
-
 
 		def cf(xi, yi, zi, zmin=np.min(z), zmax=np.max(z)):
 			if zi > zmax:

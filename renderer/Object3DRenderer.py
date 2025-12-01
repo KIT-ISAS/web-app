@@ -27,15 +27,8 @@ class Object3DRenderer:
 				"scale": 4,
 			}
 		}
-		if self.object.samples.size and self.object.samples.shape[0] != 0:
-			sample_count = self.object.samples.shape[0]
-			if sample_count == 0:
-				marker_size = 4 # default
-			else:
-				marker_size = (10 * (sample_count / 100) ** (-0.35)) / self.device_pixel_ratio
-				marker_size = np.minimum(10,marker_size)
-		else:
-			marker_size = 4
+		
+		marker_size = 4 # initial size, will be updated based on samples
 
 		self.fig = go.Figure(
 			data=[
@@ -48,9 +41,9 @@ class Object3DRenderer:
 				),
 				go.Scatter3d(
 					name="Samples",
-					x=self.object.samples[:, 0] if self.object.samples.size else [],
-					y=self.object.samples[:, 1] if self.object.samples.size else [],
-					z=self.object.samples[:, 2] if self.object.samples.size else [],
+					x=[],
+					y=[],
+					z=[],
 					mode="markers",
 					marker=dict(
 						size=marker_size,
@@ -284,21 +277,21 @@ class Object3DRenderer:
 			opt.update_state(new_state)
 
 		# samples 
-		self.object.update_sample(selected_distribution, selected_sampling, sampling_options, dist_options)
+		samples, _ = self.object.update_sample(selected_distribution, selected_sampling, sampling_options, dist_options)
 
 
 		patched_figure = Patch()
 
 
-		patched_figure["data"][1].x = self.object.samples[:, 0]
-		patched_figure["data"][1].y = self.object.samples[:, 1]
-		patched_figure["data"][1].z = self.object.samples[:, 2]
+		patched_figure["data"][1].x = samples[:, 0]
+		patched_figure["data"][1].y = samples[:, 1]
+		patched_figure["data"][1].z = samples[:, 2]
 
 		# set size based on number of samples
-		if self.object.samples.size == 0:
+		if samples.size == 0:
 			marker_size = 0 
 		else:
-			sample_count = self.object.samples.shape[0]
+			sample_count = samples.shape[0]
 			marker_size = (10 * (sample_count / 100) ** (-0.35)) / dpr
 			marker_size = np.minimum(10,marker_size) 
 		

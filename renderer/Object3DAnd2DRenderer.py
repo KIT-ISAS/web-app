@@ -194,13 +194,13 @@ class Object3DAnd2DRenderer(Object3DRenderer):
 			opt.update_state(new_state)
 
 		# samples 
-		self.object.update_sample(selected_distribution, selected_sampling, sampling_options, dist_options)
+		samples, samples_2d = self.object.update_sample(selected_distribution, selected_sampling, sampling_options, dist_options)
 
 		patched_figure = Patch()
-		tp = self.object.samples_2d
+		tp = samples_2d
 
 		# marker size scaling
-		sample_count = self.object.samples.shape[0]
+		sample_count = samples.shape[0]
 		if sample_count == 0:
 			marker_size = 0 # no samples, no size
 		else:
