@@ -2902,9 +2902,8 @@ description = "A Python 3 package for inferential statistics on vectorial data o
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
-files = [
-    {file = "sphstat-1.0.6.tar.gz", hash = "sha256:e085b097bc8f49a9287c62672dc26906b21b70febf62bc822d455969e5b1241c"},
-]
+files = []
+develop = false
 
 [package.dependencies]
 matplotlib = "*"
@@ -2914,6 +2913,12 @@ pandas = "*"
 scipy = "*"
 setuptools = ">=65.5.1"
 sympy = "*"
+
+[package.source]
+type = "git"
+url = "https://github.com/Vlad-Kor/sphstat"
+reference = "HEAD"
+resolved_reference = "fad7f8779d4b4f8eeccae0f5e1e2ed6dd7280a22"
 
 [[package]]
 name = "sympy"
@@ -3251,4 +3256,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.11"
-content-hash = "b4e51cf951334efcb04908fd8b8e3e4137a37f7bc95f5c816ccbe5fe4dca95f0"
+content-hash = "c82a202be54f6a4615afad2b04cd40b613894e842671ea77f3c43239bade1539"

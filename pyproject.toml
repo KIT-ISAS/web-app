@@ -18,7 +18,7 @@ dependencies = [
     "dash-resizable-panels (>=0.1.0,<0.2.0)",
     "scipy (>=1.13,<2.0)",
     "gunicorn (>=23.0.0,<24.0.0)",
-    "sphstat (>=1.0.6,<2.0.0)",
+    "sphstat @ git+https://github.com/Vlad-Kor/sphstat",
     "pyrecest @ git+https://github.com/KIT-ISAS/pyRecEst.git@002c7757e2a5a81e4e57da5c1b657c5f9bd5cf6e",
     "kent-distribution @ git+https://github.com/Vlad-Kor/kent_distribution",
     "sympy (>=1.14.0,<2.0.0)",
