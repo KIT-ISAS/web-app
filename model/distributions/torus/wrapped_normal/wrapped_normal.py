@@ -9,7 +9,7 @@ from model.distributions.torus.wrapped_normal.fibonacci import TorusFibRank1WNSa
 from model.distributions.torus.wrapped_normal.fibonacci_kronecker import TorusFibKroneckerWNSampling
 from model.distributions.torus.wrapped_normal.cartesian import TorusFibCartWNSampling
 from model.torus.torus import Torus
-class UniformTorusDistribution(TorusDistribution):
+class WrappedNormalTorusDistribution(TorusDistribution):
 	def __init__(self):
 		self.distribution_options = [
 			PiSlider("Mean p (μₚ)", 0, 1, 2),
