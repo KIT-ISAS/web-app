@@ -24,7 +24,7 @@ class Object3DRenderer:
 			"modeBarButtonsToRemove": ["select2d", "lasso2d"],
 			"toImageButtonOptions": {
 				"format": "png",
-				"scale": 4,
+				"scale": 8,
 			}
 		}
 		
