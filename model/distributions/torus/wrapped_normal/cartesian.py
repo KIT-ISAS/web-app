@@ -29,7 +29,7 @@ class TorusFibCartWNSampling(TorusSamplingSchema):
 
 		n = int(np.sqrt(sample_count))
 
-		grid = cu.generate_cartesian_grid(n, (2 * np.pi, 2 * np.pi))
+		grid = cu.generate_cartesian_grid(n, (1.0, 1.0))
 
 		mean_x = distribution_options[0].state
 		mean_y = distribution_options[1].state
@@ -48,6 +48,3 @@ class TorusFibCartWNSampling(TorusSamplingSchema):
 		gaus_grid[:,0] = gaus_grid[:,0] % (2 * np.pi)
 		gaus_grid[:,1] = gaus_grid[:,1] % (2 * np.pi)
 		return gaus_grid
-
-
-	

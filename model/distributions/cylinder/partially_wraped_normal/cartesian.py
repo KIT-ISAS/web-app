@@ -29,7 +29,7 @@ class CylinderFibCartPWNSampling(CylinderSamplingSchema):
 
 		n = int(np.sqrt(sample_count))
 
-		grid = cu.generate_cartesian_grid(n, (2 * np.pi, 2 * np.pi))
+		grid = cu.generate_cartesian_grid(n, (1.0, 1.0))
 
 		mean_x = distribution_options[0].state
 		mean_y = distribution_options[1].state
@@ -44,7 +44,7 @@ class CylinderFibCartPWNSampling(CylinderSamplingSchema):
 		
 		gaus_grid = gu.transform_grid_gaussian(grid, (mean_x, mean_y), Cov)
 
-		# wrapp
+		# wrap
 		gaus_grid[:,0] = gaus_grid[:,0] % (2 * np.pi)
 		return gaus_grid
 
