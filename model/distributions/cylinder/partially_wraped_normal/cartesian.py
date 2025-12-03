@@ -17,7 +17,6 @@ class CylinderFibCartPWNSampling(CylinderSamplingSchema):
 		self.sampler = CylinderFibRank1UniformSampling()
 		self.info_md = """
 		> Warning: Using the Cartesian Grid is not recomended in practise, as it yields bad results.
-		> Sample count may appear off due to samples overlapping.
 		> It is included for demonstration purposes only."""
 
 	def get_name(self):
