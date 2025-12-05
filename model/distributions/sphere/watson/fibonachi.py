@@ -26,13 +26,8 @@ class WatsonFibonachiSampling(SphereSamplingSchema):
 
 
 	def sample(self, sample_options, distribution_options):
-		kappa = distribution_options[0].state
-		if kappa < 0:
-			return self.sample_closed(sample_options, distribution_options)
-		elif kappa < 30:
-			return self.sample_inverse_ode(sample_options, distribution_options)
-		else:
-			return self.sample_inverse_interpolation(sample_options, distribution_options)
+		return self.sample_closed(sample_options, distribution_options)
+		
 	def sample_inverse_interpolation(self, sample_options, distribution_options):
 		kappa = distribution_options[0].state
 		sample_count = sample_options[0].state
@@ -149,30 +144,42 @@ class WatsonFibonachiSampling(SphereSamplingSchema):
 		x_i_f_2 = np.sqrt(1-w**2) * np.sin( (2 * np.pi * indices) / gold_seq)
 		x_i_f = np.column_stack((x_i_f_1, x_i_f_2, x_i_f_0)) # order so that mu=[0, 0, 1]
 		return x_i_f
-
+	
 	@staticmethod
-	def erfi_inv(x):
-			x = np.asarray(x, dtype=float)
+	def erfi_inv(y, iters=8, thresh=1.5):
+		y = np.asarray(y, dtype=float)
+		sgn = np.sign(y)
+		z = np.abs(y)
 
-			def _scalar_inv(y):
-				if y == 0.0:
-					return 0.0
-				sgn = 1.0 if y > 0 else -1.0
-				y = abs(y)
+		x = np.zeros_like(z)
+		mask = z > 0
+		if not np.any(mask):
+			return x  # all zeros
 
-				# Find an upper bracket hi with erfi(hi) >= y (erfi is monotone)
-				hi = max(1.0, 0.5 * np.sqrt(np.pi) * y)  # decent first guess
-				while erfi(hi) < y:
-					hi *= 2.0
-					if hi > 30:  # erfi(30) is huge
-						break
+		z_nz = z[mask]
+		x0 = np.empty_like(z_nz)
 
-				# Solve g(t) = erfi(t) - y = 0 on [0, hi]
-				g = lambda t: erfi(t) - y
-				t = scipy.optimize.brentq(g, 0.0, hi, xtol=1e-12, rtol=1e-12, maxiter=200)
-				return sgn * t
+		# Small region: Taylor
+		small = z_nz <= thresh
+		large = ~small
 
-			return np.vectorize(_scalar_inv, otypes=[float])(x)
+		x0[small] = z_nz[small] * np.sqrt(np.pi) / 2.0
+
+		# Large region: leading asymptotic, ignoring 1/x
+		if np.any(large):
+			t = np.log(z_nz[large] * np.sqrt(np.pi))
+			t = np.maximum(t, 0.0)
+			x0[large] = np.sqrt(t)
+
+		# Newton
+		x_new = x0
+		for _ in range(iters):
+			fx = erfi(x_new) - z_nz
+			dfx = 2.0 / np.sqrt(np.pi) * np.exp(x_new**2)
+			x_new = x_new - fx / dfx
+
+		x[mask] = x_new
+		return sgn * x
 
 
 	def sample_closed(self, sample_options, distribution_options):
