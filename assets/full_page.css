@@ -11,3 +11,35 @@
 	flex-direction: column;
 	min-height: 0;
 }
+
+
+#panelgroup-parent-container {
+  min-height: 0;
+}
+
+.split-pane-group {
+  height: 100%;
+}
+
+@media (min-width: 768px) {
+	.split-pane-handle {
+		cursor: col-resize;
+	}
+}
+
+/* < md: "mobile" layout */
+@media (max-width: 767.98px) {
+	.split-pane-group {
+		flex-direction: column !important;
+	}
+
+
+	.split-pane-left .bg-light {
+		max-height: 40vh;
+		overflow-y: auto;
+	}
+
+	.split-pane-handle {
+		display: none !important; /* no resize on mobile */
+	}
+}

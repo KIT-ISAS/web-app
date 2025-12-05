@@ -11,6 +11,7 @@ def SplitPane(children1, children2, default_size):
 			children=[
 				Panel(
 					id='left-sidebar',
+					className="split-pane-left",
 					minSizePercentage=15,
 					defaultSizePercentage=default_size,
 					children=[
@@ -22,6 +23,7 @@ def SplitPane(children1, children2, default_size):
 				),
 				PanelResizeHandle(
 					id='resize-handle',
+					className="split-pane-handle",
 					style={
 						"flex": "0 0 20px",
 						"margin": "0 -10px",
@@ -34,12 +36,13 @@ def SplitPane(children1, children2, default_size):
 				),
 				Panel(
 					id='plot-panel',
+					className="split-pane-right",
 					minSizePercentage=15,
 					children=children2,
 				)
 			], 
 			direction='horizontal',
-			className='w-100 px-0 pb-2',
+			className='split-pane-group w-100 px-0 pb-2',
 			style={'minHeight': '0'}
 		)
 	], 

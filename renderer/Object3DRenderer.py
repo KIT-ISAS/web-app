@@ -74,11 +74,13 @@ class Object3DRenderer:
 			uirevision=f"object-3d-{self.id}",
 		)
 
+		# Keep legend overlayed in the corner so it does not steal width from narrow layouts
 		self.fig.update_layout(legend=dict(
 			yanchor="top",
-			y=0.99,
-			xanchor="right",
-			x=0.1,
+			y=0.98,
+			xanchor="left",
+			x=0.02,
+			bgcolor="rgba(255,255,255,0.7)"
 		))
 
 		if (self.object.camera_settings_3d is not None):

@@ -56,7 +56,7 @@ fig.update_xaxes(range=rangx, tickmode='array', tickvals=list(range(rangx[0], ra
 fig.update_yaxes(range=rangy, tickmode='array', tickvals=list(range(rangy[0], rangy[1]+1)), scaleanchor="x", scaleratio=1)
 fig.update_layout(transition_duration=100, transition_easing='linear')
 fig.update_scenes(camera_projection_type="orthographic")
-fig.update_scenes(aspectmode="cube")
+fig.update_scenes(aspectmode="auto")
 # fig.update_scenes(xaxis_nticks=1)
 # fig.update_scenes(yaxis_nticks=1)
 fig.update_scenes(zaxis_nticks=1)
@@ -64,12 +64,12 @@ fig.update_layout(margin=dict(l=0, r=0, t=0, b=0, pad=0))
 
 fig.update_layout(
 	legend=dict(
-		orientation="v",
-		yanchor="top",
-		y=0.99,
-		xanchor="right",
-		x=0.1,
-	)
+			yanchor="top",
+			y=0.98,
+			xanchor="left",
+			x=0.02,
+			bgcolor="rgba(255,255,255,0.7)"
+		)
 )
 
 config = {
