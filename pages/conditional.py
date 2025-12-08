@@ -74,7 +74,7 @@ fig.update_layout(
 
 config = {
 	'toImageButtonOptions': {
-		'format': 'png',  # png, svg, pdf, jpeg, webp
+		'format': 'jpeg',  # png, svg, pdf, jpeg, webp
 		'width':  None,   # None: use currently-rendered size
 		'height': None,
 		'filename': 'conditional',

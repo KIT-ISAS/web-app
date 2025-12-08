@@ -23,7 +23,7 @@ class Object3DRenderer:
 			'scrollZoom': True,
 			"modeBarButtonsToRemove": ["select2d", "lasso2d"],
 			"toImageButtonOptions": {
-				"format": "png",
+				"format": "jpeg",
 				"scale": 8,
 			}
 		}
