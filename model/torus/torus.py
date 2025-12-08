@@ -5,7 +5,7 @@ from scipy.spatial import Delaunay
 from model.distributions.distribution_loader import DistributionLoader
 from model.distributions.torus.torus_distribution import TorusDistribution
 from model.manifold import Manifold
-from renderer.PlotSettings2d import PlotSettings2D
+from renderer.plot_settings_2d import PlotSettings2D
 from model.distributions.cylinder.uniform.fibonacci_rank_1 import CylinderFibRank1UniformSampling
 from util.selectors.slider_fib import SliderFib
 

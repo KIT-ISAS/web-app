@@ -2,7 +2,7 @@ from dash import html, dcc, callback, Input, Output, ALL, State, Patch, no_updat
 import numpy as np
 import plotly.graph_objects as go
 
-from renderer.Object3DRenderer import Object3DRenderer
+from renderer.object_3D_renderer import Object3DRenderer
 
 class Object3DAnd2DRenderer(Object3DRenderer):
 	def __init__(self, object, id):

@@ -4,7 +4,9 @@ import numpy as np
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
 import dash
-class Object3DRenderer:
+
+from renderer.renderer import Renderer
+class Object3DRenderer(Renderer):
 	def __init__(self, object_3D, id, register_3d_callbacks=True):
 		# dash doesnt like duplicate calback functions
 		# so each renderer instance gets a uuid for suffixing

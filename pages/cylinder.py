@@ -8,7 +8,7 @@ import numpy as np
 
 from components.split_pane import SplitPane
 from model.cylinder.cylinder import Cylinder
-from renderer.Object3DAnd2DRenderer import Object3DAnd2DRenderer
+from renderer.object_3D_and_2D_renderer import Object3DAnd2DRenderer
 
 
 dash.register_page(__name__)

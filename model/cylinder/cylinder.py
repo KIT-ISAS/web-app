@@ -7,7 +7,7 @@ from scipy.spatial import Delaunay
 from model.distributions.distribution_loader import DistributionLoader
 from model.distributions.cylinder.cylinder_distribution import CylinderDistribution
 from model.manifold import Manifold
-from renderer.PlotSettings2d import PlotSettings2D
+from renderer.plot_settings_2d import PlotSettings2D
 from model.distributions.cylinder.uniform.fibonacci_kronecker import CylinderFibUniformSampling
 from util.selectors.slider import Slider
 

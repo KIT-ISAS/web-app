@@ -8,7 +8,7 @@ import numpy as np
 
 from components.split_pane import SplitPane
 from model.sphere.sphere import Sphere
-from renderer.Object3DRenderer import Object3DRenderer
+from renderer.object_3D_renderer import Object3DRenderer
 
 dash.register_page(__name__)
 
