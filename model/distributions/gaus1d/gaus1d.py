@@ -9,7 +9,6 @@ from scipy.special import erfinv
 from pathlib import Path
 
 from components.popup_box import PopupBox
-
 from model.selfcontained_distribution import SelfContainedDistribution
 
 class Gaus1D(SelfContainedDistribution):
