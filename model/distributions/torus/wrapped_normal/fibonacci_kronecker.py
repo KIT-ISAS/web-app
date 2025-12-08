@@ -20,13 +20,15 @@ class TorusFibKroneckerWNSampling(TorusSamplingSchema):
 		sample_count = sample_options[0].state
 
 		indices = np.arange(0, sample_count)
+		indices_p1 = np.arange(0, sample_count + 1)
 		gol = (1+5**0.5)/2
 		
 		# centered rank-1 lattice generator
 		equidistant_generator = (2 * indices + 1) / (2 * sample_count)
 		
 		t = equidistant_generator
-		p = (indices / gol) % 1
+		p = (indices_p1 / gol) % 1
+		p = p[1:]
 
 
 		fib_grid = np.column_stack((t , p))
