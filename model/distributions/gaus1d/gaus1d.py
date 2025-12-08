@@ -1,0 +1,180 @@
+import plotly
+import dash
+from dash import dcc, html, Input, Output, callback, Patch
+import plotly.graph_objects as go
+import dash_bootstrap_components as dbc
+from numpy import sqrt, linspace, vstack, pi, nan, full, exp, square, sort, arange, array
+from numpy.random import randn, randint
+from scipy.special import erfinv
+
+from components.popup_box import PopupBox
+
+from model.distributions.gaus1d.info_text import info_text
+from model.selfcontained_distribution import SelfContainedDistribution
+
+class Gaus1D(SelfContainedDistribution):
+	def __init__(self):
+		self.methods = ['iid', 'Golden-Sequence', 'Equidistant', 'Unscented']
+
+		self.config = {
+			'toImageButtonOptions': {
+				'format': 'svg',  # png, svg, pdf, jpeg, webp
+				'height': None,   # None: use currently-rendered size
+				'width': None,
+				'filename': 'gauss2d',
+			},
+			'modeBarButtonsToRemove': ['zoom'],
+			'scrollZoom': True,
+		}
+
+		self.rang = [-5, 5]
+		self.col_density = plotly.colors.qualitative.Plotly[1]
+		self.col_samples = plotly.colors.qualitative.Plotly[0]
+
+
+		self.settings_layout =[
+			dbc.Container(
+				dbc.Col([
+					html.P("Select Sampling Method:"),
+					html.Br(),
+
+					# Sampling Strategy RadioItems
+					dbc.RadioItems(id='gauss1D-smethod',
+								options=[{"label": x, "value": x} for x in self.methods],
+								value=self.methods[randint(len(self.methods))],
+								inline=True),
+
+					html.Br(),
+					html.Hr(),
+					html.Br(),
+
+					# param Slider
+					dcc.Slider(id="gauss1D-p", min=0, max=1, value=randint(3, 7)/10,
+							tooltip={"template": "p={value}", "placement": "bottom", "always_visible": True}, updatemode='drag', marks=None),
+
+					# L Slider
+					dcc.Slider(id="gauss1D-L", min=0, max=100, step=1, value=randint(5, 25),
+							tooltip={"template": "L={value}", "placement": "bottom", "always_visible": True}, updatemode='drag', marks=None),
+
+					# μ Slider
+					dcc.Slider(id="gauss1D-μ", min=-5, max=5, step=0.01, value=randint(-20, 20)/10,
+							tooltip={"template": "µ={value}", "placement": "bottom", "always_visible": True}, updatemode='drag', marks=None),
+
+					# σ Slider
+					dcc.Slider(id="gauss1D-σ", min=0, max=5, step=0.01, value=randint(5, 20)/10,
+							tooltip={"template": 'σ={value}', "placement": "bottom", "always_visible": True}, updatemode='drag', marks=None),
+
+					html.Hr(),
+					html.Br(),
+
+					# Info Popup
+					*PopupBox("gauss1D-info", "Learn More", "Additional Information", info_text),
+					
+
+				])
+			, 
+			fluid=True, 
+			className="g-0"
+			)
+		]
+		self.plot_layout = [
+			dcc.Graph(id="gauss1D-graph", config=self.config, style={'height': '100%'}),
+		]
+
+		self._register_callbacks()
+
+	def _register_callbacks(self):
+		@callback(
+			Output('gauss1D-p', 'min'),
+			Output('gauss1D-p', 'max'),
+			Output('gauss1D-p', 'value'),
+			Output('gauss1D-p', 'step'),
+			Output('gauss1D-p', 'tooltip'),
+			Output('gauss1D-L', 'disabled'),
+			Input("gauss1D-smethod", "value"),
+		)
+		def update_smethod(smethod):
+			patched_tooltip = Patch()
+			match smethod:
+				case 'iid':
+					patched_tooltip.template = "dice"
+					return 0, 1, .5, 0.001, patched_tooltip, False
+				case 'Golden-Sequence':
+					patched_tooltip.template = "z={value}"
+					return -50, 50, 0, 1, patched_tooltip, False
+				case 'Equidistant':
+					patched_tooltip.template = "γ={value}"
+					return -1, 1, 0, 0.001, patched_tooltip, False
+				case 'Unscented':
+					patched_tooltip.template = "{value}"
+					return 0, 2, 1, 0.001, patched_tooltip, True
+				case _:
+					raise Exception("Wrong smethod")
+
+
+		@callback(
+			Output("gauss1D-graph", "figure"),
+			Input("gauss1D-smethod", "value"),
+			Input("gauss1D-p", "value"),
+			Input("gauss1D-L", "value"),
+			Input("gauss1D-μ", "value"),
+			Input("gauss1D-σ", "value"),
+		)
+		def update(smethod, p, L, μ, σ):
+			fig = go.Figure() # TODO use Patch here too
+
+			if σ == 0:
+				# Dirac Delta
+				fig.add_trace(go.Scatter(x=[self.rang[0], μ, μ, μ, self.rang[1]], y=[0, 0, 1, 0, 0], hoverinfo='skip', line={'width': 5}, name='Dirac Delta', marker_color=self.col_density, showlegend=True))
+				if L > 0:
+					fig.add_trace(go.Scatter(x=[μ, μ], y=[0, 1], name='Samples', mode='lines', marker_color=self.col_samples, showlegend=True))
+			else:
+				# Draw Samples
+				xGauss = None
+				match smethod:
+					case 'iid':
+						# xUni = sort(rand(L))
+						xGauss = sort(randn(L)*σ + μ)
+					case 'Golden-Sequence':
+						xUni = (sqrt(5)-1)/2 * (arange(L)+1+round(p)) % 1
+					case 'Equidistant':
+						xUni = (2*arange(L)+1+p)/(2*L)
+					case 'Unscented':
+						# TODO scaled unscented etc
+						xGauss = array([μ-σ, μ+σ])  # TODO parameter
+					case _:
+						raise Exception("Wrong smethod")
+				# Transform Samples
+				if xGauss is None:
+					xGauss = σ*sqrt(2)*erfinv(2*xUni-1) + μ
+				L2 = len(xGauss)
+				sample_height = full([1, L2], self.gauss1(0, 0, σ))
+				# sample_height = full([1, L], 1/L)
+				# Plot Density
+				s = linspace(self.rang[0], self.rang[1], 500)
+				# https://plotly.com/python-api-reference/generated/plotly.graph_objects.Scatter.html
+				# TODO lighter fillcolor: fillcolor=matplotlib.colors.to_rgba('#aabbcc80')
+				fig.add_trace(go.Scatter(x=s, y=self.gauss1(s, μ, σ), hoverinfo='skip', line={'width': 5}, line_shape='spline', name='Density', fill='tozeroy', marker_color=self.col_density, showlegend=True))
+				# Plot Samples
+				xp = vstack((xGauss, xGauss, full([1, L2], nan))).T.flatten()
+				yp = vstack((full([1, L2], 0), sample_height, full([1, L2], nan))).T.flatten()
+				fig.add_trace(go.Scatter(x=xp, y=yp, name='Samples', mode='lines', marker_color=self.col_samples, showlegend=True))
+			# Style
+			fig.update_xaxes(range=self.rang, tickmode='array', tickvals=list(range(-5, 6)))
+			fig.update_yaxes(range=[0, None], fixedrange=True)
+			fig.update_layout(legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1))
+			fig.update_layout(dragmode="pan")
+
+			fig.update_layout(
+				legend=dict(
+					orientation="v",
+					xanchor="right",
+					x=0.1,
+				)
+			)
+			return fig
+		
+	@staticmethod
+	def gauss1(x, μ, σ):
+		return 1/sqrt(2*pi*σ) * exp(-1/2 * square((x-μ)/σ))
+
