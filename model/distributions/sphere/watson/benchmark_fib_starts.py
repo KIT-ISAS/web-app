@@ -9,7 +9,7 @@ from model.distributions.sphere.watson.fibonachi import WatsonFibonachiSampling
 from util.selectors.slider_float import FloatSlider
 import pyperf
 import statistics
-
+import numpy as np
 
 sampler = WatsonFibonachiSampling()
 methods = {
@@ -56,16 +56,36 @@ def bench_multiple_sample_counts(kappa):
 			all_results[name].append((sample_count, bench))
 	return all_results
 
+def bench_multiple_sample_counts_log(kappa):
+	all_results = {}
+	sample_counts = np.unique(np.logspace(2, 5, num=90, dtype=int))
+	for sample_count in sample_counts:
+		res = bench_single_kappa(kappa, sample_count, f"Multiple Sample Counts Log (kappa={kappa}, sample_count={sample_count})")
+		for name, bench in res.items():
+			if name not in all_results:
+				all_results[name] = []
+			all_results[name].append((sample_count, bench))
+	return all_results
 
-def plot_benches(results, title, x_label):
+
+def plot_benches(results, title, filename, x_label, log_x=False, log_y=False):
 	import plotly.express as px
 	try:
 		if x_label == "sample_count":
 			rows = [dict(name=n, sample_count=k, time=t.mean()) for n, pts in results.items() for k, t in pts]
 		else:
 			rows = [dict(name=n, kappa=k, time=t.mean()) for n, pts in results.items() for k, t in pts]
-		fig = px.line(rows, x=x_label, y="time", color="name", markers=True, title=title)
-		fig.write_image(f"{title.replace(' ', '_').replace(':', '')}.svg")
+		fig = px.line(
+			rows,
+			x=x_label,
+			y="time",
+			color="name",
+			markers=True,
+			title=title,
+			log_x=log_x,
+			log_y=log_y,
+		)
+		fig.write_image(f"{filename.replace(' ', '_').replace(':', '')}.svg")
 	except Exception as e:
 		print("Generating plot failed, dumping data:", e)
 		print(results.items())
@@ -76,13 +96,22 @@ def plot_benches(results, title, x_label):
 
 if __name__ == "__main__":
 	runner = pyperf.Runner()
+	
+
 	mult_kappa = bench_multiple_kappa()
-	mult_samples_neg_10 = bench_multiple_sample_counts(-10)
-	mult_samples_10 = bench_multiple_sample_counts(10)
+	#mult_samples_neg_10 = bench_multiple_sample_counts(-10)
+	#mult_samples_10 = bench_multiple_sample_counts(10)
+	log_mult_samples_10 = bench_multiple_sample_counts_log(10)
+	log_mult_samples_neg_10 = bench_multiple_sample_counts_log(-10)
+	
 
 	if not runner.args.worker:
-		plot_benches(mult_kappa, "time taken for various kappa values (10000 samples)", "kappa")
-		plot_benches(mult_samples_neg_10, "time taken for various sample counts (kappa=-10)", "sample_count")
-		plot_benches(mult_samples_10, "time taken for various sample counts (kappa=10)", "sample_count")
+		plot_benches(mult_kappa, "time taken for various kappa values (10000 samples)", "time taken for various kappa values (10000 samples)", "kappa")
+		plot_benches(mult_kappa, "time taken for various kappa values log scale (10000 samples)", "time taken for various kappa values log scale (10000 samples)", "kappa", log_y=True)
 		
-	
+		#plot_benches(mult_samples_10, "time taken for various sample counts (kappa=10)", "time taken for various sample counts (kappa=10)", "sample_count")
+		plot_benches(log_mult_samples_10, "time taken for various sample counts (kappa=10)", "time taken for various sample counts log scale (kappa=10)", "sample_count", log_x=True, log_y=True)
+
+		#plot_benches(mult_samples_neg_10, "time taken for various sample counts (kappa=-10)", "time taken for various sample counts (kappa=-10)", "sample_count")
+		plot_benches(log_mult_samples_neg_10, "time taken for various sample counts (kappa=-10)", "time taken for various sample counts log scale (kappa=-10)", "sample_count", log_x=True, log_y=True)
+
