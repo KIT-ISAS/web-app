@@ -11,7 +11,7 @@ from util.gaus_util import GausUtil as gu
 class CylinderFibRank1PWNSampling(CylinderSamplingSchema):
 	def __init__(self):
 		self.sample_options = [
-			MI(SliderFib("Number of Samples", 2, 34, 21, 9))
+			MI(SliderFib("Number of Samples", 3, 33, 21, 9, minus_1=True))
 		]
 		self.sampler = CylinderFibRank1UniformSampling()
 
@@ -20,9 +20,9 @@ class CylinderFibRank1PWNSampling(CylinderSamplingSchema):
 	
 	def sample(self, sample_options, distribution_options):
 		# see https://isas.iar.kit.edu/pdf/Fusion21_Frisch.pdf
-		sample_count = sample_options[0].state
+		sample_count = sample_options[0].state + 1  # because minus_1 is true slider displays fib(n)-1
 
-		t, p = self.sampler.get_rank_1(sample_count, sample_options[0].idx)
+		t, p = self.sampler.get_rank_1(sample_count, sample_options[0].idx, without_first_point=True)
 
 		fib_grid = np.column_stack((t , p))
 

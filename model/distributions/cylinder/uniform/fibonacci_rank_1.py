@@ -23,7 +23,7 @@ class CylinderFibRank1UniformSampling(CylinderSamplingSchema):
 		return np.column_stack((p * 2 * np.pi, z * 2 * np.pi))
 	
 	@staticmethod
-	def get_rank_1(sample_count, k):
+	def get_rank_1(sample_count, k, without_first_point=False):
 		indices = np.arange(0, sample_count)
 		
 		# centered rank-1 lattice
@@ -32,5 +32,9 @@ class CylinderFibRank1UniformSampling(CylinderSamplingSchema):
 		
 		z = (indices * (1/F_k_p_1) + (1/(2*F_k_p_1)) ) % 1
 		p = (indices * (F_k/F_k_p_1) + (1/(2*F_k_p_1)) ) % 1
+
+		if without_first_point:
+			z = z[1:]
+			p = p[1:]
 
 		return z, p
