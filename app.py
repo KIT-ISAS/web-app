@@ -4,7 +4,7 @@ from dash import Dash, html
 import dash_bootstrap_components as dbc
 
 # Usage Locally:
-# $ python app.py
+# $ poetry run python app.py
 
 # select theme
 # https://dash-bootstrap-components.opensource.faculty.ai/docs/themes/
