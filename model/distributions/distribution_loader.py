@@ -25,7 +25,11 @@ class DistributionLoader:
 		for finder, name, ispkg in pkgutil.walk_packages(pkg.__path__, prefix=pkg.__name__ + "."):
 			if "benchmark" in name:
 				continue
-			module = importlib.import_module(name)
+			try:
+				module = importlib.import_module(name)
+			except Exception as e:
+				print(f"Could not import distribution module '{name}': {e}")
+				continue
 
 			for _, obj in inspect.getmembers(module, inspect.isclass):
 				# skip abstract, parametered intervace and non-subclasses
