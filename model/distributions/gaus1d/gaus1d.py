@@ -6,10 +6,10 @@ import dash_bootstrap_components as dbc
 from numpy import sqrt, linspace, vstack, pi, nan, full, exp, square, sort, arange, array
 from numpy.random import randn, randint
 from scipy.special import erfinv
+from pathlib import Path
 
 from components.popup_box import PopupBox
 
-from model.distributions.gaus1d.info_text import info_text
 from model.selfcontained_distribution import SelfContainedDistribution
 
 class Gaus1D(SelfContainedDistribution):
@@ -31,6 +31,10 @@ class Gaus1D(SelfContainedDistribution):
 		self.col_density = plotly.colors.qualitative.Plotly[1]
 		self.col_samples = plotly.colors.qualitative.Plotly[0]
 
+
+		path = Path(__file__).parent / "info_text.md"
+		with open(path, 'r') as f:
+			self.info_text = dcc.Markdown(f.read(), mathjax=True)
 
 		self.settings_layout =[
 			dbc.Container(
@@ -68,7 +72,7 @@ class Gaus1D(SelfContainedDistribution):
 					html.Br(),
 
 					# Info Popup
-					*PopupBox("gauss1D-info", "Learn More", "Additional Information", info_text),
+					*PopupBox("gauss1D-info", "Learn More", "Additional Information", self.info_text),
 					
 
 				])
