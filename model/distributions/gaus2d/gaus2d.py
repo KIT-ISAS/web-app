@@ -71,7 +71,7 @@ class Gaus2D(SelfContainedDistribution):
 					hoverinfo='skip', 
 					line={'width': 3}, 
 					line_shape='linear', 
-					fill='tozerox'
+					fill='toself'
 				),
 				go.Scattergl(
 					name='Samples', 
