@@ -3,13 +3,15 @@ import plotly
 import dash
 import pandas
 from urllib.error import HTTPError
-from dash import dcc, html, Input, Output, callback, Patch
+from dash import dcc, html, Input, Output, callback, Patch, ctx, no_update
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
+import numpy as np
 from numpy import sqrt, linspace, vstack, hstack, pi, nan, full, exp, square, arange, array, sin, cos, diff, matmul, log10, deg2rad, identity, ones, zeros, diag, cov, mean
 from numpy.random import randn, randint
 from numpy.linalg import cholesky, eig, det, inv
 from scipy.special import erfinv
+
 
 from components.popup_box import PopupBox
 from model.selfcontained_distribution import SelfContainedDistribution
@@ -141,6 +143,10 @@ class Gaus2D(SelfContainedDistribution):
 					# ρ Slider
 					dcc.Slider(id="gauss2D-ρ", min=-1, max=1, step=0.001, value=0, updatemode='drag', marks=None,
 							tooltip={"template": 'ρ={value}', "placement": "bottom", "always_visible": True}),
+					
+					# ρ Slider
+					dcc.Slider(id="angle", min=0, max=180, step=2, value=0, updatemode='drag', marks=None,
+							tooltip={"template": 'angle={value}°', "placement": "bottom", "always_visible": True}),
 
 					html.Hr(),
 					html.Br(),
@@ -194,6 +200,10 @@ class Gaus2D(SelfContainedDistribution):
 
 		@callback(
 			Output("gauss2D-graph", "figure"),
+			Output("gauss2D-σx", "value"),
+			Output("gauss2D-σy", "value"),
+			Output("gauss2D-ρ", "value"),
+			Output("angle", "value"),
 			Input("gauss2D-smethod", "value"),
 			Input("gauss2D-tmethod", "value"),
 			Input("gauss2D-p", "value"),
@@ -201,15 +211,51 @@ class Gaus2D(SelfContainedDistribution):
 			Input("gauss2D-σx", "value"),
 			Input("gauss2D-σy", "value"),
 			Input("gauss2D-ρ", "value"),
+			Input("angle", "value"),
 		)
-		def update(smethod, tmethod, p, L0, σx, σy, ρ):
+		def update(smethod, tmethod, p, L0, sigma_x, sigma_y, rho, angle):
+			trig = ctx.triggered_id
+
+			def _rot2d(angle_deg):
+				a = np.deg2rad(angle_deg)
+				c, s = np.cos(a), np.sin(a)
+				return np.array([[c, -s],
+								[s,  c]], dtype=float)
+			
+			
+			
+
+			if trig == "angle":
+				R = _rot2d(angle)
+				C = np.array([[sigma_x**2, sigma_x*sigma_y*rho],
+							  [sigma_x*sigma_y*rho, sigma_y**2]])
+				w, _ = np.linalg.eigh(C)
+				w = np.sort(w)[::-1]
+				C_rot = R @ np.diag(w) @ R.T
+				sigma_x = np.sqrt(C_rot[0, 0])
+				sigma_y = np.sqrt(C_rot[1, 1])
+				if sigma_x > 0:
+					rho = C_rot[0, 1] / (sigma_x * sigma_y)
+				else:
+					rho = 0.0
+				silder_changes = (sigma_x, sigma_y, rho, no_update)
+			else:
+				if np.isclose(rho, 0) and np.isclose(sigma_x, sigma_y):
+					angle = 0.0
+				else:
+					angle = 0.5 * np.arctan2(2 * rho * sigma_x * sigma_y, sigma_x**2 - sigma_y**2)
+					angle = np.rad2deg(angle)
+					angle = angle % 180
+				silder_changes = (no_update, no_update, no_update, angle)
+				
+
 			# Slider Transform,
 			L = self.trafo_L(L0)
 			# Mean
 			# μ = array([[μx], [μy]])
 			μ = array([[0], [0]])
 			# Covariance
-			C = array([[square(σx), σx*σy*ρ], [σx*σy*ρ, square(σy)]])
+			C = array([[square(sigma_x), sigma_x*sigma_y*rho], [sigma_x*sigma_y*rho, square(sigma_y)]])
 			C_D, C_R = eig(C)
 			C_D = C_D[..., None]  # to column vector
 
@@ -271,7 +317,6 @@ class Gaus2D(SelfContainedDistribution):
 				else:
 					weights = weights.flatten()
 				sizes = sqrt(abs(weights) * L2) * det(2*pi*C)**(1/4) / sqrt(L2) * 70
-			# print(hstack((cov(xyG, bias=True, aweights=weights), C)))
 			# Plot Ellipse
 			elp = matmul(C_R, sqrt(C_D) * self.circ) + μ
 			patched_fig['data'][0]['x'] = elp[0, :]
@@ -281,7 +326,7 @@ class Gaus2D(SelfContainedDistribution):
 			patched_fig['data'][1]['y'] = xyG[1, :]
 			patched_fig['data'][1]['marker']['size'] = sizes
 			patched_fig['data'][1]['marker']['line']['width'] = sizes/20
-			return patched_fig
+			return patched_fig, *silder_changes
 
 	
 	@staticmethod
