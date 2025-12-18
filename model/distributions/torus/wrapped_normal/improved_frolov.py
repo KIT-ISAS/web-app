@@ -39,4 +39,5 @@ class IFrolovWNSampling(TorusSamplingSchema):
 
 		# wrapp
 		gaus_grid[:,0] = gaus_grid[:,0] % (2 * np.pi)
+		gaus_grid[:,1] = gaus_grid[:,1] % (2 * np.pi)
 		return gaus_grid
