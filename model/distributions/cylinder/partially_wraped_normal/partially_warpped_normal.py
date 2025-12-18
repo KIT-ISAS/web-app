@@ -8,6 +8,9 @@ from model.distributions.cylinder.partially_wraped_normal.random import Cylinder
 from model.distributions.cylinder.partially_wraped_normal.fibonacci_rank_1 import CylinderFibRank1PWNSampling
 from model.distributions.cylinder.partially_wraped_normal.fibonacci_kronecker import CylinderFibKroneckerPWNSampling
 from model.distributions.cylinder.partially_wraped_normal.cartesian import CylinderFibCartPWNSampling
+from model.distributions.cylinder.partially_wraped_normal.frolov import CFrolovPWNSampling
+from model.distributions.cylinder.partially_wraped_normal.improved_frolov import IFrolovPWNSampling
+
 from model.cylinder.cylinder import Cylinder
 
 class PartiallyWrappedNormalDistribution(CylinderDistribution):
@@ -24,6 +27,8 @@ class PartiallyWrappedNormalDistribution(CylinderDistribution):
 			CylinderFibRank1PWNSampling(),
 			CylinderFibKroneckerPWNSampling(),
 			CylinderFibCartPWNSampling(),
+			CFrolovPWNSampling(),
+			IFrolovPWNSampling(),
 		]
 
 	def get_name(self):
