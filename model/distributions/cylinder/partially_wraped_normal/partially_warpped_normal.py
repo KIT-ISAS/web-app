@@ -10,6 +10,7 @@ from model.distributions.cylinder.partially_wraped_normal.fibonacci_kronecker im
 from model.distributions.cylinder.partially_wraped_normal.cartesian import CylinderFibCartPWNSampling
 from model.distributions.cylinder.partially_wraped_normal.frolov import CFrolovPWNSampling
 from model.distributions.cylinder.partially_wraped_normal.improved_frolov import IFrolovPWNSampling
+from model.distributions.cylinder.partially_wraped_normal.fibonacci_frolov import FFrolovPWNSampling
 
 from model.cylinder.cylinder import Cylinder
 
@@ -29,6 +30,7 @@ class PartiallyWrappedNormalDistribution(CylinderDistribution):
 			CylinderFibCartPWNSampling(),
 			CFrolovPWNSampling(),
 			IFrolovPWNSampling(),
+			FFrolovPWNSampling(),
 		]
 
 	def get_name(self):

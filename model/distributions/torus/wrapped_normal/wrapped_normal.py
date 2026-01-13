@@ -10,6 +10,7 @@ from model.distributions.torus.wrapped_normal.fibonacci_kronecker import TorusFi
 from model.distributions.torus.wrapped_normal.cartesian import TorusFibCartWNSampling
 from model.distributions.torus.wrapped_normal.frolov import CFrolovWNSampling
 from model.distributions.torus.wrapped_normal.improved_frolov import IFrolovWNSampling
+from model.distributions.torus.wrapped_normal.fibonacci_frolov import FFrolovWNSampling
 from model.torus.torus import Torus
 class WrappedNormalTorusDistribution(TorusDistribution):
 	def __init__(self):
@@ -27,6 +28,7 @@ class WrappedNormalTorusDistribution(TorusDistribution):
 			TorusFibCartWNSampling(),
 			CFrolovWNSampling(),
 			IFrolovWNSampling(),
+			FFrolovWNSampling(),
 		]
 		
 
