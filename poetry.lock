@@ -746,7 +746,7 @@ vtk = "*"
 
 [[package]]
 name = "deterministic-gaussian-sampling-fibonacci"
-version = "0.2.1"
+version = "0.2.2"
 description = "Deterministic sampling via orthogonal inverse transform of low-discrepancy Fibonacci grids."
 optional = false
 python-versions = ">=3.10"
@@ -763,7 +763,7 @@ scipy = {version = ">=1.15,<1.16", markers = "python_version < \"3.11\""}
 type = "git"
 url = "https://github.com/KIT-ISAS/deterministic_gaussian_sampling_fibonacci"
 reference = "HEAD"
-resolved_reference = "6d6e940a5eb4753835a43ff338bac5a8e9be8792"
+resolved_reference = "4d06e05460e108f19dd2f3eea37f61001cfdb8b3"
 
 [[package]]
 name = "dill"
