@@ -59,7 +59,7 @@ class Object3DAnd2DRenderer(Object3DRenderer):
 					x=self.color_heatmap_x,
 					y=self.color_heatmap_y,
 					z=np.zeros((100,100)),
-					colorscale="Viridis",
+					colorscale="cividis",
 					zmin=0.0,
 					zmax=1.0,
 					zsmooth="best",
