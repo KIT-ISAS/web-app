@@ -175,7 +175,6 @@ class Gaus2D(SelfContainedDistribution):
 			Output('gauss2D-p', 'step'),
 			Output('gauss2D-p', 'tooltip'),
 			Output('gauss2D-L', 'disabled'),
-			Output('gauss2D-tmethod', 'className'),
 			Output('gauss2D-p', 'className'), # to hide when not needed
 			Input("gauss2D-smethod", "value"),
 		)
@@ -186,28 +185,28 @@ class Gaus2D(SelfContainedDistribution):
 				case 'iid':
 					patched_tooltip.template = "dice"
 					# min, max, value, step, tooltip
-					return 0, 1, .5, 0.001, patched_tooltip, False, 'visible', 'visible'
+					return 0, 1, .5, 0.001, patched_tooltip, False, 'visible'
 				case 'Fibonacci':
 					patched_tooltip.template = "z={value}"
-					return -50, 50, 0, 1, patched_tooltip, False, 'visible', 'visible'
+					return -50, 50, 0, 1, patched_tooltip, False, 'visible'
 				case 'LCD':
 					patched_tooltip.template = "α={value}°"
-					return -360, 360, 0, 0.1, patched_tooltip, False, 'visible', 'visible'
+					return -360, 360, 0, 0.1, patched_tooltip, False, 'visible'
 				case 'SP-Julier04':
 					patched_tooltip.template = "W₀={value}"
-					return -2, 1, .1, 0.001, patched_tooltip, True, 'visible', 'visible'
+					return -2, 1, .1, 0.001, patched_tooltip, True, 'visible'
 				case 'SP-Menegaz11':
 					patched_tooltip.template = "Wₙ₊₁={value}"
-					return 0, 1, 1/3, 0.001, patched_tooltip, True, 'visible', 'visible'
+					return 0, 1, 1/3, 0.001, patched_tooltip, True, 'visible'
 				case 'Classical Frolov':
 					patched_tooltip.always_visible = False
-					return no_update, no_update, no_update, no_update, patched_tooltip, False, 'invisible', 'invisible'
+					return no_update, no_update, no_update, no_update, patched_tooltip, False, 'invisible'
 				case 'Improved Frolov':
 					patched_tooltip.always_visible = False
-					return no_update, no_update, no_update, no_update, patched_tooltip, False, 'invisible', 'invisible'
+					return no_update, no_update, no_update, no_update, patched_tooltip, False, 'invisible'
 				case 'Fibonacci Frolov':
 					patched_tooltip.always_visible = False
-					return no_update, no_update, no_update, no_update, patched_tooltip, False, 'invisible', 'invisible'
+					return no_update, no_update, no_update, no_update, patched_tooltip, False, 'invisible'
 				case _:
 					raise Exception("Wrong smethod")
 
@@ -228,8 +227,6 @@ class Gaus2D(SelfContainedDistribution):
 			Input("angle", "value"),
 		)
 		def update(smethod, tmethod, p, L0, sigma_x, sigma_y, rho, angle):
-			if smethod in ['Classical Frolov', 'Improved Frolov', 'Fibonacci Frolov']:
-				tmethod = None
 			trig = ctx.triggered_id
 
 			def _rot2d(angle_deg):
@@ -318,11 +315,11 @@ class Gaus2D(SelfContainedDistribution):
 					method = smethod.replace(' ', '')
 					method = 'Fibonacci' if method == 'FibonacciFrolov' else method
 					if L > 0:
-						samples = dgsf.sample_gaussian_fibonacci(μ.flatten(), C, L, method)
+						grid = dgsf.get_uniform_grid(2, L, method)
 					else:
-						samples = np.empty((L, 2))
-					xyG = samples.T
-					
+						grid = np.empty((L, 2))
+					xyUni = grid.T
+					xySND = sqrt(2)*erfinv(2*xyUni-1)
 				case _:
 					raise Exception("Wrong smethod")
 			match tmethod:
@@ -330,12 +327,10 @@ class Gaus2D(SelfContainedDistribution):
 					xyG = matmul(cholesky(C), xySND) + μ
 				case 'Eigendecomposition':
 					xyG = matmul(C_R, sqrt(C_D) * xySND) + μ
-				case None:
-					pass
 				case _:
 					raise Exception("Wrong smethod")
 			# Sample weights to scatter sizes
-			L2 = xySND.shape[1] if tmethod is not None else xyG.shape[1]  # actual number of saamples
+			L2 = xySND.shape[1]  # actual number of saamples
 			if L2 == 0:
 				sizes = 10
 			else:
