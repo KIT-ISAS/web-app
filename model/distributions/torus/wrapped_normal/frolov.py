@@ -35,7 +35,7 @@ class CFrolovWNSampling(TorusSamplingSchema):
 			[correlation * sigma_t * sigma_p, sigma_p**2]
 		])
 		
-		gaus_grid = sample_gaussian_fibonacci(mu, Cov, sample_count, "ClassicalFrolov")
+		gaus_grid = gu.sample_frolov_gaussian(mu, Cov, sample_count, "ClassicalFrolov")
 
 		# wrapp
 		gaus_grid[:,0] = gaus_grid[:,0] % (2 * np.pi)

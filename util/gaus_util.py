@@ -1,5 +1,7 @@
 import numpy as np
 from scipy.stats import norm
+from deterministic_gaussian_sampling_fibonacci import get_uniform_grid
+
 
 class GausUtil:
 	@staticmethod
@@ -28,3 +30,9 @@ class GausUtil:
 		gaus[:,1] += mu[1]
 
 		return gaus
+	
+	@staticmethod
+	def sample_frolov_gaussian(mu, cov, sample_count, variant="ClassicalFrolov"):
+		grid = get_uniform_grid(2, sample_count, variant)
+		gaus_grid = GausUtil.transform_grid_gaussian(grid, mu, cov)
+		return gaus_grid
