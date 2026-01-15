@@ -156,23 +156,22 @@ class Object3DRenderer(Renderer):
 			prevent_initial_call=True,
 		)
 		def manual_input_changed(val, val_silder, selected_distribution, selected_sampling):
-			source = dash.ctx.triggered_id["type"]
+			triggered_id = dash.ctx.triggered_id
+			source = triggered_id["type"]
 
 			if val is None and source == "manual_input-sampling":
 				return no_update, no_update
 
 			sampling_options = self.object.distributions[selected_distribution].sampling_method_dict[selected_sampling].sample_options
 
-			# find the wrapper that called this
-			wrapper = None
-			for opt in sampling_options:
-				id = getattr(opt, "id", None)
-				if id is not None and id == dash.ctx.triggered_id["index"]:
-					wrapper = opt
-					break
-
-			if wrapper is None:
+			try:
+				index = int(triggered_id["index"])
+			except (TypeError, ValueError):
 				return no_update, no_update
+			if index < 0 or index >= len(sampling_options):
+				return no_update, no_update
+
+			wrapper = sampling_options[index]
 			
 			if source == "manual_input-sampling": # manual input changed, update slider
 
@@ -195,22 +194,22 @@ class Object3DRenderer(Renderer):
 			prevent_initial_call=True,
 		)
 		def manual_input_dist_changed(val_manual, val_slider, selected_distribution, selected_sampling):
-			source = dash.ctx.triggered_id["type"]
+			triggered_id = dash.ctx.triggered_id
+			source = triggered_id["type"]
 
 			if val_manual is None and source == "manual_input-dist":
 				return no_update, no_update
 
 			dist_options =  self.object.distributions[selected_distribution].distribution_options
 
-			wrapper = None
-			for opt in dist_options:
-				opt_id = getattr(opt, "id", None)
-				if opt_id is not None and opt_id == dash.ctx.triggered_id["index"]:
-					wrapper = opt
-					break
-
-			if wrapper is None:
+			try:
+				index = int(triggered_id["index"])
+			except (TypeError, ValueError):
 				return no_update, no_update
+			if index < 0 or index >= len(dist_options):
+				return no_update, no_update
+
+			wrapper = dist_options[index]
 
 			if source == "manual_input-dist":
 				# check_input is given by distribution/ sampling method, if None, no special constraints are given
