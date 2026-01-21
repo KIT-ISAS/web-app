@@ -22,7 +22,7 @@ class WatsonFibonachiSampling(SphereSamplingSchema):
 		]
 		
 	def get_name(self):
-		return "Fibonacci Lattice"
+		return "Fibonacci-Kronecker Lattice"
 
 
 	def sample(self, sample_options, distribution_options):

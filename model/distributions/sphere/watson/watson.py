@@ -10,6 +10,7 @@ from pyrecest.distributions import WatsonDistribution as WatsonDistributionPyrec
 from model.distributions.sphere.watson.random_sampling import WatsonRandomSampling
 from model.distributions.sphere.watson.fibonachi import WatsonFibonachiSampling
 from model.distributions.sphere.watson.cartesian import WatsonCartesianSampling
+from model.distributions.sphere.watson.fibonachi_rank1 import WatsonFibonachiRank1Sampling			
 
 
 class WatsonDistribution(SphereDistribution):
@@ -22,6 +23,7 @@ class WatsonDistribution(SphereDistribution):
 			WatsonRandomSampling(),
 			WatsonFibonachiSampling(),
 			WatsonCartesianSampling(),
+			WatsonFibonachiRank1Sampling(),
 		]
 
 	def get_name(self):
