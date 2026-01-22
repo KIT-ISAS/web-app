@@ -34,6 +34,17 @@ class WatsonRandomSampling(SphereSamplingSchema):
 		lamb, mu, nu = Sphere.spherical_to_cartesian(theta, phi)
 
 		samples = sphstat.distributions.watson(numsamp, lamb, mu, nu, kappa)["points"]
-		samples_array = np.vstack(samples)
-
-		return samples_array
+		if numsamp > 1:
+			m = len(samples)
+			n = m // 2
+			assert numsamp == n, "Unexpected number of samples generated"
+			rng = np.random.default_rng(None)
+			pts = np.vstack(samples)      # shape (2numsamp,3)
+			A = pts[:n]
+			B = pts[n:]
+			choose_B = rng.random(n) < 0.5
+			out = np.where(choose_B[:, None], B, A)
+			return out
+		else:
+			samples_array = np.vstack(samples)
+			return samples_array
