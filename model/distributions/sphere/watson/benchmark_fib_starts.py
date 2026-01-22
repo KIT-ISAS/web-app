@@ -5,6 +5,9 @@ sudo "$(poetry run which python)" -m pyperf system tune
 PYTHONPATH=$PWD poetry run python model/distributions/sphere/watson/benchmark_fib_starts.py
 '''
 
+import json
+from pathlib import Path
+import plotly.express as px
 from model.distributions.sphere.watson.fibonachi import WatsonFibonachiSampling
 from util.selectors.slider_float import FloatSlider
 import pyperf
@@ -30,7 +33,7 @@ def bench_single_kappa(kappa, sample_count, id):
 	results = {}
 	for method_name, method in methods.items():
 		bench_name = f"Watson Fibonacci Sampling: {method_name} (kappa={kappa}) [{id}]"
-		benchmark = runner.bench_func(bench_name, benchmark_kappa, method, kappa, sample_count, 5)
+		benchmark = runner.bench_func(bench_name, benchmark_kappa, method, kappa, sample_count, 1)
 		results[method_name] = benchmark
 
 	return results
@@ -68,29 +71,86 @@ def bench_multiple_sample_counts_log(kappa):
 	return all_results
 
 
-def plot_benches(results, title, filename, x_label, log_x=False, log_y=False):
-	import plotly.express as px
-	try:
-		if x_label == "sample_count":
-			rows = [dict(name=n, sample_count=k, time=t.mean()) for n, pts in results.items() for k, t in pts]
-		else:
-			rows = [dict(name=n, kappa=k, time=t.mean()) for n, pts in results.items() for k, t in pts]
-		fig = px.line(
-			rows,
-			x=x_label,
-			y="time",
-			color="name",
-			markers=True,
-			title=title,
-			log_x=log_x,
-			log_y=log_y,
+def _sanitize_filename(name):
+	return name.replace(" ", "_").replace(":", "")
+
+def _rows_from_results(results, x_label):
+	if x_label == "sample_count":
+		return [dict(name=n, sample_count=k, time=t.mean()) for n, pts in results.items() for k, t in pts]
+	if x_label == "kappa":
+		return [dict(name=n, kappa=k, time=t.mean()) for n, pts in results.items() for k, t in pts]
+	raise ValueError(f"Unsupported x_label: {x_label}")
+
+def _plot_rows(rows, title, filename, x_label, log_x=False, log_y=False):
+	fig = px.line(
+		rows,
+		x=x_label,
+		y="time",
+		color="name",
+		markers=True,
+		log_x=log_x,
+		log_y=log_y,
+	)
+	fig.update_layout(
+		legend=dict(
+			orientation="h",
+			yanchor="bottom",
+			y=1.02,
+			xanchor="left",
+			x=0,
 		)
-		fig.write_image(f"{filename.replace(' ', '_').replace(':', '')}.svg")
+	)
+	try:
+		fig.write_image(f"{_sanitize_filename(filename)}.svg")
 	except Exception as e:
 		print("Generating plot failed, dumping data:", e)
-		print(results.items())
+		print(rows)
 		print("Trying to save html as fallback")
-		fig.write_html(f"{title.replace(' ', '_').replace(':', '')}.html", include_plotlyjs="cdn", full_html=True)
+		fig.write_html(f"{_sanitize_filename(title)}.html", include_plotlyjs="cdn", full_html=True)
+
+def plot_benches(results, title=None, filename=None, x_label=None, log_x=None, log_y=None, json_filename=None):
+
+	if isinstance(results, (str, Path)):
+		json_path = Path(results)
+		with json_path.open("r", encoding="utf-8") as handle:
+			payload = json.load(handle)
+		rows = payload["rows"]
+		if title is None:
+			title = payload.get("title", json_path.stem)
+		if filename is None:
+			filename = payload.get("filename", json_path.stem)
+		if x_label is None:
+			x_label = payload.get("x_label")
+		if log_x is None:
+			log_x = payload.get("log_x", False)
+		if log_y is None:
+			log_y = payload.get("log_y", False)
+		if x_label is None:
+			raise ValueError("x_label is required when replotting from JSON")
+		_plot_rows(rows, title, filename, x_label, log_x=log_x, log_y=log_y)
+		return
+
+	if title is None or filename is None or x_label is None:
+		raise ValueError("title, filename, and x_label are required for raw benchmark data")
+	if log_x is None:
+		log_x = False
+	if log_y is None:
+		log_y = False
+
+	rows = _rows_from_results(results, x_label)
+	payload = {
+		"title": title,
+		"filename": filename,
+		"x_label": x_label,
+		"log_x": log_x,
+		"log_y": log_y,
+		"rows": rows,
+	}
+	if json_filename is None:
+		json_filename = f"{_sanitize_filename(filename)}.json"
+	with open(json_filename, "w", encoding="utf-8") as handle:
+		json.dump(payload, handle, indent=2, sort_keys=True)
+	_plot_rows(rows, title, filename, x_label, log_x=log_x, log_y=log_y)
 
 
 
@@ -114,4 +174,3 @@ if __name__ == "__main__":
 
 		#plot_benches(mult_samples_neg_10, "time taken for various sample counts (kappa=-10)", "time taken for various sample counts (kappa=-10)", "sample_count")
 		plot_benches(log_mult_samples_neg_10, "time taken for various sample counts (kappa=-10)", "time taken for various sample counts log scale (kappa=-10)", "sample_count", log_x=True, log_y=True)
-
