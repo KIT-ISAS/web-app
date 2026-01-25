@@ -75,10 +75,25 @@ def _sanitize_filename(name):
 	return name.replace(" ", "_").replace(":", "")
 
 def _rows_from_results(results, x_label):
+	def _to_builtin(value):
+		if isinstance(value, np.integer):
+			return int(value)
+		if isinstance(value, np.floating):
+			return float(value)
+		return value
+
 	if x_label == "sample_count":
-		return [dict(name=n, sample_count=k, time=t.mean()) for n, pts in results.items() for k, t in pts]
+		return [
+			dict(name=n, sample_count=_to_builtin(k), time=_to_builtin(t.mean()))
+			for n, pts in results.items()
+			for k, t in pts
+		]
 	if x_label == "kappa":
-		return [dict(name=n, kappa=k, time=t.mean()) for n, pts in results.items() for k, t in pts]
+		return [
+			dict(name=n, kappa=_to_builtin(k), time=_to_builtin(t.mean()))
+			for n, pts in results.items()
+			for k, t in pts
+		]
 	raise ValueError(f"Unsupported x_label: {x_label}")
 
 def _plot_rows(rows, title, filename, x_label, log_x=False, log_y=False):
