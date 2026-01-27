@@ -110,7 +110,7 @@ def _plot_rows(rows, title, filename, x_label, log_x=False, log_y=False):
 		markers=True,
 		log_x=log_x,
 		log_y=log_y,
-		labels={"time": "time in s"}, 
+		labels={"time": "time in s", "sample_count": "sample count"}, 
 	)
 	fig.update_layout(
 		legend=dict(
