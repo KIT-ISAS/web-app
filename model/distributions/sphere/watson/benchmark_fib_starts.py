@@ -3,6 +3,10 @@ Run this file directly from project root with:
 
 sudo "$(poetry run which python)" -m pyperf system tune
 PYTHONPATH=$PWD poetry run python model/distributions/sphere/watson/benchmark_fib_starts.py
+
+
+you can also plot from existing JSON files by setting the environment variable:
+PLOT_FROM_JSON=1 PYTHONPATH=$PWD poetry run python model/distributions/sphere/watson/benchmark_fib_starts.py
 '''
 
 import json
@@ -106,6 +110,7 @@ def _plot_rows(rows, title, filename, x_label, log_x=False, log_y=False):
 		markers=True,
 		log_x=log_x,
 		log_y=log_y,
+		labels={"time": "time in s"}, 
 	)
 	fig.update_layout(
 		legend=dict(
@@ -114,12 +119,14 @@ def _plot_rows(rows, title, filename, x_label, log_x=False, log_y=False):
 			y=1.02,
 			xanchor="left",
 			x=0,
-		)
+		),
+		font=dict(size=26),
 	)
 	if log_x:
 		fig.update_xaxes(dtick=1)
 	if log_y:
 		fig.update_yaxes(dtick=1)
+	fig.update_layout(legend_title_text="")
 
 	try:
 		fig.write_image(f"{_sanitize_filename(filename)}.svg")
