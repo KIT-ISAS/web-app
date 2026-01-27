@@ -6,6 +6,7 @@ PYTHONPATH=$PWD poetry run python model/distributions/sphere/watson/benchmark_fi
 '''
 
 import json
+import os
 from pathlib import Path
 import plotly.express as px
 from model.distributions.sphere.watson.fibonachi import WatsonFibonachiSampling
@@ -115,6 +116,11 @@ def _plot_rows(rows, title, filename, x_label, log_x=False, log_y=False):
 			x=0,
 		)
 	)
+	if log_x:
+		fig.update_xaxes(dtick=1)
+	if log_y:
+		fig.update_yaxes(dtick=1)
+
 	try:
 		fig.write_image(f"{_sanitize_filename(filename)}.svg")
 	except Exception as e:
@@ -170,6 +176,21 @@ def plot_benches(results, title=None, filename=None, x_label=None, log_x=None, l
 
 
 if __name__ == "__main__":
+	plot_from_json = os.getenv("PLOT_FROM_JSON")
+	if plot_from_json:
+		if plot_from_json != "1":
+			json_paths = [p.strip() for p in plot_from_json.split(",") if p.strip()]
+		else:
+			json_paths = [
+				f"{_sanitize_filename('time taken for various kappa values (10000 samples)')}.json",
+				f"{_sanitize_filename('time taken for various kappa values log scale (10000 samples)')}.json",
+				f"{_sanitize_filename('time taken for various sample counts log scale (kappa=10)')}.json",
+				f"{_sanitize_filename('time taken for various sample counts log scale (kappa=-10)')}.json",
+			]
+		for json_path in json_paths:
+			plot_benches(json_path)
+		raise SystemExit(0)
+
 	runner = pyperf.Runner()
 	
 

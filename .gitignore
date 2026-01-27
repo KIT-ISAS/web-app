@@ -162,3 +162,5 @@ cython_debug/
 #.kate-swp
  
 .vscode/
+time_taken_for_various*
+
