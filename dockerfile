@@ -2,7 +2,8 @@ FROM python:3.10.12 AS base
 
 WORKDIR /code
 
-RUN pip install --no-cache-dir poetry
+ARG POETRY_VERSION=2.3.1
+RUN pip install --no-cache-dir "poetry==${POETRY_VERSION}"
 COPY pyproject.toml poetry.lock /code/
 RUN poetry sync --no-root --without dev
 
