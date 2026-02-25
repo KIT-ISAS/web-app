@@ -1,0 +1,16 @@
+services:
+  web:
+    build: 
+      context: .
+      target: prod
+    image: web_app:latest
+    ports: 
+     - "8080:8080"
+    restart: unless-stopped
+
+  tests:
+    build:
+      context: .
+      target: tests
+    image: web_app:tests
+    profiles: ["test"]
