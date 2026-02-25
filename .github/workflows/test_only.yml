@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - vlad/devel
+      - main
+      - staging
 jobs:
   test:
     runs-on: ubuntu-latest
