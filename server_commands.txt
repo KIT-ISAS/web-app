@@ -1,4 +1,3 @@
-
 # Create server
 https://portal.bw-cloud.org/project/instances/
 https://www.bw-cloud.org/de/bwcloud_scope/nutzen
@@ -29,6 +28,27 @@ nohup python app.py &
 # Official production solution
 nohup gunicorn --bind 0.0.0.0:8080 --workers 32 app:server &
 TODO use daemon
+
+# install docker
+sudo apt update
+sudo apt install -y docker.io docker-compose
+sudo systemctl enable --now docker
+sudo usermod -aG docker $USER
+(then exit ssh and log back in)
+
+# run with docker 
+('docker-compose' for old docker version from debian repos, 'docker compose' for newer versions like ubuntu-latest github runner)
+docker-compose --profile default up -d --build
+
+run tests:
+docker compose --profile test build tests
+docker compose --profile test run --rm tests
+
+turn server off (not needed for updating image):
+docker compose down
+
+clean up onld images:
+docker image prune -a -f
 
 # Test in Browser
 http://193.196.39.120:8080

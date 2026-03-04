@@ -1,0 +1,50 @@
+from abc import ABC, abstractmethod
+import numpy as np
+import scipy
+import sphstat
+
+from model.distributions.sphere.sphere_sampling_schema import SphereSamplingSchema
+from util.selectors.silder_log import LogSlider
+from model.sphere.sphere import Sphere
+from util.selectors.silder_manual_input_wrapper import SliderManualInputWrapper as MI
+
+
+
+class WatsonRandomSampling(SphereSamplingSchema):
+	def __init__(self):
+		self.sample_options = [
+			MI(LogSlider("Number of Samples", 10, 100, 10000)),
+		]
+		
+	def get_name(self):
+		return "Random"
+	
+	def sample(self, sample_options, distribution_options):
+		kappa = distribution_options[0].state
+		
+		theta = 0 # can be hardcoded because the user can just turn the sphere
+		phi = 0
+
+		numsamp = sample_options[0].state
+		if kappa == 0: # become uniform distribution
+			samples = np.random.normal(size=(numsamp, 3))
+			samples /= np.linalg.norm(samples, axis=1)[:, np.newaxis]
+			return samples
+
+		lamb, mu, nu = Sphere.spherical_to_cartesian(theta, phi)
+
+		samples = sphstat.distributions.watson(numsamp, lamb, mu, nu, kappa)["points"]
+		if numsamp > 1:
+			m = len(samples)
+			n = m // 2
+			assert numsamp == n, "Unexpected number of samples generated"
+			rng = np.random.default_rng(None)
+			pts = np.vstack(samples)      # shape (2numsamp,3)
+			A = pts[:n]
+			B = pts[n:]
+			choose_B = rng.random(n) < 0.5
+			out = np.where(choose_B[:, None], B, A)
+			return out
+		else:
+			samples_array = np.vstack(samples)
+			return samples_array

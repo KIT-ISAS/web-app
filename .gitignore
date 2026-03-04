@@ -160,3 +160,7 @@ cython_debug/
 #.idea/
 
 #.kate-swp
+ 
+.vscode/
+time_taken_for_various*
+

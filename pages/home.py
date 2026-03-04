@@ -15,6 +15,7 @@ layout = dbc.Container([
 
         Version History:
         - 2024-04 | Daniel Frisch | gauss1d, gauss2d
+        - 2026-01 | Vlad Korsakov | sphere, torus, cylinder and improved UI
 
         TODO:
         - Sample Reduction

@@ -1,0 +1,23 @@
+/* Danger / error-style blockquote inside dcc.Markdown */
+blockquote {
+	border-left: 4px solid #e53935;
+	background-color: #ffebee;
+	padding: 1rem 1.25rem 1rem 2.7rem;
+	margin: 1rem 0;
+	color: #b71c1c;
+	border-radius: 6px;
+	position: relative;
+}
+
+/* Warning icon */
+blockquote::before {
+	content: "⚠";
+	position: absolute;
+	left: 0.9rem;
+	top: 0.9rem;
+	font-size: 1.1rem;
+}
+
+blockquote p {
+	margin: 0;
+}
