@@ -25,13 +25,13 @@ CMD ["poetry", "run", "pytest", "--headless"]
 FROM base AS prod
 
 
-#=== Select Appropriate Run Command [nano dockerfile] === 
+#=== Select ONE Appropriate Run Command [edit with: nano dockerfile] === 
 
-# For Test Server with Debug Capabilities
+# For Test Server, with Debug Capabilities in Browser
 CMD ["poetry", "run", "python", "app.py"]
 
-# For Test Server with Gunicorn 
+# For Test Server, with Gunicorn 
 # CMD ["poetry", "run", "gunicorn", "--workers", "1", "--bind", "0.0.0.0:8080", "app:server"]
 
-# For Production Server (needs enough RAM and CPU cores!) 
+# For PRODUCTION Server, (needs enough RAM and CPU cores!) 
 # CMD ["poetry", "run", "gunicorn", "--workers", "32", "--bind", "0.0.0.0:8080", "app:server"]

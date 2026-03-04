@@ -26,12 +26,13 @@ cd ./web-app
 git pull 
 
 # Optional: Edit Dockerfile 
-# nano dockerfile
+nano dockerfile
+# uncomment 32 cores only on server with enough resources 
 # Strg-S, Strg-X 
 
 # Main Command: Run with docker 
-('docker-compose' for old docker version from debian repos, 'docker compose' for newer versions like ubuntu-latest github runner)
-(This command starts the app. If a previous version is already running, it also shuts it down.) 
+# ('docker-compose' for old docker version from debian repos, 'docker compose' for newer versions like ubuntu-latest github runner)
+# (This command starts the app. If a previous version is already running, it also shuts it down.) 
 docker-compose --profile default up -d --build
 
 # Run tests
