@@ -6,60 +6,46 @@ https://www.bw-cloud.org/de/bwcloud_scope/nutzen
 Linux: ssh isas-interactive
 Windows: Puttygen -> Putty -> username "debian"
 
-# Update
-sudo apt-get dist-upgrade
 
 # Install
 sudo apt-get update
-sudo apt-get install git
-sudo apt-get install virtualenv
+sudo apt-get dist-upgrade
 
-sudo rm -r ./web-app
-git clone https://github.com/KIT-ISAS/web-app.git
-cd ./web-app
-virtualenv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-
-# Start
-# Python Environment (shouldn't be used on production server, but has debug messages)
-nohup python app.py &
-
-# Official production solution
-nohup gunicorn --bind 0.0.0.0:8080 --workers 32 app:server &
-TODO use daemon
-
-# install docker
-sudo apt update
+# Only once: Install Docker
 sudo apt install -y docker.io docker-compose
 sudo systemctl enable --now docker
 sudo usermod -aG docker $USER
 (then exit ssh and log back in)
 
-# run with docker 
+# Only Once: Git 
+sudo apt-get install git
+git clone https://github.com/KIT-ISAS/web-app.git
+
+# Continue here
+cd ./web-app
+git pull 
+
+# Optional: Edit Dockerfile 
+# nano dockerfile
+# Strg-S, Strg-X 
+
+# Main Command: Run with docker 
 ('docker-compose' for old docker version from debian repos, 'docker compose' for newer versions like ubuntu-latest github runner)
+(This command starts the app. If a previous version is already running, it also shuts it down.) 
 docker-compose --profile default up -d --build
 
-run tests:
+# Run tests
 docker compose --profile test build tests
 docker compose --profile test run --rm tests
 
-turn server off (not needed for updating image):
+# Turn server off (not needed for updating image):
 docker compose down
 
-clean up onld images:
+# Clean up onld images
 docker image prune -a -f
 
 # Test in Browser
-http://193.196.39.120:8080
+Test server: http://193.196.39.84:8080
+Production server: http://193.196.39.120:8080
 
-# Terminate old process
-ps
-pkill -9 python
-pkill -f gunicorn
-pkill -9 gunicorn
 
-# Update code from GitHub
-ssh isas-interactive
-cd ./web-app
-git pull

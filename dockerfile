@@ -23,4 +23,15 @@ COPY ./tests /code/tests
 CMD ["poetry", "run", "pytest", "--headless"]
 
 FROM base AS prod
-CMD ["poetry", "run", "gunicorn", "--workers", "1", "--bind", "0.0.0.0:8080", "app:server"]
+
+
+#=== Select Appropriate Run Command [nano dockerfile] === 
+
+# For Test Server with Debug Capabilities
+CMD ["poetry", "run", "python", "app.py"]
+
+# For Test Server with Gunicorn 
+# CMD ["poetry", "run", "gunicorn", "--workers", "1", "--bind", "0.0.0.0:8080", "app:server"]
+
+# For Production Server (needs enough RAM and CPU cores!) 
+# CMD ["poetry", "run", "gunicorn", "--workers", "32", "--bind", "0.0.0.0:8080", "app:server"]
